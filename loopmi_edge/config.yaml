@@ -1,12 +1,12 @@
 name: LoopMi Edge
-version: "0.1.9"
+version: "0.1.11"
 slug: loopmi_edge
 description: Production-grade LoopMi Edge runtime for Home Assistant Add-on.
 url: https://github.com/yaggii/LoopMi
 image: ghcr.io/yaggii/loopmi-edge
 startup: application
 boot: auto
-init: true
+init: false
 arch:
   - aarch64
 watchdog: http://[HOST]:5034/health
@@ -15,7 +15,6 @@ ports:
 ports_description:
   5034/tcp: LoopMi Edge REST API
 map:
-  - config:rw
   - addon_config:rw
 options: {}
 schema: {}

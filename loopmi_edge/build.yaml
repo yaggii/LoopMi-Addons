@@ -1,6 +1,0 @@
-build_from:
-  aarch64: ghcr.io/home-assistant/aarch64-base-debian:bookworm
-labels:
-  org.opencontainers.image.title: "LoopMi Edge Home Assistant Add-on"
-  org.opencontainers.image.description: "LoopMi Edge Native AOT runtime packaged as a Home Assistant Add-on."
-  org.opencontainers.image.source: "https://github.com/yaggii/LoopMi"
