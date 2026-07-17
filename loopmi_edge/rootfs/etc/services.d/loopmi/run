@@ -25,4 +25,10 @@ fi
 export ASPNETCORE_URLS="http://0.0.0.0:5034"
 export Measurements__DatabasePath="/data/loopmi-edge.db"
 
+if [ -n "${SUPERVISOR_TOKEN:-}" ]; then
+    export HomeAssistant__BaseUrl="http://supervisor"
+    export HomeAssistant__WebSocketPath="/core/websocket"
+    export HomeAssistant__LongLivedAccessToken="${SUPERVISOR_TOKEN}"
+fi
+
 exec /app/LoopMi.Edge
