@@ -1,5 +1,5 @@
 name: LoopMi Edge
-version: "0.2.0"
+version: "0.2.1"
 slug: loopmi_edge
 description: Production-grade LoopMi Edge runtime for Home Assistant Add-on.
 url: https://github.com/yaggii/LoopMi-Addons
