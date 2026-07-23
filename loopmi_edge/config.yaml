@@ -1,5 +1,5 @@
 name: LoopMi Edge
-version: "0.2.1"
+version: "0.2.2"
 slug: loopmi_edge
 description: Production-grade LoopMi Edge runtime for Home Assistant Add-on.
 url: https://github.com/yaggii/LoopMi-Addons
@@ -17,5 +17,9 @@ ports_description:
   5034/tcp: LoopMi Edge REST API
 map:
   - addon_config:rw
-options: {}
-schema: {}
+options:
+  registration_token: ""
+  cloud_base_url: ""
+schema:
+  registration_token: "password?"
+  cloud_base_url: "url?"

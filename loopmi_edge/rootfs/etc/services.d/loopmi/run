@@ -25,10 +25,32 @@ fi
 export ASPNETCORE_URLS="http://0.0.0.0:5034"
 export Measurements__DatabasePath="/data/loopmi-edge.db"
 
+# The client identity certificate/CA pin are written during registration and must survive addon
+# restarts/updates - /data is the persistent volume HA maps in, unlike the app's own working directory.
+export Provisioning__ClientIdentityPfxPath="/data/edge-identity.pfx"
+export Provisioning__CaCertificatePemPath="/data/loopmi-ca.pem"
+
 if [ -n "${SUPERVISOR_TOKEN:-}" ]; then
     export HomeAssistant__BaseUrl="http://supervisor"
     export HomeAssistant__WebSocketPath="/core/websocket"
     export HomeAssistant__LongLivedAccessToken="${SUPERVISOR_TOKEN}"
+fi
+
+# Threads the "registration_token"/"cloud_base_url" add-on options (config.yaml) through to the app -
+# /data/options.json is where the Supervisor writes configured option values for every add-on.
+OPTIONS_FILE="/data/options.json"
+
+if [ -f "${OPTIONS_FILE}" ]; then
+    REGISTRATION_TOKEN="$(jq -r '.registration_token // empty' "${OPTIONS_FILE}")"
+    CLOUD_BASE_URL="$(jq -r '.cloud_base_url // empty' "${OPTIONS_FILE}")"
+
+    if [ -n "${REGISTRATION_TOKEN}" ]; then
+        export Provisioning__RegistrationToken="${REGISTRATION_TOKEN}"
+    fi
+
+    if [ -n "${CLOUD_BASE_URL}" ]; then
+        export Provisioning__CloudBaseUrl="${CLOUD_BASE_URL}"
+    fi
 fi
 
 exec /app/LoopMi.Edge
