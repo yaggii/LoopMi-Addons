@@ -36,13 +36,18 @@ if [ -n "${SUPERVISOR_TOKEN:-}" ]; then
     export HomeAssistant__LongLivedAccessToken="${SUPERVISOR_TOKEN}"
 fi
 
-# Threads the "registration_token"/"cloud_base_url" add-on options (config.yaml) through to the app -
-# /data/options.json is where the Supervisor writes configured option values for every add-on.
+# Threads the "registration_token"/"cloud_base_url"/"ingestion_base_url" add-on options (config.yaml)
+# through to the app - /data/options.json is where the Supervisor writes configured option values for
+# every add-on. cloud_base_url is registration only (RegisterEdgeGatewayFunction, in the Provisioning
+# Function App) - ingestion_base_url is the separate host the ongoing check-in/discovery/measurement
+# calls need (those routes live in the Ingestion Function App instead). Previously only cloud_base_url
+# existed and both clients read it, so registration worked but every call after it 404'd.
 OPTIONS_FILE="/data/options.json"
 
 if [ -f "${OPTIONS_FILE}" ]; then
     REGISTRATION_TOKEN="$(jq -r '.registration_token // empty' "${OPTIONS_FILE}")"
     CLOUD_BASE_URL="$(jq -r '.cloud_base_url // empty' "${OPTIONS_FILE}")"
+    INGESTION_BASE_URL="$(jq -r '.ingestion_base_url // empty' "${OPTIONS_FILE}")"
 
     if [ -n "${REGISTRATION_TOKEN}" ]; then
         export Provisioning__RegistrationToken="${REGISTRATION_TOKEN}"
@@ -50,6 +55,10 @@ if [ -f "${OPTIONS_FILE}" ]; then
 
     if [ -n "${CLOUD_BASE_URL}" ]; then
         export Provisioning__CloudBaseUrl="${CLOUD_BASE_URL}"
+    fi
+
+    if [ -n "${INGESTION_BASE_URL}" ]; then
+        export Ingestion__CloudBaseUrl="${INGESTION_BASE_URL}"
     fi
 fi
 
