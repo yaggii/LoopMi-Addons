@@ -12,6 +12,14 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.15.0] - 2026-07-28
+### Added
+- (Cloud) Organizations now have a trial deadline (30 days from creation by default, adjustable per
+  organization by a platform administrator). A Suspended organization - whether from a lapsed trial or
+  direct administrative action - now actually enforces something for the first time: existing data stays
+  readable through the Portal, but the Ingestion API rejects new data from that organization's Edge
+  Gateways. No Edge-visible change unless your own organization's trial lapses.
+
 ## [0.14.0] - 2026-07-28
 ### Changed
 - (Cloud) Equipment lifecycle state now has real effect for the first time: Archived
