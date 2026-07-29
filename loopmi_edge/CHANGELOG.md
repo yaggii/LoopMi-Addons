@@ -12,6 +12,14 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.17.0] - 2026-07-29
+### Added
+- (Cloud) Re-inviting an email that belongs to an account previously removed from every
+  organization now reactivates that same account instead of failing with "already
+  registered": a fresh temporary password is emailed, and TOTP/recovery codes are cleared
+  entirely so the member re-enrolls from scratch. Still rejected if the email belongs to
+  a currently active member elsewhere, or to the platform administrator.
+
 ## [0.16.0] - 2026-07-29
 ### Changed
 - (Cloud) An invited organization member's temporary password is now emailed directly to
