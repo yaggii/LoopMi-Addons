@@ -12,6 +12,15 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.18.0] - 2026-07-29
+### Added
+- (Cloud) A real-time monitoring dashboard for the Portal - an Organization-wide landing page
+  summarizing every Location's health and active alerts, linking into a per-Location dashboard with
+  current Equipment readings (grouped by Temperature and Water/Gas), a best-effort energy consumption
+  estimate (today's total plus two comparisons against yesterday - cost/savings deliberately parked,
+  no metering/billing concept exists yet), a "Recent Alerts" feed built from the existing alert
+  history, and a per-Area consumption breakdown. Refreshes automatically every 30 seconds while open.
+
 ## [0.17.0] - 2026-07-29
 ### Added
 - (Cloud) Re-inviting an email that belongs to an account previously removed from every
