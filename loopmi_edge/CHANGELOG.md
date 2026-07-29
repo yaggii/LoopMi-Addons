@@ -12,6 +12,17 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.19.0] - 2026-07-29
+### Fixed
+- (Cloud) The dashboard's energy day boundary now uses Lisbon local time instead of UTC's own calendar
+  midnight - during WEST (UTC+1, in effect most of the year), the old UTC boundary was an hour later than
+  the real local midnight, skewing the "today vs yesterday" comparison by that hour's readings.
+- (Cloud) The "Recent Alerts" panel is now genuinely limited to the last 24 hours, rather than always
+  showing up to 20 entries regardless of age.
+### Added
+- (Cloud) The consumption dashboard now shows yesterday's absolute kWh figure for the same elapsed time of
+  day alongside the percentage comparison, not the percentage alone.
+
 ## [0.18.0] - 2026-07-29
 ### Added
 - (Cloud) A real-time monitoring dashboard for the Portal - an Organization-wide landing page
