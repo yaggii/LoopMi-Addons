@@ -12,6 +12,14 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.16.0] - 2026-07-29
+### Changed
+- (Cloud) An invited organization member's temporary password is now emailed directly to
+  them instead of being shown to the inviting Owner.
+### Added
+- (Cloud) Owners can now remove a member from their organization (the sole-Owner
+  guardrail still applies); removal also revokes the member's outstanding sessions.
+
 ## [0.15.0] - 2026-07-28
 ### Added
 - (Cloud) Organizations now have a trial deadline (30 days from creation by default, adjustable per
