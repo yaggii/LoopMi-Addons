@@ -12,6 +12,13 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.24.0] - 2026-07-29
+### Changed
+- (Cloud) The Consumption Today drill-down now returns hour-by-hour consumption buckets instead of raw
+  Power-channel readings, so the Portal can chart and table today vs. yesterday one hour at a time rather
+  than one instantaneous reading at a time. `EnergyConsumptionCalculator` gains `ComputeHourlyBuckets`,
+  reusing the same trapezoidal integration `Compute` already uses so the two always reconcile.
+
 ## [0.23.0] - 2026-07-29
 ### Added
 - (Cloud) `ILocationDashboardService` gains `GetEnergyDetailAsync`, returning today's raw Power-channel
