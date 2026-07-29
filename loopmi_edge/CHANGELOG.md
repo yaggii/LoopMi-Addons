@@ -12,6 +12,12 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.20.0] - 2026-07-29
+### Added
+- (Cloud) LocationHealthResult now carries the most recent successful sync timestamp across a Location's
+  Edge Gateways, so the Portal can show "how long ago" alongside connectivity/storage status instead of
+  just the status word.
+
 ## [0.19.0] - 2026-07-29
 ### Fixed
 - (Cloud) The dashboard's energy day boundary now uses Lisbon local time instead of UTC's own calendar
