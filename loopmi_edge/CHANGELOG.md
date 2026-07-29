@@ -12,6 +12,14 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.25.0] - 2026-07-30
+### Added
+- (Cloud) A new weekly energy drill-down behind the dashboard's "% of Yesterday's Full Day" tile: this
+  week's consumption so far compared day-by-day against last week's, bucketed by calendar day.
+  `EnergyConsumptionCalculator` gains `ComputeDailyBuckets`, sharing its boundary-interpolation core with
+  the existing hourly bucketing so both stay reconciled with `Compute`'s totals. A day later in the current
+  week that hasn't happened yet is simply absent from the result, not reported as zero.
+
 ## [0.24.0] - 2026-07-29
 ### Changed
 - (Cloud) The Consumption Today drill-down now returns hour-by-hour consumption buckets instead of raw
