@@ -12,6 +12,12 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.22.0] - 2026-07-29
+### Added
+- (Cloud) LocationHealthResult now also carries the least remaining local storage across a Location's
+  Edge Gateways, so the Portal's storage icon can show the actual free space (e.g. "48.2 GB free") instead
+  of the last-synced timestamp, which made more sense for the connectivity icon than for storage.
+
 ## [0.21.0] - 2026-07-29
 ### Fixed
 - (Cloud) A revoked Edge Gateway (e.g. an old one superseded by a fresh registration after the Edge lost
