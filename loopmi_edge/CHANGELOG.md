@@ -12,6 +12,13 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.23.0] - 2026-07-29
+### Added
+- (Cloud) `ILocationDashboardService` gains `GetEnergyDetailAsync`, returning today's raw Power-channel
+  registries alongside yesterday's over the identical elapsed portion of the day - the "show the actual
+  numbers" drill-down behind the dashboard's Consumption Today tile, for a chart and table view rather
+  than the single rolled-up estimate.
+
 ## [0.22.0] - 2026-07-29
 ### Added
 - (Cloud) LocationHealthResult now also carries the least remaining local storage across a Location's
