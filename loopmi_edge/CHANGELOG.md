@@ -12,6 +12,19 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.29.0] - 2026-07-30
+### Fixed
+- (Cloud) Fixed a real production bug found while investigating unexpectedly high Azure SQL usage:
+  `Device` and `Equipment` had only one constructor each, so EF Core's constructor-binding materialization
+  convention invoked it - re-raising `DeviceRegisteredDomainEvent`/`EquipmentCreatedDomainEvent` - on every
+  load of an already-existing row, not just on genuine creation. A single real Device had accumulated
+  roughly 4,000 duplicate Outbox rows purely from being read back by ordinary repository calls (79 real
+  Devices → 320,374 Outbox rows), which never purge - 97%+ of the entire database's disk usage. Both
+  aggregates now have the same private ORM-materialization-only constructor every other aggregate
+  (`Area`, `EdgeGateway`, `Location`, `Organization`, `RegistrationToken`) already had. Neither event type
+  is alert-worthy, but the flood of junk rows was also crowding genuine alerts out of the Active Alerts
+  feed's recent-history scan window within roughly 10-15 minutes.
+
 ## [0.28.0] - 2026-07-30
 ### Added
 - (Cloud) `EquipmentTemperatureRange` gains `AverageValue` - the plain mean of today's readings for each
