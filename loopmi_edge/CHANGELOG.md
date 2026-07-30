@@ -12,6 +12,13 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.26.0] - 2026-07-30
+### Changed
+- (Cloud) The Consumption Today drill-down now shows yesterday's consumption in FULL (all 24 hours),
+  instead of only the same elapsed portion of the day as today - a whole-day reference for the chart to
+  plot today's so-far line against, rather than a same-timeframe comparison (that comparison still exists,
+  computed separately for the dashboard's percentage tile).
+
 ## [0.25.0] - 2026-07-30
 ### Added
 - (Cloud) A new weekly energy drill-down behind the dashboard's "% of Yesterday's Full Day" tile: this
