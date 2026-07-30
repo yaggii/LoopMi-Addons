@@ -12,6 +12,18 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.31.0] - 2026-07-30
+### Fixed
+- (Cloud) `Equipment.OperationalHealth` now actually gets computed. `UpdateOperationalHealth` has existed
+  on the domain aggregate since it was introduced, but nothing ever called it - every Equipment showed
+  permanently "Offline" on the dashboard's Temperature Monitoring / Water & Gas grids from the moment it
+  was created, regardless of how fresh its data really was. `HealthTransitionDetectionService`'s existing
+  5-minute sweep (already computing per-Device data freshness and per-Channel battery status) now also
+  rolls those up per Equipment: Healthy when every assigned Device is fresh with no low battery, Critical
+  if any is Stale, Warning if only a battery is Low, Offline only when no assigned Device has ever
+  reported. No manual data fix needed - the field self-corrects on the sweep's next run after this
+  deploys.
+
 ## [0.30.0] - 2026-07-30
 ### Changed
 - (Edge add-on + Cloud) Replaced the hand-drawn "Scan Arc / Signal Fade" logo mark with the real
