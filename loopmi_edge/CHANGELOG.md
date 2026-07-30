@@ -12,6 +12,16 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.34.0] - 2026-07-30
+### Fixed
+- (Cloud) `Channel.LastSeenUtc` — what Data Freshness (§06.2), and therefore `Equipment.OperationalHealth`,
+  is actually computed from — was never updated by measurement ingestion. `Channel.RecordSeen` existed but
+  had zero callers, so every channel stayed "never seen" forever regardless of how much data was really
+  arriving, and every Device/Equipment showed permanently Offline even with monitoring enabled and fresh
+  readings flowing in. `MeasurementIngestionService.IngestBatchAsync` now calls the new
+  `Device.RecordChannelSeen` for every channel in a batch (accepted or duplicate) using the cloud's own
+  receipt instant, via a new bulk `IDeviceRepository.ListByChannelIdsAsync`.
+
 ## [0.33.0] - 2026-07-30
 ### Fixed
 - (Cloud) The per-Equipment temperature drill-down added in 0.32.0 was scoped by Equipment only, so an
