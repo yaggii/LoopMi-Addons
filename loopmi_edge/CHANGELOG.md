@@ -12,6 +12,16 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.35.0] - 2026-07-30
+### Added
+- (Cloud) Measurement ingestion now only stores readings for Channels whose Device is assigned to an
+  Operational Equipment. Created, Commissioned (but not yet made Operational), Maintenance, Retired, and
+  Archived Equipment all silently discard incoming readings instead of storing them - a Device with no
+  Equipment assigned at all is unaffected (no lifecycle to gate on). Discarded readings still count as
+  "accepted" in the ingestion response so the Edge doesn't keep retrying a reading that will never be
+  stored under this policy. `Channel.LastSeenUtc`/Data Freshness tracking is unaffected either way - that's
+  a connectivity fact, independent of whether a reading's value was worth keeping.
+
 ## [0.34.0] - 2026-07-30
 ### Fixed
 - (Cloud) `Channel.LastSeenUtc` — what Data Freshness (§06.2), and therefore `Equipment.OperationalHealth`,
