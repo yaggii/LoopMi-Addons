@@ -12,6 +12,16 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.36.0] - 2026-07-31
+### Changed
+- (Cloud) The dashboard's Temperature/Water/Gas Monitoring grids now only show a tile for a Channel that is
+  both monitored (`IsMonitored`) and belongs to an Operational Equipment - previously every Temperature/
+  Leak/GasLeak-kind Channel got a tile regardless, showing a blank or (before 0.35.0's ingestion gate)
+  stale value for equipment nobody had actually finished setting up. Applies everywhere the shared
+  Channel tree is built: the dashboard grids themselves, the Avg Temperature figure and its drill-down, and
+  the per-Channel 15-minute-interval drill-down. Power Channels (energy estimate) are unaffected - unlike
+  Temperature/Water/Gas, Power never renders as its own tile.
+
 ## [0.35.0] - 2026-07-30
 ### Added
 - (Cloud) Measurement ingestion now only stores readings for Channels whose Device is assigned to an
