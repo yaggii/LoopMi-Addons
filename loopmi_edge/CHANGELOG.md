@@ -12,6 +12,12 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.28.0] - 2026-07-30
+### Added
+- (Cloud) `EquipmentTemperatureRange` gains `AverageValue` - the plain mean of today's readings for each
+  Temperature-reporting Equipment/Channel, alongside the existing min/max, so the Avg Temperature drill-down
+  can show a headline average with the min/max as supporting detail.
+
 ## [0.27.0] - 2026-07-30
 ### Added
 - (Cloud) Two new dashboard drill-downs: `GetTemperatureDetailAsync` returns today's min/max range per
