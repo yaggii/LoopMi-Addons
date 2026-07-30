@@ -12,6 +12,17 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.33.0] - 2026-07-30
+### Fixed
+- (Cloud) The per-Equipment temperature drill-down added in 0.32.0 was scoped by Equipment only, so an
+  Equipment with two separate Temperature Channels (e.g. front/back sensors on the same fridge) had both
+  tiles open the SAME combined min/max/average across both channels' readings, instead of each tile showing
+  only its own channel. Rescoped `ILocationDashboardService.GetEquipmentTemperatureDetailAsync` to
+  `GetChannelTemperatureDetailAsync(LocationId, ChannelId, ...)`, matching how the Temperature Monitoring
+  grid itself already renders one tile per (Equipment, Channel) pair, not per Equipment.
+  `LocationDashboardEquipmentReading` gains `ChannelId` and `EquipmentTemperatureDetailResult` gains
+  `ChannelLabel` so the Cloud/Portal layers can carry the distinction through.
+
 ## [0.32.0] - 2026-07-30
 ### Added
 - (Cloud) A new per-Equipment temperature drill-down: today's readings bucketed into 15-minute intervals,
