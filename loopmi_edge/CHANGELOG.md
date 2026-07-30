@@ -12,6 +12,14 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.27.0] - 2026-07-30
+### Added
+- (Cloud) Two new dashboard drill-downs: `GetTemperatureDetailAsync` returns today's min/max range per
+  Temperature-reporting Equipment/Channel (behind the Avg Temperature tile), and
+  `IAlertFeedService.ListForLocationAsync` returns a Location's alerts within an arbitrary time range
+  (behind the Active Alerts tile, with a Last 24 hours/7 days/30 days picker). `AlertFeedService`'s scan
+  window grows from 100 to 500 rows so a 30-day query still reaches back far enough at today's alert volume.
+
 ## [0.26.0] - 2026-07-30
 ### Changed
 - (Cloud) The Consumption Today drill-down now shows yesterday's consumption in FULL (all 24 hours),
