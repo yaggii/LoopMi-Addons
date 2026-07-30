@@ -12,6 +12,14 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.32.0] - 2026-07-30
+### Added
+- (Cloud) A new per-Equipment temperature drill-down: today's readings bucketed into 15-minute intervals,
+  each with its own min/max/average, behind a tile in the dashboard's Temperature Monitoring grid (not the
+  Location-wide Avg Temperature tile, which already had its own drill-down). Adds
+  `ReadingStatisticsCalculator`, a generic min/max/average interval bucketer (temperature today, but not
+  temperature-specific) alongside the existing kWh-specific `EnergyConsumptionCalculator`.
+
 ## [0.31.0] - 2026-07-30
 ### Fixed
 - (Cloud) `Equipment.OperationalHealth` now actually gets computed. `UpdateOperationalHealth` has existed
