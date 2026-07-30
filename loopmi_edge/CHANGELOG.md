@@ -12,6 +12,16 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.30.0] - 2026-07-30
+### Changed
+- (Edge add-on + Cloud) Replaced the hand-drawn "Scan Arc / Signal Fade" logo mark with the real
+  loopmi.com brand mark, fetched from the live site and checked in as the new canonical raster source
+  (`branding/loopmi-logo-master.png`) - there's no vector source, so `gen_logo.py` now resizes instead of
+  redrawing, capped at 512px (the source's native resolution). Updated everywhere the mark is wired in:
+  the Edge add-on's `icon.png`/`logo.png`, `LoopMi.UI`'s favicon/icon-192, and (via the Cloud repo) the
+  Cloud Portal's favicon/icon-192. No C# changed in this release - version bumped to keep this repo's HA
+  add-on and NuGet package versions in lockstep, per the existing shared-tag release process.
+
 ## [0.29.0] - 2026-07-30
 ### Fixed
 - (Cloud) Fixed a real production bug found while investigating unexpectedly high Azure SQL usage:
