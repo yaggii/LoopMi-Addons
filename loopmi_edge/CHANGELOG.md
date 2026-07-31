@@ -12,11 +12,16 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.39.5] - 2026-07-31
+### Changed
+- (Cloud) Reverts the 0.39.4 test comment from `src/LoopMi.Edge/Program.cs` now that both selective-build
+  gate cases (Cloud-only skip in 0.39.3, Edge-relevant full-build in 0.39.4) are confirmed working.
+
 ## [0.39.4] - 2026-07-31
 ### Changed
 - (Edge) Test: verifies the opposite case of 0.39.3 - this release touches `src/LoopMi.Edge/Program.cs`
   (a comment, outside the safe list), so `addon-ghcr.yml`'s selective-build gate should correctly trigger a
-  full Edge rebuild this time. Reverted immediately after confirming.
+  full Edge rebuild this time. Confirmed live: full build ran (2m19s, every step executed).
 
 ## [0.39.3] - 2026-07-31
 ### Changed
