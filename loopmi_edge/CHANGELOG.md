@@ -12,6 +12,16 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.37.0] - 2026-07-31
+### Fixed
+- (Cloud) A single malformed reading in a measurement batch (most commonly a binary Leak/GasLeak sensor's
+  "wet"/"dry" state, which Home Assistant reports with no `unit_of_measurement` at all) used to throw out of
+  `IngestBatchAsync` entirely, failing the whole HTTP call with a 400 and marking nothing in that batch as
+  synced - including every other perfectly valid reading riding alongside it. Since an Edge Gateway resends
+  the same unsynced batch verbatim every retry cycle, one bad reading could permanently wedge a gateway's
+  sync forever. Invalid readings are now discarded individually (logged, and still counted as "accepted" so
+  the Edge doesn't retry something that will never become valid) without affecting the rest of the batch.
+
 ## [0.36.0] - 2026-07-31
 ### Changed
 - (Cloud) The dashboard's Temperature/Water/Gas Monitoring grids now only show a tile for a Channel that is
