@@ -12,6 +12,12 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.39.1] - 2026-07-31
+### Changed
+- (Cloud) A trivial, comment-only change to `LoopMi.Application.Cloud` (verifying `addon-ghcr.yml`'s new
+  selective-build gate skips the Edge Docker rebuild for a Cloud-only release, per the plan approved this
+  session). To be reverted in the next release once confirmed.
+
 ## [0.39.0] - 2026-07-31
 ### Changed
 - (Cloud) Split the Cloud-only portion of `LoopMi.Application` (dashboards, alerting, identity/auth,
