@@ -12,6 +12,17 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.39.0] - 2026-07-31
+### Changed
+- (Cloud) Split the Cloud-only portion of `LoopMi.Application` (dashboards, alerting, identity/auth,
+  multi-tenancy - never referenced by the Edge add-on) into a new `LoopMi.Application.Cloud` project/package.
+  Namespaces are unchanged, so `yaggii/LoopMi-Cloud` needs only a new `PackageReference` added, no `using`
+  changes. `addon-ghcr.yml` now skips the Edge Docker rebuild (ARM64 Native AOT build/test/publish + GHCR
+  push + the `LoopMi-Addons` sync) entirely when a release's diff since the previous tag only touches
+  `LoopMi.Application.Cloud` - most releases from here on, based on this repo's actual history. This release
+  itself still does a full rebuild (introducing the new project structure touches shared files), proving the
+  split and the new skip logic both work before the fast path is ever exercised for real.
+
 ## [0.38.0] - 2026-07-31
 ### Changed
 - (Cloud) The Location energy estimate (dashboard tile, hourly/daily/weekly drill-downs, and per-Area
