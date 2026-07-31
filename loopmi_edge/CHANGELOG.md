@@ -12,6 +12,18 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.39.4] - 2026-07-31
+### Changed
+- (Edge) Test: verifies the opposite case of 0.39.3 - this release touches `src/LoopMi.Edge/Program.cs`
+  (a comment, outside the safe list), so `addon-ghcr.yml`'s selective-build gate should correctly trigger a
+  full Edge rebuild this time. Reverted immediately after confirming.
+
+## [0.39.3] - 2026-07-31
+### Changed
+- (Cloud) Reverts the 0.39.1 test comment. Also re-verifies the fixed selective-build gate (0.39.2): this
+  release touches only `LoopMi.Application.Cloud` and this changelog, so `addon-ghcr.yml` should skip the
+  Edge Docker rebuild entirely this time.
+
 ## [0.39.2] - 2026-07-31
 ### Fixed
 - (Cloud) `addon-ghcr.yml`'s selective-build gate (added in 0.39.0) used `dorny/paths-filter`'s inverted
