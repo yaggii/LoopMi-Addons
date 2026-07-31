@@ -12,6 +12,18 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.38.0] - 2026-07-31
+### Changed
+- (Cloud) The Location energy estimate (dashboard tile, hourly/daily/weekly drill-downs, and per-Area
+  consumption breakdown) is now computed from Energy-kind Channels' cumulative kWh meter readings (an exact
+  delta between two readings, however sparsely the meter happens to be polled) instead of Power-kind
+  Channels' instantaneous kW readings (a numeric integration over time that degrades badly when Power
+  samples are sparse - which they always are in practice). Adds `CumulativeEnergyCalculator` alongside the
+  existing `EnergyConsumptionCalculator`, which is no longer called for this estimate but is kept for a
+  possible future "current instantaneous power" display - a Power channel measures something a cumulative
+  Energy channel cannot. `MeasurementKind.Energy` previously had no consumer anywhere in the dashboard at
+  all - Energy-kind readings were captured and stored correctly but silently went nowhere.
+
 ## [0.37.0] - 2026-07-31
 ### Fixed
 - (Cloud) A single malformed reading in a measurement batch (most commonly a binary Leak/GasLeak sensor's
