@@ -12,6 +12,37 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.42.0] - 2026-08-01
+### Changed
+- (Cloud) `Equipment` gains configurable `MinAcceptableTemperature`/`MaxAcceptableTemperature`
+  thresholds (§13), and a new `TemperatureReportService` builds a HACCP-style daily temperature
+  log for a Location - one row per Equipment/Channel/calendar-day (min/max/avg, reading count,
+  and a Conforme/Não Conforme verdict when thresholds are set), foundation for the Portal's new
+  Reporting section.
+
+## [0.41.0] - 2026-07-31
+### Changed
+- (Cloud) Alerts can now be dismissed permanently, so a handled alert stops appearing in every alert feed
+  (dashboard "Recent Alerts", the Active Alerts drill-down, and Active/Recent counts). `DescribedAlertEvent`
+  now carries the underlying Outbox message's `Id` (previously discarded in translation), and
+  `IOutboxRepository`/`IAlertFeedService` gained `TryDismissAsync`/`DismissAsync`.
+
+## [0.40.1] - 2026-07-31
+### Fixed
+- (Edge, Cloud) Every Leak/GasLeak reading (and any other boolean/detection MeasurementKind sourced from a
+  Home Assistant `binary_sensor` entity, which never reports a `unit_of_measurement`) was being silently
+  and permanently discarded on ingestion - `Measurement`'s constructor and `MeasurementIngestionService`'s
+  validation both rejected an empty `Unit` as invalid, logged a warning, then marked the reading "accepted"
+  anyway so the Edge never retried it. An empty Unit is now accepted as legitimate for these readings.
+
+## [0.40.0] - 2026-07-31
+### Changed
+- (Cloud) `LocationDashboardService`/`LocationDashboardResult`: a Humidity channel's latest reading now
+  decorates its Equipment's own Temperature reading (`HumidityValue`/`HumidityUnit`), and every Power
+  channel's latest instantaneous reading is summed into a new Location-wide `CurrentPowerWatts`/
+  `CurrentPowerUnit` figure - the "how much is this place drawing right now" complement to the existing
+  cumulative Energy estimate.
+
 ## [0.39.5] - 2026-07-31
 ### Changed
 - (Cloud) Reverts the 0.39.4 test comment from `src/LoopMi.Edge/Program.cs` now that both selective-build
