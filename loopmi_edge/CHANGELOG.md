@@ -12,6 +12,16 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.43.0] - 2026-08-01
+### Changed
+- (Cloud) `Measurement` now carries its owning Organization directly (denormalized at ingestion time
+  from the reporting Edge Gateway's Location), and Row-Level Security on `Measurements` filters on that
+  plain column instead of a Channel -> Device -> EdgeGateway -> Location join. The join defeated the
+  table's own index once it grew past a trivial size - reproduced directly against the real dev database
+  at 8.6s for a query now down to under 200ms. The Edge-Cloud wire protocol is unchanged; this only
+  affects Cloud-side storage and query performance. `Measurement`'s constructor gained a required
+  parameter as part of this, a breaking change for any other direct kernel consumer.
+
 ## [0.42.0] - 2026-08-01
 ### Changed
 - (Cloud) `Equipment` gains configurable `MinAcceptableTemperature`/`MaxAcceptableTemperature`
