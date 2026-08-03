@@ -12,6 +12,22 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.44.0] - 2026-08-03
+### Added
+- (Cloud) Leak/GasLeak channels and Equipment temperature-range thresholds now feed a real calculated
+  state (`DetectionStatus`/`TemperatureRangeStatus`), detected by the same periodic health sweep that
+  already drives connectivity/freshness alerting - a leak or an out-of-range temperature now raises its
+  own alert, independent of Equipment's existing overall health rollup.
+- (Cloud) Bounded Measurement retention for Channels tracked purely for liveness (monitored, but not
+  flagged for full history): a new periodic sweep keeps only the 20 most recent readings per such
+  Channel, instead of accumulating unbounded history forever like an analytical channel does.
+### Fixed
+- (Cloud) A live SQL execution-timeout 500 on the Location Dashboard, caused by an N+1 query pattern
+  that scaled with a Location's Area/Equipment count, and a redundant double-scan in the "latest reading
+  per channel" query underneath it - both replaced with bulk/indexed queries, confirmed live.
+- (Cloud) The Temperature Report now flags non-conformance per 15-minute averaged bucket, matching how
+  HACCP compliance is actually assessed, instead of flagging on any single raw reading outside range.
+
 ## [0.43.0] - 2026-08-01
 ### Changed
 - (Cloud) `Measurement` now carries its owning Organization directly (denormalized at ingestion time
