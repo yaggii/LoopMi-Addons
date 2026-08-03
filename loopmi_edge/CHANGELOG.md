@@ -12,6 +12,51 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.48.0] - 2026-08-03
+### Added
+- (Cloud) `Device.OfflineAfterMinutes` now accepts `0` as an explicit opt-out from Data Freshness (§06.2),
+  instead of only positive values. A Device whose only monitored channels are event-driven (a Leak sensor,
+  which only reports when its state actually changes and can otherwise sit silent for months while working
+  correctly) previously had no way to avoid false "Stale" alerts, since "no recent reading" isn't evidence
+  of a stalled device the way it is for a channel with a real reporting cadence. `0` is device-level, not
+  per-channel - a deliberate, simpler choice over a more granular per-Channel design that was also
+  considered.
+
+## [0.47.0] - 2026-08-03
+### Fixed
+- (Cloud) A real, live gap in `OutboxDispatchService`: sending an alert email to an Organization's
+  Owners/Admins was one try/catch around the whole recipient loop, so a single recipient's transient send
+  failure (e.g. a provider rate limit) restarted the loop from the top on every retry - whoever was early
+  in enumeration order got duplicate emails indefinitely, and everyone after the failure point got nothing
+  for as long as it lasted. Each recipient's success is now persisted immediately and independently, so a
+  retry only ever (re)targets recipients who haven't actually received the alert yet.
+- (Cloud) `DispatchOutbox`'s cadence dropped from once a minute to once every 5 seconds (still the same
+  Timer-triggered function, with an in-process guard against overlapping runs), so a pending alert waits
+  far less time before it's first attempted.
+- (Cloud) The Device Messages dialog's channel filter now only lists `AlwaysReport` channels - a
+  liveness-only channel is bounded to a small retention buffer (§05.4) and is very often one the HA
+  integration never actually reports on at all (a diagnostic/config channel), so including it invited
+  "where did my data go" confusion for devices with plenty of real data under a different channel.
+
+## [0.46.0] - 2026-08-03
+### Added
+- (Cloud) A periodic sweep (`PruneOutboxFunction`/`IOutboxRetentionService`, every 5 minutes) now permanently
+  deletes dispatched Outbox messages older than 30 days. The Outbox previously had no purge mechanism at
+  all - a past materialization bug (fixed separately, v0.29.0) produced 320,000+ Outbox rows from 79 real
+  Devices, 97%+ of the entire database's disk usage, purely because nothing ever cleaned up dispatched
+  rows. This closes that gap regardless of what causes a future flood, not just the one bug that caused
+  this one.
+
+## [0.45.0] - 2026-08-03
+### Added
+- The Edge can now recover on its own from an orphaned certificate (e.g. its Cloud-side Edge Gateway
+  record was deleted) instead of requiring someone to delete local files by hand: pasting a fresh
+  `registration_token` and restarting is now enough on its own, and a new self-resetting
+  `clear_connection` option forces the same re-registration even when the token hasn't changed. A
+  failed attempt never disturbs a working identity - re-registration only replaces local files after
+  the Cloud confirms success. Requires the add-on's new `hassio_api` permission (used only to reset the
+  `clear_connection` option back to off once it succeeds).
+
 ## [0.44.0] - 2026-08-03
 ### Added
 - (Cloud) Leak/GasLeak channels and Equipment temperature-range thresholds now feed a real calculated

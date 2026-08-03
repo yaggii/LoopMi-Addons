@@ -29,25 +29,36 @@ export Measurements__DatabasePath="/data/loopmi-edge.db"
 # restarts/updates - /data is the persistent volume HA maps in, unlike the app's own working directory.
 export Provisioning__ClientIdentityPfxPath="/data/edge-identity.pfx"
 export Provisioning__CaCertificatePemPath="/data/loopmi-ca.pem"
+export Provisioning__RegisteredTokenHashPath="/data/registered-token.hash"
 
 if [ -n "${SUPERVISOR_TOKEN:-}" ]; then
     export HomeAssistant__BaseUrl="http://supervisor"
     export HomeAssistant__WebSocketPath="/core/websocket"
     export HomeAssistant__LongLivedAccessToken="${SUPERVISOR_TOKEN}"
+
+    # Distinct from the HA Core token above: this is the Supervisor's own self-management API
+    # (hassio_api: true in config.yaml), used to reset the self-resetting clear_connection option once
+    # it has done its job.
+    export Provisioning__SupervisorToken="${SUPERVISOR_TOKEN}"
 fi
 
-# Threads the "registration_token"/"cloud_base_url"/"ingestion_base_url" add-on options (config.yaml)
-# through to the app - /data/options.json is where the Supervisor writes configured option values for
-# every add-on. cloud_base_url is registration only (RegisterEdgeGatewayFunction, in the Provisioning
-# Function App) - ingestion_base_url is the separate host the ongoing check-in/discovery/measurement
-# calls need (those routes live in the Ingestion Function App instead). Previously only cloud_base_url
-# existed and both clients read it, so registration worked but every call after it 404'd.
+# Threads the "registration_token"/"cloud_base_url"/"ingestion_base_url"/"clear_connection" add-on
+# options (config.yaml) through to the app - /data/options.json is where the Supervisor writes
+# configured option values for every add-on. cloud_base_url is registration only
+# (RegisterEdgeGatewayFunction, in the Provisioning Function App) - ingestion_base_url is the separate
+# host the ongoing check-in/discovery/measurement calls need (those routes live in the Ingestion
+# Function App instead). Previously only cloud_base_url existed and both clients read it, so
+# registration worked but every call after it 404'd. clear_connection is a self-resetting checkbox (HA
+# add-ons have no native "action button") that forces re-registration on the next start regardless of
+# whether the token changed - the app itself resets it back to false via the Supervisor API once
+# re-registration succeeds.
 OPTIONS_FILE="/data/options.json"
 
 if [ -f "${OPTIONS_FILE}" ]; then
     REGISTRATION_TOKEN="$(jq -r '.registration_token // empty' "${OPTIONS_FILE}")"
     CLOUD_BASE_URL="$(jq -r '.cloud_base_url // empty' "${OPTIONS_FILE}")"
     INGESTION_BASE_URL="$(jq -r '.ingestion_base_url // empty' "${OPTIONS_FILE}")"
+    CLEAR_CONNECTION="$(jq -r '.clear_connection // false' "${OPTIONS_FILE}")"
 
     if [ -n "${REGISTRATION_TOKEN}" ]; then
         export Provisioning__RegistrationToken="${REGISTRATION_TOKEN}"
@@ -60,6 +71,8 @@ if [ -f "${OPTIONS_FILE}" ]; then
     if [ -n "${INGESTION_BASE_URL}" ]; then
         export Ingestion__CloudBaseUrl="${INGESTION_BASE_URL}"
     fi
+
+    export Provisioning__ClearConnection="${CLEAR_CONNECTION}"
 fi
 
 exec /app/LoopMi.Edge

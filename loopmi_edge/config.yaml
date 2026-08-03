@@ -1,5 +1,5 @@
 name: LoopMi Edge
-version: "0.44.0"
+version: "0.48.0"
 slug: loopmi_edge
 description: Production-grade LoopMi Edge runtime for Home Assistant Add-on.
 url: https://github.com/yaggii/LoopMi-Addons
@@ -8,6 +8,7 @@ startup: application
 boot: auto
 init: false
 homeassistant_api: true
+hassio_api: true
 arch:
   - aarch64
 watchdog: http://[HOST]:5034/health
@@ -21,7 +22,9 @@ options:
   registration_token: ""
   cloud_base_url: ""
   ingestion_base_url: ""
+  clear_connection: false
 schema:
   registration_token: "password?"
   cloud_base_url: "url?"
   ingestion_base_url: "url?"
+  clear_connection: "bool?"
