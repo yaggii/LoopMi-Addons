@@ -12,6 +12,29 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.49.0] - 2026-08-04
+### Fixed
+- (Cloud) Alert emails now go out as a single send, BCC to every Owner/Admin, instead of one send per
+  recipient. Root cause of persistent `429 Too Many Requests` errors: the ACS Email resource's free Azure
+  Managed Domain caps sending at 5 emails/minute and 10/hour *per subscription* - a limit that cannot be
+  raised for this domain type at all - and that cap is per API call, not per recipient, so one alert
+  reaching 4 people as 4 separate sends burned 4x the scarce quota for the same notification.
+  `AzureCommunicationServicesEmailSender` also now holds a short cooldown after any 429, since immediate
+  retries still count against the usage limit per Microsoft's own guidance - and disables the Azure SDK's
+  own automatic retry policy (`EmailClientOptions.Retry.MaxRetries = 0`), confirmed live as necessary: with
+  the SDK's default retries, a 429 never actually surfaced as a catchable exception within any reasonable
+  time, so the cooldown above never engaged at all and every attempt kept burning real quota via the SDK's
+  own silent internal retries. This replaces the per-recipient delivery tracking added a day earlier
+  (`OutboxMessage.SentToEmails`) - no longer needed, since a single BCC send is all-or-nothing for the whole
+  alert, with no partial-recipient state to preserve across a retry.
+- (Cloud) A second real gap found live while diagnosing the above: `DispatchPendingAsync` processed pending
+  Outbox messages in one sequential loop with no per-message bound, so a single hanging send (ACS's
+  `WaitUntil.Completed` polling an email that was taking unusually long) blocked every message behind it in
+  the same sweep - including non-alert bookkeeping events (e.g. `RefreshTokenUsedDomainEvent`) that need no
+  network call at all and would otherwise be marked processed instantly. Each message's processing is now
+  bounded to 20 seconds; a message that doesn't finish in time is simply left pending for the next sweep
+  instead of blocking everything after it.
+
 ## [0.48.0] - 2026-08-03
 ### Added
 - (Cloud) `Device.OfflineAfterMinutes` now accepts `0` as an explicit opt-out from Data Freshness (§06.2),
