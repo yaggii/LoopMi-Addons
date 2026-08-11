@@ -12,6 +12,39 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.1] - 2026-08-11
+### Added
+- (Cloud) A "Clear All" button on the Active Alerts dialog dismisses every currently-active alert for a
+  Location in one action, alongside the existing one-at-a-time Dismiss.
+- (Cloud) A Device's "went Stale" alert now auto-resolves the moment its data freshness recovers back to
+  Fresh on its own, instead of sitting there until a user dismisses it by hand. Deliberately narrow to data
+  freshness - Leak/GasLeak, battery, and temperature-range alerts still require a human to dismiss them even
+  if the next reading looks normal.
+
+### Changed
+- (Cloud) `OperationalHealth.Offline` renamed to `Unknown`. It never actually meant "offline" - the only way
+  an Equipment reaches this state is every attached Device's Data Freshness reading Unknown, which never
+  observes connectivity at all. That happens both for a Device that's never reported yet and for one whose
+  `OfflineAfterMinutes` is deliberately 0/unset (the Freshness opt-out) - found live on a Power Plug that was
+  actively reporting and still showed as permanently "Offline" for the latter reason.
+
+## [0.51.0] - 2026-08-06
+### Fixed
+- (Cloud) The Location dashboard and its "Temperature Ranges Today" drill-down no longer 500 when an
+  Equipment has more than one monitored Humidity channel (e.g. several Devices assigned to the same
+  Equipment, each reporting Humidity). The most-recently-reported Humidity channel now decorates the
+  Equipment's Temperature tile, instead of a `Dictionary` keyed by Equipment throwing on the second one.
+
+## [0.50.0] - 2026-08-04
+### Changed
+- (Cloud) `IEmailSender` gained `SendDirectAsync`, addressed directly ("To:") to a single recipient,
+  for anything personal to one named account - an invite's temporary password, a future password-reset
+  email. The existing BCC-everyone `SendAsync` stays exactly as it was, reserved for genuinely
+  multi-recipient sends (an operational alert going to every Owner/Admin). Previously every email,
+  including one-to-one invites, went out via BCC with the sender's own address as "To:" and the real
+  recipient hidden in "Bcc:" - correct RFC 5322 usage for a broadcast, wrong for a message addressed to
+  one person.
+
 ## [0.49.0] - 2026-08-04
 ### Fixed
 - (Cloud) Alert emails now go out as a single send, BCC to every Owner/Admin, instead of one send per
