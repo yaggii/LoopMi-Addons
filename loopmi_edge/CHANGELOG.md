@@ -12,6 +12,12 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.2] - 2026-08-13
+### Added
+- (Cloud) A login-attempt security log records every login attempt - success and failure alike, at both
+  two-step login stages - with IP address, User-Agent, resolved auth method, and correlated challenge/
+  refresh-token IDs, for brute-force/credential-stuffing investigation. 15-day retention.
+
 ## [0.51.1] - 2026-08-11
 ### Added
 - (Cloud) A "Clear All" button on the Active Alerts dialog dismisses every currently-active alert for a
