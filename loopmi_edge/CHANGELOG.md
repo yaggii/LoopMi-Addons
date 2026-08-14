@@ -12,6 +12,14 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.6] - 2026-08-14
+### Added
+- (Cloud) A just-in-time support-access flow: a platform administrator can request time-boxed, full-Owner
+  access to a customer Organization; any one Owner of that Organization is emailed and can approve or
+  reject it from the Portal; once approved, the administrator can enter with a short-lived, non-refreshable
+  access token that re-validates the grant live on every renewal, so an Owner's revoke takes effect within
+  one token lifetime instead of lingering for weeks.
+
 ## [0.51.5] - 2026-08-14
 ### Added
 - (Cloud) A fourth first-run gate requires every user to accept the current Terms of Service/Privacy Policy
