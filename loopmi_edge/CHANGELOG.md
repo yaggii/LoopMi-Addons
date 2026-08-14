@@ -12,6 +12,25 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.5] - 2026-08-14
+### Added
+- (Cloud) A fourth first-run gate requires every user to accept the current Terms of Service/Privacy Policy
+  bundle before using the Portal - checked first, ahead of password change and TOTP enrollment. Acceptance
+  is recorded permanently (never pruned) with the accepting user, version, timestamp, and IP address as a
+  compliance-evidence trail, and is versioned so a future policy change can re-gate every user at once.
+
+## [0.51.4] - 2026-08-13
+### Added
+- (Cloud) Login-attempt summaries now expose the login challenge ID that correlates a two-step login's
+  CredentialVerification and SecondFactor rows, so the Portal's login-history view can group them into one
+  expandable event instead of two unrelated-looking rows.
+
+## [0.51.3] - 2026-08-13
+### Added
+- (Cloud) Portal login-history views on top of the login-attempt security log: Owner/Admin can view any
+  organization member's login history from the Members page; a member can view their own from a new
+  account menu in the top-right corner. Members are no longer able to open the Members page at all.
+
 ## [0.51.2] - 2026-08-13
 ### Added
 - (Cloud) A login-attempt security log records every login attempt - success and failure alike, at both
