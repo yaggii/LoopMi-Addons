@@ -12,6 +12,47 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.12] - 2026-08-15
+### Fixed
+- (Edge) Log lines now carry a UTC timestamp prefix (e.g. `2026-08-15 08:38:46.907 info: ...`) instead of
+  appearing with no date/time at all - the console formatter previously had no `TimestampFormat` configured,
+  so entries in the Supervisor log viewer couldn't be placed in time or correlated with other events.
+
+## [0.51.11] - 2026-08-15
+### Fixed
+- (Cloud) A Carbon Monoxide channel (an HA `carbon_monoxide` device_class binary sensor) is now included in
+  the dashboard's Water & Gas Monitoring tile grid, alongside the existing Leak/GasLeak/Smoke channels - the
+  same gap as the Smoke fix in 0.51.10, just for a different MeasurementKind that the dashboard's
+  channel-tree builder hadn't been extended to cover yet.
+
+## [0.51.10] - 2026-08-14
+### Fixed
+- (Cloud) A Smoke channel (an HA `smoke` device_class binary sensor) is now included in the dashboard's
+  Water & Gas Monitoring tile grid, alongside the existing Leak/GasLeak channels - previously it was
+  correctly mapped by the Home Assistant device_class table but silently dropped by the dashboard's
+  channel-tree builder, so it never appeared on any tile.
+
+## [0.51.9] - 2026-08-14
+### Added
+- (Cloud) Area-scoped dashboards: every alert now carries the Area/Equipment it concerns when one can be
+  resolved, and the Location dashboard service gained a full Area-scoped counterpart to its existing
+  Location-scoped dashboard, energy, and temperature drill-downs - the shared kernel piece behind the
+  Portal's new "Location → Areas → single Area" drill-down.
+
+## [0.51.8] - 2026-08-14
+### Added
+- (Cloud) The Organization dashboard's Location tiles now show current electric power draw, today's
+  energy consumption, and average temperature, alongside the existing name/status/alert-count summary. The
+  top of the dashboard also gains Organization-wide totals for current power draw and today's consumption,
+  next to the existing all-locations active-alerts count.
+
+## [0.51.7] - 2026-08-14
+### Added
+- (Cloud) A read side for the terms-acceptance compliance-evidence trail: a self-service "My Terms
+  Acceptance History" view and an Owner/Admin view of a specific member's history, mirroring the existing
+  login-attempt history feature. Both that dialog and this new one now page their rows client-side instead
+  of rendering the full list at once.
+
 ## [0.51.6] - 2026-08-14
 ### Added
 - (Cloud) A just-in-time support-access flow: a platform administrator can request time-boxed, full-Owner
