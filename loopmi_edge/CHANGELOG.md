@@ -12,6 +12,17 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.14] - 2026-08-15
+### Added
+- (Edge) Self-heals from an orphaned certificate: if the cloud-side EdgeGateway record is ever deleted
+  (accidentally, or by a future decommissioning feature), the Edge previously got stuck in a permanent
+  authentication-rejection loop, since it only checked local file existence to decide whether it was
+  already registered and never noticed its certificate was no longer recognized. It now recognizes the
+  cloud's specific "UnknownEdgeGateway" rejection reason and automatically re-registers using whatever
+  registration token is currently configured, resetting its mTLS client so the fresh identity takes effect
+  immediately - no restart or manual file deletion needed. A deliberately revoked gateway does NOT
+  self-heal (by design - that must stay a manual fix, not silently undone).
+
 ## [0.51.13] - 2026-08-15
 ### Fixed
 - (Edge) The 0.51.12 log-timestamp fix didn't actually take effect in the shipped add-on: it configured the
