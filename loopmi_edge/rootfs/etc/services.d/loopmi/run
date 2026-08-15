@@ -25,6 +25,10 @@ fi
 export ASPNETCORE_URLS="http://0.0.0.0:5034"
 export Measurements__DatabasePath="/data/loopmi-edge.db"
 
+if [ -n "${LOOPMI_EDGE_VERSION:-}" ]; then
+    export EdgeSync__EdgeSoftwareVersion="${LOOPMI_EDGE_VERSION}"
+fi
+
 # The client identity certificate/CA pin are written during registration and must survive addon
 # restarts/updates - /data is the persistent volume HA maps in, unlike the app's own working directory.
 export Provisioning__ClientIdentityPfxPath="/data/edge-identity.pfx"

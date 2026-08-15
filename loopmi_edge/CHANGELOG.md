@@ -12,6 +12,15 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.15] - 2026-08-15
+### Fixed
+- (Edge) The Edge Gateways page's "Edge Software Version" and "Home Assistant Version" columns showed
+  meaningless placeholder values ("1.0.0" and "unknown") on every real install - both were hardcoded
+  defaults that nothing ever overrode. Edge Software Version is now the real add-on version, threaded from
+  the Docker image's own build version through to the running app. Home Assistant Version is now queried
+  live from the Home Assistant Supervisor's REST API (`GET /core/info`) on every check-in, falling back to
+  the same placeholder only when no Supervisor is available (e.g. local dev outside a real installation).
+
 ## [0.51.14] - 2026-08-15
 ### Added
 - (Edge) Self-heals from an orphaned certificate: if the cloud-side EdgeGateway record is ever deleted
