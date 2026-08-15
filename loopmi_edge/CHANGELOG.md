@@ -12,6 +12,15 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.13] - 2026-08-15
+### Fixed
+- (Edge) The 0.51.12 log-timestamp fix didn't actually take effect in the shipped add-on: it configured the
+  console formatter via appsettings.json's `Logging:Console:FormatterOptions`, which binds through
+  reflection-based `ConfigurationBinder` - silently stripped by Native AOT trimming in the real published
+  binary (worked fine in a plain `dotnet run`, which isn't AOT-compiled, so the gap wasn't visible locally).
+  Now set directly via `builder.Logging.AddSimpleConsole(...)` in code, which needs no reflection and is
+  guaranteed to survive trimming.
+
 ## [0.51.12] - 2026-08-15
 ### Fixed
 - (Edge) Log lines now carry a UTC timestamp prefix (e.g. `2026-08-15 08:38:46.907 info: ...`) instead of
