@@ -12,6 +12,23 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.18] - 2026-08-16
+### Fixed
+- (Cloud) `EquipmentEnergyComparisonReportService` wrongly required a Channel's `IsMonitored` flag to be
+  set before including it - every other place Energy channels are resolved (the Location/Area dashboard's
+  own energy estimate, `HasEnergyReadingDevice`) has never gated Energy on that flag, unlike Temperature.
+  Any Equipment whose Energy channel had never been individually toggled "monitored" - the common case -
+  always computed a zero-consumption comparison despite having real readings.
+
+## [0.51.17] - 2026-08-16
+### Added
+- (Cloud) `IEquipmentManagementService.DeleteEquipmentAsync` - deletes Equipment that has no Device
+  currently assigned to it. A Device that's assigned but has never itself reported a measurement still
+  blocks deletion; the caller must unassign it first (`ManagementFailureReason.EquipmentHasAssignedDevices`).
+### Changed
+- (Cloud) `IEquipmentRepository` gained a `Remove` method alongside its existing `Add`, the first delete
+  capability on this repository.
+
 ## [0.51.16] - 2026-08-16
 ### Added
 - (Cloud) Kernel services behind two new Reporting-area comparison reports: `EquipmentEnergyComparisonReportService`
