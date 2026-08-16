@@ -12,6 +12,16 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.16] - 2026-08-16
+### Added
+- (Cloud) Kernel services behind two new Reporting-area comparison reports: `EquipmentEnergyComparisonReportService`
+  and `EquipmentTemperatureComparisonReportService` compare several pieces of Equipment against each other
+  over the same date range (energy consumption and temperature, respectively), to surface an outlier unit
+  that might indicate a developing fault - an Equipment consuming noticeably more than its selected peers,
+  or running noticeably hotter/colder/more variably. Purely additive: no existing service, endpoint, or
+  report was touched. An Equipment with more than one qualifying channel has them summed (energy) or
+  averaged (temperature) rather than requiring a channel-picker step.
+
 ## [0.51.15] - 2026-08-15
 ### Fixed
 - (Edge) The Edge Gateways page's "Edge Software Version" and "Home Assistant Version" columns showed
