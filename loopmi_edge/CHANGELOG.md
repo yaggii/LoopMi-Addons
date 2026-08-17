@@ -12,6 +12,13 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.19] - 2026-08-16
+### Added
+- (Cloud) `EquipmentEnergySeries`/`EquipmentTemperatureSeries` (the Energy/Temperature Comparison reports)
+  each gained an `HourlyPoints` list alongside the existing `DailyPoints` - the chart can now plot
+  intraday detail (a compressor short-cycling, a usage burst) instead of one flattened dot per day, while
+  the table's Total/Avg/Min/Max figures stay computed from `DailyPoints` exactly as before.
+
 ## [0.51.18] - 2026-08-16
 ### Fixed
 - (Cloud) `EquipmentEnergyComparisonReportService` wrongly required a Channel's `IsMonitored` flag to be
