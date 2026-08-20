@@ -12,6 +12,13 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.22] - 2026-08-20
+### Changed
+- (Cloud) Battery-kind channels now join the liveness-only Measurement retention sweep (§05.4) regardless
+  of `IsMonitored`, keeping only the most recent ~20 readings per channel instead of accumulating unbounded
+  history - the threshold check only ever needs the latest value, not a full history. An explicit
+  `AlwaysReport=true` still opts a Battery channel out of pruning, same as every other kind.
+
 ## [0.51.21] - 2026-08-20
 ### Changed
 - Battery-kind channels now always sync to the cloud regardless of the `IsMonitored`/`AlwaysReport`
