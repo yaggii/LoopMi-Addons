@@ -12,6 +12,13 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.20] - 2026-08-20
+### Added
+- (Cloud) `Organization.BatteryLowThresholdPercent` - the low-battery alert threshold is now configurable
+  per organization (still defaulting to 20%) instead of a single hardcoded platform-wide constant. Platform
+  administration API/Portal support to edit it per organization ships in the `LoopMi-Cloud` repo on top of
+  this.
+
 ## [0.51.19] - 2026-08-16
 ### Added
 - (Cloud) `EquipmentEnergySeries`/`EquipmentTemperatureSeries` (the Energy/Temperature Comparison reports)
