@@ -12,6 +12,16 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.23] - 2026-08-20
+### Fixed
+- (Cloud) A channel's very first-ever battery reading now alerts immediately if it's already below
+  threshold, instead of being silently suppressed like every other status's first observation. Found live:
+  a fridge sensor's first-ever battery reading after the always-sync fix (v0.51.21) came in already at 18%
+  and never alerted, because the suppress-first-observation rule (meant to avoid alert storms on a freshly
+  onboarded device) doesn't distinguish "just started syncing" from "already been low for a while." Domain
+  logic only (`Device.cs`) - no Edge runtime behavior actually changes, but the change lands in
+  `LoopMi.Domain` so this still triggers a real Edge image rebuild.
+
 ## [0.51.22] - 2026-08-20
 ### Changed
 - (Cloud) Battery-kind channels now join the liveness-only Measurement retention sweep (§05.4) regardless
