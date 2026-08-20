@@ -12,6 +12,20 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.21] - 2026-08-20
+### Changed
+- Battery-kind channels now always sync to the cloud regardless of the `IsMonitored`/`AlwaysReport`
+  monitoring filter (§05.1) - low-battery alerting depends on it, so it's no longer customer-optional
+  telemetry like every other measurement kind. Fixes a real gap where a battery reading confirmed present
+  in Home Assistant/Zigbee2MQTT never reached the cloud because nobody had opted the diagnostic battery
+  entity into monitoring.
+- The battery-low threshold comparison is now inclusive (`<=`) instead of strictly-below (`<`) - a reading
+  exactly at the organization's threshold now counts as Low.
+- (Cloud) Low-battery alerting now re-alerts on every further drop below the value that triggered the last
+  alert, not just once per Ok→Low transition - e.g. threshold 20%: alerts at 20%, stays silent while still
+  at 20%, alerts again at 19%, again at 18%, and so on. A person dismissing an earlier alert never suppresses
+  a genuinely lower future reading. New `Channel.LastAlertedBatteryPercent` watermark backs this.
+
 ## [0.51.20] - 2026-08-20
 ### Added
 - (Cloud) `Organization.BatteryLowThresholdPercent` - the low-battery alert threshold is now configurable
