@@ -12,6 +12,16 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.24] - 2026-08-21
+### Documentation
+- Documents a real incident: Home Assistant Supervisor's "Repair" action for a broken add-on wipes this
+  add-on's `/data` directory - the client identity certificate, CA pin, registration-token hash, and local
+  SQLite mapping database, all in one shot. That loss is permanent and can't be undone from the Cloud side
+  (this Edge never sends Home Assistant's own entity identifiers to the Cloud, so there's no way to
+  recognize "same physical device" after re-registering fresh). `DOCS.md`'s "Data persistence" section now
+  explains this plainly and recommends including this add-on in Home Assistant's own Backups so a
+  Supervisor repair or bad update has something to recover from. No runtime behavior change.
+
 ## [0.51.23] - 2026-08-20
 ### Fixed
 - (Cloud) A channel's very first-ever battery reading now alerts immediately if it's already below

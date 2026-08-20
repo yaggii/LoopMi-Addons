@@ -75,6 +75,27 @@ If you're troubleshooting or planning a backup, the Edge keeps state at:
 Deleting the identity certificate or database forces re-registration on next start -
 you'd need a fresh registration token from the Cloud Portal.
 
+**This loss is permanent and cannot be undone from the Cloud side.** This Edge never
+sends Home Assistant's own entity identifiers to the Cloud - only an identity it invents
+itself on first discovery and keeps solely in the files above. If those files are gone,
+there is no way for the Cloud (or a freshly re-registered Edge) to recognize "this is
+the same physical device as before," even on the exact same Home Assistant instance.
+Every device you've configured - Equipment assignments, names, monitoring settings,
+alert history - belongs to the old identity and stops updating forever; you'd start
+over, discovering everything again as new (the **Rescan** button on the Cloud Portal's
+Discovered Devices page speeds this up by forcing a full re-walk of the entity registry
+instead of waiting on each entity's next natural state change).
+
+**Home Assistant Supervisor's own "Repair" action for a broken add-on works by wiping
+this add-on's entire `/data` directory** - the exact files listed above, with everything
+that implies. No setting in this add-on can opt out of that; it's Supervisor tearing
+down the add-on's own storage, not something this add-on's configuration controls. The
+only real protection is making sure a recovery point exists *before* you ever need it:
+include this add-on when you configure Home Assistant's own **Backups** (Settings →
+System → Backups) - a full or add-on-scoped backup captures `/data`, so a Supervisor
+repair or a bad update can be recovered from that backup instead of losing your
+identity. Without a backup to restore from, there is no way back.
+
 ## Support
 
 - Cloud Portal and account questions: your LoopMi Cloud organization's Owner/Admin.
