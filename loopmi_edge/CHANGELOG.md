@@ -12,6 +12,18 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.27] - 2026-08-21
+### Fixed
+- Found live, immediately after 0.51.26: the check-in/rescan handshake could deadlock forever.
+  `EdgeCheckInWorker` re-triggered a local rescan on *every* check-in as long as the cloud still reported
+  `DiscoveryRequested: true` - even when the connector had already finished that exact rescan seconds
+  earlier. That re-trigger immediately blocked the very code path that would report the caught-up config
+  version back to the cloud, so the cloud's flag could never clear either: neither side could ever break
+  out, and the connector kept getting cancelled and reconnecting roughly every 60 seconds indefinitely
+  instead of settling once the rescan actually finished. Now a rescan is only triggered once per
+  CurrentConfigVersion generation, so a later check-in that still sees a stale `DiscoveryRequested: true`
+  (because the cloud hasn't heard back yet) reports progress instead of re-cancelling the connector.
+
 ## [0.51.26] - 2026-08-21
 ### Fixed
 - Re-registering this Edge under a genuinely different cloud identity (a pasted registration token, or
