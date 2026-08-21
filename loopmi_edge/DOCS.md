@@ -71,6 +71,7 @@ If you're troubleshooting or planning a backup, the Edge keeps state at:
 - `/data/edge-identity.pfx` - client identity certificate, written during registration.
 - `/data/loopmi-ca.pem` - pinned CA certificate, written during registration.
 - `/data/registered-token.hash` - a hash (not the plaintext) of the registration token last used, so this Edge can notice when you paste a different one.
+- `/data/registered-edge-gateway-id` - the cloud identity last registered as, so this Edge can notice when re-registration produces a *different* identity and clear its local discovery cache accordingly (otherwise already-known devices would silently stop being reported under the new identity).
 
 Deleting the identity certificate or database forces re-registration on next start -
 you'd need a fresh registration token from the Cloud Portal.

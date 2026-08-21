@@ -12,6 +12,28 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.26] - 2026-08-21
+### Fixed
+- Re-registering this Edge under a genuinely different cloud identity (a pasted registration token, or
+  recovering from a wiped `/data` directory per 0.51.24's note) never cleared the local discovery cache
+  (`device_mappings`/`channel_mappings`). Every previously-known Home Assistant entity kept matching its
+  stale local row, so it was silently treated as "already known" and never reported to the new identity -
+  no error, no warning, just devices that stopped appearing. Found live: a Rescan processed 350 entity
+  states with zero errors, but only 2 genuinely-new devices showed up out of ~60-80 real ones. Now the
+  last-registered EdgeGatewayId is tracked (`/data/registered-edge-gateway-id`), and a re-registration that
+  returns a different one clears the local mapping cache first, forcing every entity to be rediscovered and
+  reported fresh under the new identity. Does not retroactively fix devices already stuck under a prior
+  mismatched registration - see the pinned note in the Cloud Portal / ask support for the one-time manual
+  recovery step.
+
+## [0.51.25] - 2026-08-21
+### Fixed
+- (Cloud) `LocationHealthService.ListUnassignedDevicesAsync` (backing Discovered Devices/Hidden Devices)
+  fetched devices one Edge Gateway at a time - a real N+1 that scales directly with how many gateways a
+  Location has, found live after a re-registration incident left a Location with two gateways. Now one
+  batched query (`IDeviceRepository.ListByEdgeGatewayIdsAsync`) across every gateway at once, same result
+  set, fewer round trips regardless of how many gateways accumulate over time.
+
 ## [0.51.24] - 2026-08-21
 ### Documentation
 - Documents a real incident: Home Assistant Supervisor's "Repair" action for a broken add-on wipes this

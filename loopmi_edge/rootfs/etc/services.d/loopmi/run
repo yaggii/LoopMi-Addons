@@ -34,6 +34,7 @@ fi
 export Provisioning__ClientIdentityPfxPath="/data/edge-identity.pfx"
 export Provisioning__CaCertificatePemPath="/data/loopmi-ca.pem"
 export Provisioning__RegisteredTokenHashPath="/data/registered-token.hash"
+export Provisioning__RegisteredEdgeGatewayIdPath="/data/registered-edge-gateway-id"
 
 if [ -n "${SUPERVISOR_TOKEN:-}" ]; then
     export HomeAssistant__BaseUrl="http://supervisor"
