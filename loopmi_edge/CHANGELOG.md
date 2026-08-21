@@ -12,6 +12,37 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.32] - 2026-08-22
+### Added
+- (Cloud) `Measurement.EquipmentId` - each reading now freezes which Equipment its Channel's owning Device
+  was assigned to at ingest time (`MeasurementIngestionService`), the same denormalization pattern already
+  used for `Measurement.OrganizationId`. Fixes a real correctness gap in every historical report/chart that
+  used to resolve "which Equipment does this reading belong to" via a *live* join to the Device's *current*
+  Equipment assignment: physically moving a sensor to a different Equipment used to retroactively drag every
+  reading it had ever recorded - including ones taken while it was still on the old Equipment - along with
+  it in every report. `TemperatureReportService`, `EquipmentTemperatureComparisonReportService`,
+  `EquipmentEnergyComparisonReportService`, and `LocationDashboardService`'s historical widgets (energy/
+  weekly-energy/temperature detail, Location- and Area-scoped) now query by the frozen `EquipmentId`
+  instead, so a reassigned device's history stays correctly split across whichever Equipment it actually
+  recorded data for at the time. Also fixed a related gap found while wiring this up: the Location/Area-wide
+  energy and temperature widgets used to derive their query scope only from Equipment *currently* holding a
+  device, so an Equipment that lost its last device entirely would silently drop out of the total - they now
+  query every Equipment in scope instead. Existing rows/tables are `NULL` until a forthcoming batched
+  backfill migration is run.
+
+## [0.51.31] - 2026-08-21
+### Fixed
+- (Cloud) `Device.IsExcludedFromDashboard` (0.51.30) was too broad - it excluded the flagged device from
+  every dashboard figure `LocationDashboardService.BuildChannelTreeAsync` feeds, including the dashboard's
+  own historical widgets (today-vs-yesterday energy chart, weekly energy chart, "today" temperature range).
+  That erased a retired device's genuine past readings from anywhere on the dashboard, not just its current
+  tile. Narrowed to a consistent rule: excluded only from figures based on `GetLatestByChannelIdsAsync`
+  ("most recent reading ever", the exact kind of lookup that shows a dead device's frozen last value forever
+  with no time decay - current tiles, current power, humidity decoration); never excluded from figures based
+  on `ListByChannelIdsAndTimeRangeAsync` (date-bounded queries, which a dead device naturally stops
+  contributing to on its own once it stops reporting, while a past range it was alive for correctly keeps
+  including it) - Energy totals/charts and the temperature today-range are unaffected by this flag now.
+
 ## [0.51.30] - 2026-08-21
 ### Added
 - (Cloud) `Device.IsExcludedFromDashboard` - lets a customer retire a physically dead/replaced device from
