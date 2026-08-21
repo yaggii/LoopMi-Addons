@@ -12,6 +12,20 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.28] - 2026-08-21
+### Fixed
+- `HomeAssistantMeasurementConnector` persisted a newly-discovered device/channel's local mapping row
+  *before* confirming the cloud actually received it. A local row is meant to mean "the cloud knows about
+  this" (§02) - but a discovery report that failed or got cancelled mid-flight (e.g. by 0.51.27's now-fixed
+  check-in deadlock) still left the row cached, so that entity was silently treated as "already reported"
+  forever, with no retry, orphaning it from the cloud exactly like the incident 0.51.26 fixed - just
+  triggered by a network failure instead of a gateway re-registration. Now the local row is only persisted
+  once the cloud report actually succeeds; a failed report for a genuinely new entity is retried on the
+  next reading instead of being cached as done. A failed report for an already-known channel's
+  classification self-heal (label/kind correction) behaves differently: the stale classification is left
+  uncorrected (and retried later), but the reading is still queued normally, since a real Channel already
+  exists on the cloud side to record it against.
+
 ## [0.51.27] - 2026-08-21
 ### Fixed
 - Found live, immediately after 0.51.26: the check-in/rescan handshake could deadlock forever.
