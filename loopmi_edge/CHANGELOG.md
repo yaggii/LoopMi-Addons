@@ -12,6 +12,33 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.30] - 2026-08-21
+### Added
+- (Cloud) `Device.IsExcludedFromDashboard` - lets a customer retire a physically dead/replaced device from
+  live dashboard tiles (current-reading tiles, Location-wide power/energy totals) while keeping its
+  Equipment assignment intact, so historical reports (a separate live join on `Device.EquipmentId`) keep
+  including its past readings. Solves the "two temperature tiles for one fridge" symptom left behind by a
+  gateway re-registration incident, where the dead device can't safely be unassigned or deleted without
+  losing its history. Deliberately does not auto-deduplicate readings per Equipment - genuine multi-sensor
+  Equipment (e.g. two real temperature probes on one fridge) must keep showing both, so only an explicit,
+  per-device customer decision can distinguish "dead duplicate" from "intentional second sensor." Checked
+  at the one chokepoint every dashboard view and drill-down already shares
+  (`LocationDashboardService.BuildChannelTreeAsync`). `LoopMi-Cloud`'s Management endpoints, Portal toggle,
+  and migration follow separately.
+
+## [0.51.29] - 2026-08-21
+### Changed
+- (Cloud) Denormalizes `LocationId`/`OrganizationId` onto Outbox rows at write time, resolved once
+  (`LoopMiCloudDbContext.SaveChangesAsync` on the `LoopMi-Cloud` side, following this kernel change) instead
+  of re-derived on every alert-feed read. `AlertFeedService`'s read methods scanned up to 500 Outbox rows
+  platform-wide and described every one of them (2-4 repository round trips each) just to filter down to
+  one Location/Organization - up to ~2000 DB round trips for a single alert-feed page load. `DismissAsync`
+  did the same scan just to find and check ownership of one row by ID. `IOutboxRepository` gains
+  `GetAsync`/`ListRecentByEventTypesForLocationAsync`/`ListRecentByEventTypesForOrganizationAsync`;
+  `PendingOutboxMessage` gains optional `LocationId`/`OrganizationId`. No behavior change to what alerts a
+  Location/Organization sees - same precedent as `Measurements.OrganizationId` (0.50.x-era fix for the same
+  join-defeats-indexing problem). `LoopMi-Cloud`'s `EfOutboxRepository`/migration follow separately.
+
 ## [0.51.28] - 2026-08-21
 ### Fixed
 - `HomeAssistantMeasurementConnector` persisted a newly-discovered device/channel's local mapping row
