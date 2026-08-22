@@ -12,6 +12,21 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.35] - 2026-08-22
+### Fixed
+- Root cause found and fixed for the retry-loop incident v0.51.33/34's diagnostic logging was chasing: SQLite
+  has no native decimal type - a `NUMERIC`-affinity column stores a value like a battery level's `100.0` as
+  a bare `REAL`, and `SqliteDataReader.GetDecimal()` hands it back as `100` on every future read. Since
+  `Value`'s exact string representation feeds the idempotency hash, that silent scale change permanently
+  altered the hash on every resend after the very first one - the Edge's locally stored `IdempotencyKey`
+  (frozen at the original insert, before the value ever touched SQLite) could then never match what the
+  cloud independently recomputes from what's actually being resent, no matter how many times it retried.
+  Traced live on a real Edge Gateway: 5 readings for one channel resent roughly every 30 seconds for over a
+  day. `EdgeMeasurementSyncWorker` now recomputes the comparison key from each measurement's current
+  (ChannelId, SourceTimestampUtc, Value, Unit) at send time instead of trusting the stored `IdempotencyKey`
+  column - self-consistent by construction with whatever's actually transmitted, so it can't drift out of
+  sync with the cloud's own independent recomputation again, for this or any similar future cause.
+
 ## [0.51.34] - 2026-08-22
 ### Added
 - Diagnostic logging for `EdgeMeasurementSyncWorker`'s sync cycle - previously completely silent on a
