@@ -12,6 +12,19 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.36] - 2026-08-22
+### Fixed
+- Battery readings are no longer reported to the cloud for a Home Assistant device that was discovered but
+  never assigned to an Equipment (e.g. a phone with the HA companion app). Battery has always been exempt
+  from the customer monitoring filter (§05.1) because low-battery alerting depends on it - but that carve-out
+  didn't check whether the device was actually under LoopMi management, so any battery-reporting entity HA
+  exposed got forwarded regardless of relevance. The check-in config bundle now carries each device's
+  Equipment-assignment status, cached locally; the Battery carve-out only applies when the device is
+  Equipment-assigned. An older Edge talking to a newer Cloud, or a newer Edge talking to an older Cloud that
+  doesn't yet send the new field, defaults to "not assigned" - fails closed (suppressing Battery readings)
+  rather than leaking an unmanaged device's battery telemetry during a rollout skew. (Cloud) The check-in
+  response's config bundle gained the same field.
+
 ## [0.51.35] - 2026-08-22
 ### Fixed
 - Root cause found and fixed for the retry-loop incident v0.51.33/34's diagnostic logging was chasing: SQLite
