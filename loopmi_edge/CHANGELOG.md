@@ -12,6 +12,16 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.37] - 2026-08-22
+### Added
+- (Cloud) Dashboard tiles (Temperature Monitoring and Water & Gas Monitoring, on both the Location and Area
+  dashboards) now show a low-battery warning badge - a battery icon plus percentage in the tile's
+  bottom-right corner - whenever the Equipment's most recent Battery-kind reading is at or below the owning
+  Organization's low-battery threshold (§06.4). Recomputed fresh from the latest reading each time (same
+  "don't trust alert-dedup bookkeeping" rule the Temperature out-of-range glow already follows), so it always
+  reflects the Equipment's actual current battery level, not a frozen alert watermark. Hidden entirely when
+  there's nothing to warn about.
+
 ## [0.51.36] - 2026-08-22
 ### Fixed
 - Battery readings are no longer reported to the cloud for a Home Assistant device that was discovered but
