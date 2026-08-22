@@ -12,6 +12,16 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.34] - 2026-08-22
+### Added
+- Diagnostic logging for `EdgeMeasurementSyncWorker`'s sync cycle - previously completely silent on a
+  routine cycle (success or failure), which made an open incident invisible in this add-on's own logs: a
+  handful of readings on some Edge Gateways keep colliding with an already-stored duplicate at the cloud
+  every sync cycle without ever clearing, and it isn't yet clear whether the cloud's accepted-keys response
+  is missing their key or the local "mark synced" write isn't persisting for them. Now logs a warning
+  listing each unaccepted reading's channel, source timestamp, and idempotency key every cycle it recurs,
+  and a normal info line once a cycle's readings are all confirmed synced.
+
 ## [0.51.33] - 2026-08-22
 ### Fixed
 - (Cloud) `IMeasurementRepository.SaveBatchAsync`'s documented contract now matches the real fix shipped in
