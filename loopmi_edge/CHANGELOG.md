@@ -12,6 +12,18 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.33] - 2026-08-22
+### Fixed
+- (Cloud) `IMeasurementRepository.SaveBatchAsync`'s documented contract now matches the real fix shipped in
+  `EfMeasurementRepository` (LoopMi-Cloud): a duplicate-key collision is reported as accepted, the same as a
+  fresh insert - both mean the cloud durably has the reading, which is all `EdgeMeasurementSyncWorker` (this
+  file) actually needs to know to stop retrying. Previously a duplicate came back unaccepted, so an Edge
+  Gateway whose original "accepted" confirmation was ever lost (network blip, restart mid-request) could
+  never learn a reading was already safely stored and would retry it forever - a real incident, observed as
+  a stuck Edge Gateway resending the same 5 readings roughly every 30 seconds for over a day. No Edge
+  behavior changes here (it already just reads whatever the cloud reports) - this release updates the
+  interface docs and test fakes/expectations to match the corrected contract.
+
 ## [0.51.32] - 2026-08-22
 ### Added
 - (Cloud) `Measurement.EquipmentId` - each reading now freezes which Equipment its Channel's owning Device
