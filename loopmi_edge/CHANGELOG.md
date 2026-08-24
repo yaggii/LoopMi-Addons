@@ -12,6 +12,46 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.41] - 2026-08-24
+### Added
+- (Cloud) The Energy Comparison and Temperature Comparison reports' chart resolution is now caller-chosen
+  instead of a fixed hour - `GetEnergyComparisonAsync`/`GetTemperatureComparisonAsync` take a new
+  `chartBucketDuration` parameter (e.g. 1h/2h/4h/12h/1d), while the summary table's Total/Avg/Min/Max
+  figures stay exactly as they were, always day-level. `EquipmentEnergySeries.HourlyPoints`/
+  `EquipmentTemperatureSeries.HourlyPoints` are renamed to `ChartPoints` since they're no longer always
+  hourly. `CumulativeEnergyCalculator` gains a new general-purpose `ComputeBuckets` method (the existing
+  `ComputeHourlyBuckets`/`ComputeDailyBuckets` are unchanged, just two fixed callers of it now).
+
+## [0.51.40] - 2026-08-24
+### Added
+- (Cloud) A device discovered under a revoked Edge Gateway can no longer be assigned to Equipment -
+  Device.EdgeGatewayId is set once at discovery and never repointed, so a device stuck on a revoked gateway
+  can never actually report through it again; the customer's real path forward is the replacement device
+  the Edge already rediscovered under its current gateway. Rejected the same way an Archived Equipment
+  target already was (HTTP 409, not a missing-resource 404).
+
+## [0.51.39] - 2026-08-23
+### Fixed
+- (Cloud) "Temperature Ranges Today" (and its Area-scoped equivalent) showed a duplicate "No data today" row
+  for a device the customer had excluded from the dashboard, whenever that Equipment also had an active
+  replacement device - the excluded device's own row should never have appeared at all. Unlike Energy
+  Detail/Weekly Energy Detail (genuine arbitrary-date-range historical reports, which correctly keep
+  showing an excluded device's real past data), Temperature Ranges Today is always a today-only view, so it
+  belongs with the dashboard's other current-tile rows in respecting the exclusion flag, not with those
+  reports' deliberate unfiltered history. Found live via the same Kitchen Fridge device-replacement scenario
+  the EquipmentId backfill fix (0.51.38, LoopMi-Cloud) surfaced.
+
+## [0.51.38] - 2026-08-22
+### Fixed
+- (Cloud) The "This Week vs Last Week" energy detail dialog showed 0.00 kWh for a day whose Energy channel
+  only started reporting partway through it (e.g. a device commissioned "today"), even while the dashboard's
+  own "Consumption Today" tile correctly showed real consumption for that same day - an inconsistency visible
+  side by side in the same dialog. `CumulativeEnergyCalculator`'s bucketed (daily/hourly) computation now
+  falls back to a channel's first-ever reading as the baseline for a bucket boundary that predates it, the
+  same "a lone reading with nothing to compare against contributes nothing" rule the plain today-so-far
+  figure already applied - every bucket fully before the channel existed still nets to zero, but the bucket
+  its first reading actually lands in now credits the real delta since then instead of being skipped.
+
 ## [0.51.37] - 2026-08-22
 ### Added
 - (Cloud) Dashboard tiles (Temperature Monitoring and Water & Gas Monitoring, on both the Location and Area
