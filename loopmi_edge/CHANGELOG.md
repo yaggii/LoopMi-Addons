@@ -12,6 +12,18 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.47] - 2026-08-24
+### Added
+- (Cloud) Power duty-cycle raw-data compaction: raw Power-channel readings for an `AlwaysReport` channel are
+  now kept only for a per-Location tunable window (`Location.PowerRawRetentionDays`, 14-31 days, default 14)
+  instead of forever - a daily sweep (`EquipmentPowerRollupService`) compacts each settled day into a small
+  permanent `EquipmentPowerDailyRollup` summary and deletes the raw readings that fed it, once a 1-day settle
+  buffer has passed. The Compressor Efficiency Report (`EquipmentEfficiencyReportService`) now reads recent
+  days live and older days from the rollup transparently, so switching a fridge's Power channel to
+  `AlwaysReport` no longer means storing every raw reading for the life of the equipment.
+- `ILocationManagementService.SetPowerRawRetentionDaysAsync` - lets an Owner/Admin adjust a Location's window
+  within the [14, 31] day range the domain enforces.
+
 ## [0.51.46] - 2026-08-24
 ### Added
 - (Cloud) Compressor Efficiency Report: a "SustainedContinuousRun" flag now carries the actual wattage
