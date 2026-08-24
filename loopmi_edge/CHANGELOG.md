@@ -12,6 +12,13 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.48] - 2026-08-24
+### Changed
+- The measurement sync cycle's log line now reports the actual serialized request payload size in KB
+  alongside the reading count (e.g. "uploaded and confirmed synced 42 reading(s) (3.1 KB).") - lets the
+  reading count be correlated with real communication size from the log alone. Applies to both the
+  success log and the "cloud did not accept N of M readings" warning log.
+
 ## [0.51.47] - 2026-08-24
 ### Added
 - (Cloud) Power duty-cycle raw-data compaction: raw Power-channel readings for an `AlwaysReport` channel are
