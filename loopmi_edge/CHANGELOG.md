@@ -12,6 +12,18 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.42] - 2026-08-24
+### Added
+- (Cloud) New Compressor Efficiency Report: reconstructs a fridge/compressor's on/off duty cycle from its
+  Power channel's delta-triggered readings, separates activity level (door-opening frequency, expected to
+  vary with closed days) from per-cycle efficiency (watts/duration per cycle, a mechanical property that
+  shouldn't drift with how busy the day was), and flags a small set of named, explained deviations from the
+  Equipment's own trailing same-tier baseline - a passive report page, not an alert. New kernel types
+  `PowerDutyCycleCalculator`, `IEquipmentEfficiencyReportService`/`EquipmentEfficiencyReportService`,
+  `EquipmentEfficiencyReportResult`. New Management endpoint `GetEquipmentEfficiencyReport`
+  (`locations/{locationId}/reports/equipment-efficiency`) and Portal page `/reports/equipment-efficiency`.
+  `EquipmentResponseDto` gains `HasPowerReadingDevice`.
+
 ## [0.51.41] - 2026-08-24
 ### Added
 - (Cloud) The Energy Comparison and Temperature Comparison reports' chart resolution is now caller-chosen
