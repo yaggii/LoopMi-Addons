@@ -12,6 +12,37 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.46] - 2026-08-24
+### Added
+- (Cloud) Compressor Efficiency Report: a "SustainedContinuousRun" flag now carries the actual wattage
+  backing its claim (`EfficiencyFlag.AssociatedWatts`, from the completed cycle's own average or the still-open
+  run's last known reading via new `OpenCompressorCycle.LastKnownWatts`) - previously the flag's "running
+  continuously" claim had no visible number anywhere in the report to back it up.
+
+## [0.51.45] - 2026-08-24
+### Fixed
+- (Cloud) `PowerDutyCycleCalculator` extrapolated every Power channel's still-open run all the way to the
+  window's end independently, even a channel whose smart plug had since been physically replaced (its old
+  readings stay attributed to the Equipment forever - `Measurement.EquipmentId` is frozen at ingest) -
+  double-counting on-time once a real replacement's data started arriving. Equipment like a fridge has one
+  power cord, so only the channel with the most recent reading overall is now treated as still current; any
+  other channel's run is bounded at its own last reading instead of extrapolated forward, and only the
+  current channel's run is eligible for the SustainedContinuousRun flag.
+
+## [0.51.44] - 2026-08-24
+### Fixed
+- (Cloud) `PowerDutyCycleCalculator` hardcoded a still-open compressor run's start to the window's own start
+  whenever the channel had no reading at or before that instant (a sparse or retention-pruned Power channel,
+  e.g. one without `AlwaysReport` set) - wildly overstating the run's duration and the on-time credited to
+  every day before the channel's real first reading. Now anchored to the actual first observed reading.
+
+## [0.51.43] - 2026-08-24
+### Fixed
+- (Cloud) `PowerDutyCycleCalculator` (Compressor Efficiency Report) reported 0 minutes of on-time for a day
+  fully covered by a still-in-progress compressor run, contradicting the SustainedContinuousRun flag the same
+  data produces. A leading-partial or open-at-end run's on-time is now distributed across every calendar day
+  it actually spans instead of only being credited when a run closes (or not at all for one that never does).
+
 ## [0.51.42] - 2026-08-24
 ### Added
 - (Cloud) New Compressor Efficiency Report: reconstructs a fridge/compressor's on/off duty cycle from its
