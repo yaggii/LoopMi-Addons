@@ -12,6 +12,15 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.49] - 2026-08-25
+### Fixed
+- (Cloud) Compressor Efficiency Report: a still-open compressor run's duration was extrapolated to the
+  requested report window's END (tomorrow's midnight, for a report requested through "today") instead of
+  to the actual current instant - found live against the Lisbon Fridge, where a genuine ~1 hour run was
+  reported as "running continuously for 16 hours," and today's on-time total came out to more minutes than
+  had actually elapsed since midnight. `EquipmentEfficiencyReportService` now clamps the live query's
+  window end to `Min(toLocalDayUtcExclusive, nowUtc)` before handing it to `PowerDutyCycleCalculator`.
+
 ## [0.51.48] - 2026-08-24
 ### Changed
 - The measurement sync cycle's log line now reports the actual serialized request payload size in KB
