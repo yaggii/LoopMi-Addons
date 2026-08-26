@@ -12,6 +12,35 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.52] - 2026-08-26
+### Added
+- (Cloud) Domain and application-layer foundation for Organization data export/restore: new
+  `OrganizationExportJob`/`OrganizationRestoreJob` aggregates, `IBlobStorageService` abstraction, and full
+  `OrganizationExportService`/`OrganizationRestoreService` implementations (entity-by-entity archive
+  serialization, checkpointed/resumable Measurement replay, Equipment lifecycle-state replay, and the
+  system-wide entity-ID existence check that makes restoring an archive into a different Organization safe).
+  Not yet wired to any endpoint or Portal UI - persistence, Alerting workers, Management API, and Portal
+  land in `LoopMi-Cloud` in a follow-up. No Edge add-on changes.
+
+## [0.51.51] - 2026-08-25
+### Added
+- (Cloud) An existing platform administrator can now invite another platform administrator directly from
+  the Portal (`/admin/create-organization`), instead of that account only ever coming from the fixed
+  cold-start bootstrap seed. `IAccountProvisioningService.InvitePlatformAdministratorAsync` mirrors
+  `InviteUserAsync`: a temporary password is emailed directly to the invitee (same branded template), who
+  proves their own device via self-service TOTP enrollment on first login - unlike the bootstrap account,
+  which still enrolls TOTP immediately. New `POST platform-administrators/invite` endpoint, gated the same
+  way as every other platform-admin-only endpoint (operator API key or an existing platform administrator's
+  JWT). No Edge add-on changes.
+
+## [0.51.50] - 2026-08-25
+### Changed
+- (Cloud) The four identity emails (invite, access-requested, access-approved, access-rejected) now send a
+  branded HTML alternative alongside the existing plain text - the LoopMi mark, a teal accent, and a direct
+  link back to the Portal (previously these said something happened but never said where to go).
+  `IEmailSender.SendDirectAsync` gained an optional `htmlBody` parameter for this; the alert-email path
+  (`SendAsync`) is unchanged. No Edge add-on changes.
+
 ## [0.51.49] - 2026-08-25
 ### Fixed
 - (Cloud) Compressor Efficiency Report: a still-open compressor run's duration was extrapolated to the
