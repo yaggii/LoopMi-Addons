@@ -12,6 +12,19 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.54] - 2026-08-27
+### Changed
+- (Cloud) `OrganizationRestoreJob.SourceExportJobId` replaced with `ArchiveContent` (the uploaded archive's
+  raw bytes, cleared once the job reaches a terminal state) — restore no longer depends on an internal
+  export-job blob still existing (those auto-delete after 7 days), so the caller now uploads the archive
+  directly instead of referencing it by ID. `IOrganizationRestoreService.RequestRestoreAsync` and
+  `DataPortabilityFailureReason` updated to match (`ExportJobNotFound`/`SourceExportNotCompleted` removed,
+  `EmptyArchiveUpload` added). Also adds `IOrganizationDeletionService`/`IOrganizationDeletionRepository`
+  for permanent, platform-administrator-only Organization deletion. Both land only in
+  `LoopMi.Application.Cloud`/`LoopMi.Domain`'s DataPortability and Management namespaces — no Edge add-on
+  behavior change; the Domain-layer touch is why this release couldn't be classified as Cloud-only by path
+  alone.
+
 ## [0.51.53] - 2026-08-27
 ### Fixed
 - (Cloud) Two contract fixes in the v0.51.52 data-portability foundation, found while wiring it up in
