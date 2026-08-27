@@ -12,6 +12,16 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.53] - 2026-08-27
+### Fixed
+- (Cloud) Two contract fixes in the v0.51.52 data-portability foundation, found while wiring it up in
+  `LoopMi-Cloud`: `IDataPortabilityRepository.AddMeasurements` is now async
+  (`AddMeasurementsAsync`) since its idempotent-insert contract needs a read before the write; and
+  `OrganizationExportJobs`/`OrganizationRestoreJobs` are documented as deliberately carrying no Row-Level
+  Security (matching `OrganizationAccessRequests`), since RLS session context can't be bypassed mid-request
+  for the cross-org lookup restore needs. No Edge add-on changes, no behavior change for anything already
+  shipped.
+
 ## [0.51.52] - 2026-08-26
 ### Added
 - (Cloud) Domain and application-layer foundation for Organization data export/restore: new
