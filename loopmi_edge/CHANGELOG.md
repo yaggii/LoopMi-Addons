@@ -12,6 +12,26 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.56] - 2026-08-28
+### Added
+- (Cloud) `Organization.SetTrial()` lets a platform administrator return an Active or Suspended
+  organization to Trial status — previously Trial was only reachable at creation, with no way back once
+  changed. `POST organizations/{id}/status` now accepts `Trial` as a target instead of rejecting it.
+- (Cloud) `IUserRepository.ListPlatformAdministratorsAsync` plus a new `ListPlatformAdministrators`
+  Management endpoint list every platform administrator, backing a new dedicated Portal page
+  (`/admin/platform-administrators`) that also now owns the invite-platform-administrator flow, moved out
+  of `/admin/create-organization`. No Edge add-on changes.
+
+## [0.51.55] - 2026-08-27
+### Fixed
+- (Cloud) `OrganizationRestoreService`'s Measurement-import phase threw `SourceTimestampUtc must use
+  DateTimeKind.Utc` on every restore that reached it — the first time this code path was ever exercised
+  against a real archive. A `DateTime` with `Kind` Unspecified (as read back from SQL Server's `datetime2`)
+  round-trips through `System.Text.Json` as Unspecified too, since there's no offset to write in the first
+  place — every timestamp in the archive is UTC by convention regardless of what `Kind` survived the round
+  trip, so both timestamps are now re-tagged with `DateTime.SpecifyKind(..., DateTimeKind.Utc)` before
+  constructing each `Measurement`. No Edge add-on changes.
+
 ## [0.51.54] - 2026-08-27
 ### Changed
 - (Cloud) `OrganizationRestoreJob.SourceExportJobId` replaced with `ArchiveContent` (the uploaded archive's
