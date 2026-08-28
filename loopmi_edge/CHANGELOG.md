@@ -12,6 +12,31 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.57] - 2026-08-28
+### Added
+- (Cloud) `IRefreshTokenRepository`/`ILoginChallengeRepository`/`IPasswordResetChallengeRepository` gain
+  `DeleteInvalidAsync` — used/revoked/expired rows are no longer kept at all, backing two new Alerting timer
+  functions (`PruneRefreshTokens`, `PruneChallenges`, the latter covering both LoginChallenges and
+  PasswordResetChallenges). No grace-period window, unlike Outbox's 30 (now 20) days: once a token or
+  challenge can never be used again, it serves no purpose.
+- (Cloud) `EfOrganizationDeletionRepository` now also deletes a User once their last Organization membership
+  is gone (excluding platform administrators, who legitimately have none by design), plus their now-orphaned
+  RefreshTokens/LoginChallenges/PasswordResetChallenges. LoginAttempts and TermsAcceptances are deliberately
+  left alone — both are audit/compliance trails designed to outlive the account.
+- (Cloud) `PowerReadingIngestionFilter` — an asymmetric ingestion-time filter for AlwaysReport Power
+  channels found necessary by a data-analysis pass (one real channel was reporting continuously, ~31% of the
+  whole Measurements table's size in 5 days). Collapses a steady OFF period to its single entry reading;
+  resamples to at most one reading per 20 seconds while ON. On/off transitions are always kept in either
+  direction, in both this filter and `EquipmentEfficiencyReportService`'s existing rules.
+### Changed
+- (Cloud) `OutboxRetentionService`'s retention window shortened from 30 to 20 days.
+### Fixed
+- (Cloud) `EquipmentPowerRollupService`/`RollUpEquipmentPowerHistoryFunction` — one Equipment's failure no
+  longer silently aborts the whole nightly sweep for every other Equipment; each is now isolated with its
+  own try/catch, and every early-return/decision path is logged. Root cause of the original zero-rollups
+  behavior was not fully provable (no function-level telemetry reached Application Insights for this
+  Function App at all), but this closes the specific blind spot that made it undebuggable.
+
 ## [0.51.56] - 2026-08-28
 ### Added
 - (Cloud) `Organization.SetTrial()` lets a platform administrator return an Active or Suspended
