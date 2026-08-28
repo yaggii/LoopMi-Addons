@@ -12,6 +12,26 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.51.59] - 2026-08-28
+### Fixed
+- (Cloud) `EquipmentEfficiencyReportService.BuildDailyPoints` ranked a day's activity tier (Low/Medium/High)
+  by index position into the window's raw day-by-day CycleCount list. Once a majority of days in the window
+  were quiet (CycleCount 0, common for real equipment), both tercile cut points collapsed onto 0, so a
+  barely-active day (1 cycle) and a genuinely busy day (10 cycles) were both simply "&gt; 0" and landed in
+  the same High tier - the report stopped distinguishing "a little activity" from "a lot." Cut points now
+  come from the window's distinct CycleCount values instead of the raw list, restoring the separation while
+  keeping the same relative-to-this-equipment's-own-history design.
+
+## [0.51.58] - 2026-08-28
+### Fixed
+- (Cloud) `EquipmentPowerRollupService` threw `windowStartUtc must use DateTimeKind.Utc` on every real
+  invocation, aborting every Equipment's rollup in the sweep - the actual root cause behind
+  `RollUpEquipmentPowerHistory` never producing a single `EquipmentPowerDailyRollup` row, only surfaced once
+  v0.51.57's Alerting Application Insights fix made the exception visible at all. Same landmine as the
+  restore-import "re-tag archive timestamps as UTC" fix: SQL Server's datetime2 doesn't preserve
+  DateTimeKind, so EF reads a stored date back as Unspecified. Re-tagged at both points Kind was lost
+  (`GetLatestRolledUpDateAsync`'s result, and `ResolveFirstUnrolledDayAsync`'s `.Min(...).Date`).
+
 ## [0.51.57] - 2026-08-28
 ### Added
 - (Cloud) `IRefreshTokenRepository`/`ILoginChallengeRepository`/`IPasswordResetChallengeRepository` gain
