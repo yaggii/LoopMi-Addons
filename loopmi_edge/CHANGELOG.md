@@ -12,6 +12,17 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.60.3] - 2026-09-02
+### Added
+- (Cloud) `TabletDevice`/`TabletPairingToken` domain model plus `ITabletPairingService`/`ITabletManagementService`
+  (Azure Boards #49, Location Status Tablet epic #48) - a wall-mounted Android tablet pairs to exactly one
+  Location via a short-lived pairing token (the same shape as `RegistrationToken`'s own Edge Gateway
+  pairing flow), receiving a long-lived device credential in exchange, minted once and never rotated on
+  its own - revoking the tablet is the only way to invalidate it. Admin can rename a tablet, pick which of
+  its Location's Equipment are visible on it, toggle an informational "requires check" flag, and revoke.
+  This repo adds the EF configurations + migration (incl. Row-Level Security), repository implementations,
+  Management API endpoints (admin CRUD + the tablet-facing pairing exchange), and Portal admin UI.
+
 ## [0.60.2] - 2026-09-02
 ### Added
 - (Cloud) `ContactExpectedStateRule`/`ContactExpectedStateWindow` and `IContactExpectedStateRuleRepository` -
