@@ -12,6 +12,50 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.60.1] - 2026-09-02
+### Fixed
+- `HomeAssistantMeasurementKindMapping` now maps a Home Assistant `cover` entity's device_class (curtain,
+  blind, shutter, shade, awning, damper, garage, gate) to `MeasurementKind.Contact`, matching what
+  `binary_sensor`'s door/garage_door/window/opening device_classes already mapped to. A cover entity's
+  open/closed state was already ingested correctly (its value already parsed via the existing on/off/
+  open/closed state-word table), but its Channel was misclassified as `Other` since only binary_sensor's
+  device_class vocabulary was recognized - found while scoping Azure Boards #50 (contact/door sensor
+  support for the Location Status Tablet feature, epic #48).
+
+## [0.60.0] - 2026-08-29
+### Changed
+- Version milestone bump - no functional change to the Edge add-on or the Cloud shared kernel beyond what
+  already shipped in 0.51.62. Marks the close of the Data Analysis Follow-ups line of work (Azure Boards
+  Epic #40): retention/pruning for OutboxMessages/RefreshTokens/LoginChallenges/PasswordResetChallenges,
+  orphaned-user deletion, the Power rollup DateTimeKind fix, the asymmetric Power ingestion filter (plus its
+  retroactive backfill), and the activity-tier terciles fix.
+
+## [0.51.62] - 2026-08-28
+### Changed
+- (Cloud) Removed the v0.51.61 diagnostic logging from `EquipmentPowerRollupService.RollUpOneDayAsync` -
+  the redeploy it shipped in confirmed live that the v0.51.60 `UtcDateTimeValueConverter` fix was already
+  sufficient (every `Kind` traced as `Utc`, zero exceptions, all 5 demo Equipment now rolled up through
+  2026-08-13 with their raw backlog correctly drained). The earlier post-restart failure was resolved by
+  this same redeploy, not a separate bug.
+
+## [0.51.61] - 2026-08-28
+### Changed
+- (Cloud) Added temporary diagnostic logging to `EquipmentPowerRollupService.RollUpOneDayAsync` - the
+  v0.51.60 `UtcDateTimeValueConverter` fix still leaves 4 of 5 demo Equipment failing with `OpenRunStartUtc
+  must use DateTimeKind.Utc` even after redeploy and a Function App restart, so this captures the actual
+  `Kind` of the raw readings and the resulting open-run timestamp directly from Application Insights instead
+  of continuing to reason from static code.
+
+## [0.51.60] - 2026-08-28
+### Fixed
+- (Cloud) `EquipmentPowerRollupService`'s two targeted `DateTime.SpecifyKind` patches (v0.51.58) were
+  treating a symptom, not the cause - a third DateTimeKind failure (`OpenRunStartUtc must use
+  DateTimeKind.Utc`, from a reading's timestamp flowing into `PowerDutyCycleCalculator`'s open-run tracking)
+  surfaced immediately after, proving `Measurement.SourceTimestampUtc`/`ReceivedTimestampUtc` losing
+  DateTimeKind on every EF read is the real, model-wide root cause, not something worth re-tagging call site
+  by call site. Both patches removed - the actual fix is a new `UtcDateTimeValueConverter` on the Cloud side
+  (`yaggii/LoopMi-Cloud`), applied to `Measurement`'s and `EquipmentPowerDailyRollup`'s "*Utc" columns.
+
 ## [0.51.59] - 2026-08-28
 ### Fixed
 - (Cloud) `EquipmentEfficiencyReportService.BuildDailyPoints` ranked a day's activity tier (Low/Medium/High)
