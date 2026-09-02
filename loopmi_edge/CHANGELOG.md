@@ -12,6 +12,16 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.60.2] - 2026-09-02
+### Added
+- (Cloud) `ContactExpectedStateRule`/`ContactExpectedStateWindow` and `IContactExpectedStateRuleRepository` -
+  the admin-configurable "what counts as a problem right now" engine for a Contact-kind Channel (Azure
+  Boards #51, Location Status Tablet epic #48). The same physical sensor type means different things
+  depending on where it's mounted: a fridge door open is always a problem, a floor door open is always
+  fine, a fridge curtain retrofit is fine open 09:00-23:00 but a problem open 23:00-09:00 - one rule per
+  Channel, a default plus optional time-of-day overrides. This repo adds the EF configuration + migration,
+  repository implementation, Management API endpoints, and Portal admin UI.
+
 ## [0.60.1] - 2026-09-02
 ### Fixed
 - `HomeAssistantMeasurementKindMapping` now maps a Home Assistant `cover` entity's device_class (curtain,
