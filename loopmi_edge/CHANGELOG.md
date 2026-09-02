@@ -12,6 +12,17 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.60.4] - 2026-09-02
+### Added
+- (Cloud) `ITabletStatusService` (Azure Boards #52, Location Status Tablet epic #48) - computes a paired
+  tablet's current status across all three signal types for every Equipment it's configured to show:
+  out-of-temperature (latest Temperature reading vs Equipment's own thresholds), Contact-kind Channel rule
+  violations (via #51's `ContactExpectedStateRule`, skipped entirely when no rule is configured for a
+  Channel), and compressor efficiency problems (reuses the existing Compressor Efficiency Report, checking
+  whether today's local calendar day raised any flag - a 30-day lookback window gives its own baseline
+  comparisons real history to work with, not just a factory-fresh empty range). This repo adds the
+  tablet-facing status-read endpoint (device-credential authenticated) and the kiosk UI itself.
+
 ## [0.60.3] - 2026-09-02
 ### Added
 - (Cloud) `TabletDevice`/`TabletPairingToken` domain model plus `ITabletPairingService`/`ITabletManagementService`
