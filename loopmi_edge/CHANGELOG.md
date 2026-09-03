@@ -12,6 +12,20 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.60.6] - 2026-09-03
+### Added
+- (Cloud) `TabletCheckIn` domain model (Azure Boards #54, Location Status Tablet epic #48) - the "tap
+  Check, pick your name, enter your PIN, done" flow: `ITabletCheckInService.SubmitCheckInAsync` verifies
+  the presented PIN via the existing `IPasswordHasher`, rejects an employee that exists but belongs to a
+  different Organization than the tablet with the exact same message as a missing employee (a cross-tenant
+  guard, not just a not-found check), and records a `TabletCheckIn` snapshotting the employee's name and a
+  human-readable summary of whatever was flagged as a problem at that moment (reusing `ITabletStatusService`
+  rather than recomputing status a second way). `TabletStatusResult` gains a `RequiresCheck` field so the
+  kiosk knows whether to offer the Check action at all. This repo adds the EF configuration + migration
+  (incl. RLS, via a new `fn_TenantAccessByTabletDeviceId` predicate function), the two tablet-facing
+  Provisioning endpoints (roster read + check-in submit, both device-credential authenticated), the
+  Management history-listing endpoint, and the Portal check-in UI + history page.
+
 ## [0.60.5] - 2026-09-03
 ### Added
 - (Cloud) `Employee` domain model (Azure Boards #53, Location Status Tablet epic #48) - a lightweight,
