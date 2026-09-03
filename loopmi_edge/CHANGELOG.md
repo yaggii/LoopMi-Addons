@@ -12,6 +12,16 @@ Entries are platform-wide (this repo publishes the Edge add-on and the Cloud sha
 kernel from the same tag), so each item is marked with what it actually affects: the
 Edge add-on itself, or the Cloud Portal/API only.
 
+## [0.60.5] - 2026-09-03
+### Added
+- (Cloud) `Employee` domain model (Azure Boards #53, Location Status Tablet epic #48) - a lightweight,
+  Organization-wide identity used only for tablet check-in: a name and a 4-digit PIN, deliberately distinct
+  from a Portal `User` (no email, no password, no TOTP, no Portal login capability at all). PINs are hashed
+  with the existing Argon2id `IPasswordHasher` before storage - the same hasher used for full passwords,
+  chosen deliberately because a 4-digit PIN's much smaller keyspace makes a slow, memory-hard hash more
+  important, not less. `IEmployeeManagementService` covers add/rename/reset-PIN/remove; this repo adds the
+  EF configuration + Row-Level Security migration, Management API endpoints, and the Portal admin CRUD page.
+
 ## [0.60.4] - 2026-09-02
 ### Added
 - (Cloud) `ITabletStatusService` (Azure Boards #52, Location Status Tablet epic #48) - computes a paired
