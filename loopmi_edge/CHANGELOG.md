@@ -19,6 +19,23 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.65.0] - 2026-09-08
+### Changed
+- (Cloud) Trusted-device window (Azure Boards #57) shortened from 30 days to 7 days - a direct follow-up
+  ask, tightening the residual bearer-token exposure window tracked in Azure Boards #59 without giving up
+  the convenience the feature is for.
+### Added
+- (Cloud) Per-device trusted-device management (Azure Boards #58) - `IAuthenticationService.ListTrustedDevicesAsync`/
+  `RevokeTrustedDeviceAsync` let a user see and individually revoke one remembered device rather than only
+  the existing bulk "sign out of all" action. Revoking a device that doesn't exist or belongs to a different
+  account is a silent no-op, the same anti-enumeration posture used elsewhere in this service.
+
+## [0.64.1] - 2026-09-08
+### Added
+- (Cloud) `ITrustedDeviceRetentionService` - the retention/pruning job for `TrustedDevice` (Azure Boards #57,
+  `v0.64.0` below) that was missing from that release, mirroring `IRefreshTokenRetentionService`'s exact
+  shape. No grace-period window - a revoked or expired trusted device is deleted outright.
+
 ## [0.64.0] - 2026-09-08
 ### Added
 - (Cloud) "Remember this device for TOTP" (Azure Boards #57) - an opt-in checkbox at the second-factor login
@@ -95,27 +112,5 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   important, not less. `IEmployeeManagementService` covers add/rename/reset-PIN/remove; this repo adds the
   EF configuration + Row-Level Security migration, Management API endpoints, and the Portal admin CRUD page.
 
-## [0.60.4] - 2026-09-02
-### Added
-- (Cloud) `ITabletStatusService` (Azure Boards #52, Location Status Tablet epic #48) - computes a paired
-  tablet's current status across all three signal types for every Equipment it's configured to show:
-  out-of-temperature (latest Temperature reading vs Equipment's own thresholds), Contact-kind Channel rule
-  violations (via #51's `ContactExpectedStateRule`, skipped entirely when no rule is configured for a
-  Channel), and compressor efficiency problems (reuses the existing Compressor Efficiency Report, checking
-  whether today's local calendar day raised any flag - a 30-day lookback window gives its own baseline
-  comparisons real history to work with, not just a factory-fresh empty range). This repo adds the
-  tablet-facing status-read endpoint (device-credential authenticated) and the kiosk UI itself.
-
-## [0.60.3] - 2026-09-02
-### Added
-- (Cloud) `TabletDevice`/`TabletPairingToken` domain model plus `ITabletPairingService`/`ITabletManagementService`
-  (Azure Boards #49, Location Status Tablet epic #48) - a wall-mounted Android tablet pairs to exactly one
-  Location via a short-lived pairing token (the same shape as `RegistrationToken`'s own Edge Gateway
-  pairing flow), receiving a long-lived device credential in exchange, minted once and never rotated on
-  its own - revoking the tablet is the only way to invalidate it. Admin can rename a tablet, pick which of
-  its Location's Equipment are visible on it, toggle an informational "requires check" flag, and revoke.
-  This repo adds the EF configurations + migration (incl. Row-Level Security), repository implementations,
-  Management API endpoints (admin CRUD + the tablet-facing pairing exchange), and Portal admin UI.
-
-Earlier releases (`0.60.2` and before) have been trimmed per this file's 10-release retention policy
+Earlier releases (`0.60.4` and before) have been trimmed per this file's 10-release retention policy
 (added 2026-09-04) - see `git log -p -- addons/loopmi_edge/CHANGELOG.md` for the full history.
