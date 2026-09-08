@@ -19,6 +19,36 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.64.0] - 2026-09-08
+### Added
+- (Cloud) "Remember this device for TOTP" (Azure Boards #57) - an opt-in checkbox at the second-factor login
+  step lets a device skip TOTP/recovery-code entry for a fixed, non-renewing 30-day window on future logins,
+  the same pattern GitHub/Google/Microsoft all use. New `TrustedDevice` domain aggregate, shaped like
+  `RefreshToken`/`LoginChallenge` (a random raw token, only its hash persisted) but deliberately multi-use
+  across its own 30-day life rather than single-use. `IAuthenticationService.VerifyCredentialsAsync` now
+  returns a closed `VerifyCredentialsOutcome` (`SecondFactorRequired` or `CompletedViaTrustedDevice`) instead
+  of a bare challenge, so a recognized trusted device skips the second factor entirely rather than merely
+  pre-filling it - a missing/unknown/expired/revoked token silently falls through to today's normal flow.
+  Platform administrators are excluded from this bypass entirely regardless of what's presented or requested.
+  Max 3 active trusted devices per user, evicting the oldest on a 4th. Every sensitive account change
+  (password change/reset, TOTP re-enrollment) revokes all of a user's trusted devices, plus a new explicit
+  "sign out of all trusted devices" action (`IAuthenticationService.SignOutAllTrustedDevicesAsync`) - a
+  per-device list/revoke is deferred (Azure Boards #58). A known, accepted residual risk (a copied cookie
+  bypasses TOTP given known credentials) is tracked, not fixed, in Azure Boards #59.
+
+## [0.63.1] - 2026-09-04
+### Fixed
+- Backfills the `0.63.0` entry below - tagged without one, same mistake as `0.61.0`/`0.62.0` (see `0.62.1`'s
+  own entry). No code change beyond this file.
+
+## [0.63.0] - 2026-09-04
+### Added
+- (Cloud) `IDataProtectionSasExpiryMonitorService` (Azure Boards #5 follow-up) - the Data Protection blob SAS
+  `bootstrap-secrets.ps1` mints has a 2-year hard expiry and no alerting at all today; a lapsed, unrenewed SAS
+  silently breaks TOTP secret decryption for every user. This service parses the SAS's own embedded `se`
+  expiry and emails a direct platform-admin warning once within 60 days of expiry (an urgent variant if
+  already past it) - wired into a new weekly timer function in `LoopMi.Cloud.Alerting`.
+
 ## [0.62.1] - 2026-09-04
 ### Fixed
 - Backfills the two changelog entries below - `v0.61.0` and `v0.62.0` were tagged without a matching entry
@@ -87,33 +117,5 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   This repo adds the EF configurations + migration (incl. Row-Level Security), repository implementations,
   Management API endpoints (admin CRUD + the tablet-facing pairing exchange), and Portal admin UI.
 
-## [0.60.2] - 2026-09-02
-### Added
-- (Cloud) `ContactExpectedStateRule`/`ContactExpectedStateWindow` and `IContactExpectedStateRuleRepository` -
-  the admin-configurable "what counts as a problem right now" engine for a Contact-kind Channel (Azure
-  Boards #51, Location Status Tablet epic #48). The same physical sensor type means different things
-  depending on where it's mounted: a fridge door open is always a problem, a floor door open is always
-  fine, a fridge curtain retrofit is fine open 09:00-23:00 but a problem open 23:00-09:00 - one rule per
-  Channel, a default plus optional time-of-day overrides. This repo adds the EF configuration + migration,
-  repository implementation, Management API endpoints, and Portal admin UI.
-
-## [0.60.1] - 2026-09-02
-### Fixed
-- `HomeAssistantMeasurementKindMapping` now maps a Home Assistant `cover` entity's device_class (curtain,
-  blind, shutter, shade, awning, damper, garage, gate) to `MeasurementKind.Contact`, matching what
-  `binary_sensor`'s door/garage_door/window/opening device_classes already mapped to. A cover entity's
-  open/closed state was already ingested correctly (its value already parsed via the existing on/off/
-  open/closed state-word table), but its Channel was misclassified as `Other` since only binary_sensor's
-  device_class vocabulary was recognized - found while scoping Azure Boards #50 (contact/door sensor
-  support for the Location Status Tablet feature, epic #48).
-
-## [0.60.0] - 2026-08-29
-### Changed
-- Version milestone bump - no functional change to the Edge add-on or the Cloud shared kernel beyond what
-  already shipped in 0.51.62. Marks the close of the Data Analysis Follow-ups line of work (Azure Boards
-  Epic #40): retention/pruning for OutboxMessages/RefreshTokens/LoginChallenges/PasswordResetChallenges,
-  orphaned-user deletion, the Power rollup DateTimeKind fix, the asymmetric Power ingestion filter (plus its
-  retroactive backfill), and the activity-tier terciles fix.
-
-Earlier releases (`0.51.62` and before) have been trimmed per this file's 10-release retention policy
+Earlier releases (`0.60.2` and before) have been trimmed per this file's 10-release retention policy
 (added 2026-09-04) - see `git log -p -- addons/loopmi_edge/CHANGELOG.md` for the full history.
