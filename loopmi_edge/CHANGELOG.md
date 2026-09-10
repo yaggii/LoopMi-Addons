@@ -19,6 +19,15 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.65.1] - 2026-09-08
+### Added
+- (Cloud) Organization-wide trusted-device view (Azure Boards #58 follow-up, direct user request) -
+  `IAuthenticationService.ListOrganizationTrustedDevicesAsync`/`RevokeMemberTrustedDeviceAsync` let an
+  Owner/Admin see and revoke every member's trusted devices in one view (including their own, since they're
+  also a member), not just their own via the existing self-service methods. Revoking a device that belongs
+  to a user of a *different* Organization is a silent no-op - a tenant-boundary check, not just the existing
+  anti-enumeration one.
+
 ## [0.65.0] - 2026-09-08
 ### Changed
 - (Cloud) Trusted-device window (Azure Boards #57) shortened from 30 days to 7 days - a direct follow-up
@@ -102,15 +111,5 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   Provisioning endpoints (roster read + check-in submit, both device-credential authenticated), the
   Management history-listing endpoint, and the Portal check-in UI + history page.
 
-## [0.60.5] - 2026-09-03
-### Added
-- (Cloud) `Employee` domain model (Azure Boards #53, Location Status Tablet epic #48) - a lightweight,
-  Organization-wide identity used only for tablet check-in: a name and a 4-digit PIN, deliberately distinct
-  from a Portal `User` (no email, no password, no TOTP, no Portal login capability at all). PINs are hashed
-  with the existing Argon2id `IPasswordHasher` before storage - the same hasher used for full passwords,
-  chosen deliberately because a 4-digit PIN's much smaller keyspace makes a slow, memory-hard hash more
-  important, not less. `IEmployeeManagementService` covers add/rename/reset-PIN/remove; this repo adds the
-  EF configuration + Row-Level Security migration, Management API endpoints, and the Portal admin CRUD page.
-
-Earlier releases (`0.60.4` and before) have been trimmed per this file's 10-release retention policy
+Earlier releases (`0.60.5` and before) have been trimmed per this file's 10-release retention policy
 (added 2026-09-04) - see `git log -p -- addons/loopmi_edge/CHANGELOG.md` for the full history.
