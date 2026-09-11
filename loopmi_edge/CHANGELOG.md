@@ -19,6 +19,31 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.66.0] - 2026-09-11
+### Added
+- (Cloud) Employee self-service PIN change from the tablet (Azure Boards #65) - `ITabletCheckInService.ChangePinAsync`
+  verifies the employee's current PIN (same lockout/anti-brute-force gate as check-in, Azure Boards #56) before
+  setting a new one via the existing `Employee.ResetPin`. Originally scoped as part of #53 but never wired
+  into the tablet UI until now.
+- (Cloud) `TabletStatusResult.NowLocal` (Azure Boards #67) - the current instant converted to the tablet's
+  Location's own local timezone, so the kiosk page can render a date that actually matches the physical
+  Location's wall clock instead of the server/browser's own.
+
+## [0.65.3] - 2026-09-10
+### Fixed
+- Backfills the `0.65.2` entry below - tagged without one, same mistake as `0.61.0`/`0.62.0`/`0.63.0` (see
+  `0.62.1`/`0.63.1`'s own entries). No code change beyond this file.
+
+## [0.65.2] - 2026-09-10
+### Fixed
+- (Cloud) Tablet status DTU spike (real Azure SQL incident) - `TabletStatusService` was re-running the full
+  compressor efficiency report (a raw-reading duty-cycle reconstruction over up to 31 days) for every
+  Equipment on every 30s tablet status poll. Now skips the report entirely for Equipment with no Power-kind
+  Channel (also fixes Azure Boards #63 - a freezer with no energy monitoring was being flagged via the
+  report's UnexplainedLowActivity rule misreading "zero power data" as a possible failure), and caches each
+  Equipment's result per local day for 1 hour, since the rule engine's own dwell/baseline windows are
+  day-granular and nothing about today's flag can legitimately change within an hour, let alone a 30s poll.
+
 ## [0.65.1] - 2026-09-08
 ### Added
 - (Cloud) Organization-wide trusted-device view (Azure Boards #58 follow-up, direct user request) -
@@ -82,34 +107,5 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   "Verify CHANGELOG.md has an entry for this version" step correctly failed both of those releases as
   designed). No code change beyond this file.
 
-## [0.62.0] - 2026-09-04
-### Added
-- (Cloud) `IEmployeeManagementService.ClearLockoutAsync` (Azure Boards #56) - lets an Owner/Admin manually
-  clear an employee's PIN lockout (see 0.61.0 below), for when the employee simply mistyped their own PIN
-  repeatedly rather than an attack.
-
-## [0.61.0] - 2026-09-04
-### Added
-- (Cloud) `Employee` PIN lockout (Azure Boards #56) - locks out after 5 consecutive failed check-in PIN
-  attempts, mirroring `User`'s existing Portal-login lockout (`AccessFailedCount`/`LockoutEndUtc`/
-  `IsLockedOut`/`RecordFailedPinAttempt`/`RecordSuccessfulCheckIn`). Closes a real brute-force gap: a
-  4-digit PIN is only 10,000 combinations, and `tablet-check-in` has no Portal JWT gating it, so a stolen
-  tablet device credential could otherwise script through every combination for one employee unopposed.
-  `TabletCheckInService.SubmitCheckInAsync` checks the lockout before even touching `IPasswordHasher`.
-
-## [0.60.6] - 2026-09-03
-### Added
-- (Cloud) `TabletCheckIn` domain model (Azure Boards #54, Location Status Tablet epic #48) - the "tap
-  Check, pick your name, enter your PIN, done" flow: `ITabletCheckInService.SubmitCheckInAsync` verifies
-  the presented PIN via the existing `IPasswordHasher`, rejects an employee that exists but belongs to a
-  different Organization than the tablet with the exact same message as a missing employee (a cross-tenant
-  guard, not just a not-found check), and records a `TabletCheckIn` snapshotting the employee's name and a
-  human-readable summary of whatever was flagged as a problem at that moment (reusing `ITabletStatusService`
-  rather than recomputing status a second way). `TabletStatusResult` gains a `RequiresCheck` field so the
-  kiosk knows whether to offer the Check action at all. This repo adds the EF configuration + migration
-  (incl. RLS, via a new `fn_TenantAccessByTabletDeviceId` predicate function), the two tablet-facing
-  Provisioning endpoints (roster read + check-in submit, both device-credential authenticated), the
-  Management history-listing endpoint, and the Portal check-in UI + history page.
-
-Earlier releases (`0.60.5` and before) have been trimmed per this file's 10-release retention policy
+Earlier releases (`0.62.0` and before) have been trimmed per this file's 10-release retention policy
 (added 2026-09-04) - see `git log -p -- addons/loopmi_edge/CHANGELOG.md` for the full history.
