@@ -19,6 +19,35 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.69.0] - 2026-09-15
+### Changed
+- (Cloud) `IMeasurementRepository.ListByEquipmentIdsAndTimeRangeAsync` now filters by the Channel's kind at
+  the source (a join to Channels), instead of every caller fetching every kind an Equipment has ever
+  recorded and filtering down to the relevant one afterward in memory. Found live: an Equipment carrying
+  channels of several kinds (e.g. a Fridge with both a Temperature sensor and a Power-metering smart plug)
+  meant a Temperature-only report also paid to fetch and transfer that Equipment's entire
+  Power/Humidity/Battery history - part of why the Temperature Comparison report measured much slower than
+  the Energy Comparison report for an equivalent range/reading volume. All 5 callers (the Energy/Temperature
+  dashboard tiles, both comparison reports, and the plain Temperature report) updated to pass their own
+  kind. No Edge-visible change - this only touches the Cloud reporting path.
+
+## [0.68.2] - 2026-09-15
+### Fixed
+- (Cloud) The Temperature Comparison report's per-Equipment day loop re-scanned that Equipment's entire
+  reading list once per day in the range (O(days x readings)) - found live as the reason it measured much
+  slower than the Energy Comparison report for an equivalent range/reading volume, which already bucketed
+  readings in one linear pass. Now buckets every reading against the range's day boundaries once, same
+  result, no behavior change. No Edge-visible change - this only touches the Cloud reporting path.
+
+## [0.68.1] - 2026-09-15
+### Changed
+- (Cloud) The Location/Area Dashboard's "This Week vs Last Week" dialog no longer live-recomputes days of
+  the current week that are already settled (everything before today) - it now reads those from the same
+  nightly `AreaEnergyDailyRollup` table last week's own days already use, only today's still-open partial
+  day is computed live. Closes the gap `v0.68.0` left: without this, the live raw-reading range grew every
+  day of the week, reintroducing the same cost that release fixed for last week specifically. No Edge-visible
+  change - this only touches the Cloud reporting path.
+
 ## [0.68.0] - 2026-09-15
 ### Changed
 - (Cloud) Location Dashboard's "% of Yesterday's Full Day" energy tile and the "this week vs last week"
@@ -76,39 +105,5 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   to a user of a *different* Organization is a silent no-op - a tenant-boundary check, not just the existing
   anti-enumeration one.
 
-## [0.65.0] - 2026-09-08
-### Changed
-- (Cloud) Trusted-device window (Azure Boards #57) shortened from 30 days to 7 days - a direct follow-up
-  ask, tightening the residual bearer-token exposure window tracked in Azure Boards #59 without giving up
-  the convenience the feature is for.
-### Added
-- (Cloud) Per-device trusted-device management (Azure Boards #58) - `IAuthenticationService.ListTrustedDevicesAsync`/
-  `RevokeTrustedDeviceAsync` let a user see and individually revoke one remembered device rather than only
-  the existing bulk "sign out of all" action. Revoking a device that doesn't exist or belongs to a different
-  account is a silent no-op, the same anti-enumeration posture used elsewhere in this service.
-
-## [0.64.1] - 2026-09-08
-### Added
-- (Cloud) `ITrustedDeviceRetentionService` - the retention/pruning job for `TrustedDevice` (Azure Boards #57,
-  `v0.64.0` below) that was missing from that release, mirroring `IRefreshTokenRetentionService`'s exact
-  shape. No grace-period window - a revoked or expired trusted device is deleted outright.
-
-## [0.64.0] - 2026-09-08
-### Added
-- (Cloud) "Remember this device for TOTP" (Azure Boards #57) - an opt-in checkbox at the second-factor login
-  step lets a device skip TOTP/recovery-code entry for a fixed, non-renewing 30-day window on future logins,
-  the same pattern GitHub/Google/Microsoft all use. New `TrustedDevice` domain aggregate, shaped like
-  `RefreshToken`/`LoginChallenge` (a random raw token, only its hash persisted) but deliberately multi-use
-  across its own 30-day life rather than single-use. `IAuthenticationService.VerifyCredentialsAsync` now
-  returns a closed `VerifyCredentialsOutcome` (`SecondFactorRequired` or `CompletedViaTrustedDevice`) instead
-  of a bare challenge, so a recognized trusted device skips the second factor entirely rather than merely
-  pre-filling it - a missing/unknown/expired/revoked token silently falls through to today's normal flow.
-  Platform administrators are excluded from this bypass entirely regardless of what's presented or requested.
-  Max 3 active trusted devices per user, evicting the oldest on a 4th. Every sensitive account change
-  (password change/reset, TOTP re-enrollment) revokes all of a user's trusted devices, plus a new explicit
-  "sign out of all trusted devices" action (`IAuthenticationService.SignOutAllTrustedDevicesAsync`) - a
-  per-device list/revoke is deferred (Azure Boards #58). A known, accepted residual risk (a copied cookie
-  bypasses TOTP given known credentials) is tracked, not fixed, in Azure Boards #59.
-
-Earlier releases (`0.63.1` and before) have been trimmed per this file's 10-release retention policy
+Earlier releases (`0.65.0` and before) have been trimmed per this file's 10-release retention policy
 (added 2026-09-04) - see `git log -p -- addons/loopmi_edge/CHANGELOG.md` for the full history.
