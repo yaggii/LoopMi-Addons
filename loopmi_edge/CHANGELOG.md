@@ -19,6 +19,29 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.68.0] - 2026-09-15
+### Changed
+- (Cloud) Location Dashboard's "% of Yesterday's Full Day" energy tile and the "this week vs last week"
+  energy comparison dialogs (Location- and Area-level) no longer reconstruct yesterday/last-week totals
+  from raw Power readings on every Portal request - a Location-level load was measured as very slow against
+  the dev database. A new nightly sweep now persists each Area's settled-day energy totals once; only the
+  still-open current day/week is still computed live. Also removes a duplicate live fetch that existed
+  between the `/dashboard` and `/areas/dashboard-summaries` endpoints (the latter is now folded into the
+  former's response). No Edge-visible change - this only touches the Cloud reporting path.
+
+## [0.67.1] - 2026-09-14
+### Fixed
+- Backfills a missing changelog entry - `v0.67.0` was tagged without one (this file's own gate correctly
+  failed that release's Edge add-on build as designed, same mistake as `0.61.0`/`0.62.0`/`0.65.2`). No code
+  change to the add-on itself beyond this file.
+
+## [0.67.0] - 2026-09-14
+### Added
+- (Cloud) Compressor Efficiency Report activity tier and rule flags are now evaluated and persisted once a
+  night per Equipment, instead of being reconstructed from raw Power readings on every Portal request (a
+  single report load was measured at 6-7 seconds against the dev database). Only today's still-open day is
+  still evaluated live. No Edge-visible change - this only touches the Cloud reporting path.
+
 ## [0.66.0] - 2026-09-11
 ### Added
 - (Cloud) Employee self-service PIN change from the tablet (Azure Boards #65) - `ITabletCheckInService.ChangePinAsync`
@@ -87,25 +110,5 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   per-device list/revoke is deferred (Azure Boards #58). A known, accepted residual risk (a copied cookie
   bypasses TOTP given known credentials) is tracked, not fixed, in Azure Boards #59.
 
-## [0.63.1] - 2026-09-04
-### Fixed
-- Backfills the `0.63.0` entry below - tagged without one, same mistake as `0.61.0`/`0.62.0` (see `0.62.1`'s
-  own entry). No code change beyond this file.
-
-## [0.63.0] - 2026-09-04
-### Added
-- (Cloud) `IDataProtectionSasExpiryMonitorService` (Azure Boards #5 follow-up) - the Data Protection blob SAS
-  `bootstrap-secrets.ps1` mints has a 2-year hard expiry and no alerting at all today; a lapsed, unrenewed SAS
-  silently breaks TOTP secret decryption for every user. This service parses the SAS's own embedded `se`
-  expiry and emails a direct platform-admin warning once within 60 days of expiry (an urgent variant if
-  already past it) - wired into a new weekly timer function in `LoopMi.Cloud.Alerting`.
-
-## [0.62.1] - 2026-09-04
-### Fixed
-- Backfills the two changelog entries below - `v0.61.0` and `v0.62.0` were tagged without a matching entry
-  here, which is exactly what this file's own gate exists to catch (`azure-pipelines-addon-ghcr.yml`'s
-  "Verify CHANGELOG.md has an entry for this version" step correctly failed both of those releases as
-  designed). No code change beyond this file.
-
-Earlier releases (`0.62.0` and before) have been trimmed per this file's 10-release retention policy
+Earlier releases (`0.63.1` and before) have been trimmed per this file's 10-release retention policy
 (added 2026-09-04) - see `git log -p -- addons/loopmi_edge/CHANGELOG.md` for the full history.
