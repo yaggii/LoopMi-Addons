@@ -19,6 +19,14 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.74.1] - 2026-09-23
+### Fixed
+- (Cloud) Organization export/restore now keeps each Location's time zone and where it came from (archive
+  format 1.3, Azure Boards #76). Found in the live export/delete/restore E2E: a restored Location fell back to
+  Europe/Lisbon, and since restored tablets come back revoked, nothing would report its real zone again until
+  a tablet was re-paired - so its days would be cut at the wrong midnight. Archives from before 1.3 still
+  restore, with the default zone; an identifier the host can't resolve is ignored. No Edge-visible change.
+
 ## [0.74.0] - 2026-09-23
 ### Changed
 - (Cloud) Tablet check-ins now belong to their Location directly (Azure Boards #77): `TabletCheckIn` records its
@@ -100,12 +108,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   slower than the Energy Comparison report for an equivalent range/reading volume, which already bucketed
   readings in one linear pass. Now buckets every reading against the range's day boundaries once, same
   result, no behavior change. No Edge-visible change - this only touches the Cloud reporting path.
-
-## [0.68.1] - 2026-09-15
-### Changed
-- (Cloud) The Location/Area Dashboard's "This Week vs Last Week" dialog no longer live-recomputes days of
-  the current week that are already settled (everything before today) - it now reads those from the same
-  nightly `AreaEnergyDailyRollup` table last week's own days already use, only today's still-open partial
-  day is computed live. Closes the gap `v0.68.0` left: without this, the live raw-reading range grew every
-  day of the week, reintroducing the same cost that release fixed for last week specifically. No Edge-visible
-  change - this only touches the Cloud reporting path.
