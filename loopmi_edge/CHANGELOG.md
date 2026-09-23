@@ -19,6 +19,13 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.74.0] - 2026-09-23
+### Changed
+- (Cloud) Tablet check-ins now belong to their Location directly (Azure Boards #77): `TabletCheckIn` records its
+  tablet's Location, check-in history is listed by Location, and access to check-ins is scoped by it - so the
+  check-ins of a revoked or missing tablet can no longer disappear from view. Existing check-ins are updated
+  from their tablet's Location. No Edge-visible change.
+
 ## [0.73.0] - 2026-09-23
 ### Added
 - (Cloud) Locations now have their own time zone, always taken from browser information (Azure Boards #76):
@@ -102,13 +109,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   day is computed live. Closes the gap `v0.68.0` left: without this, the live raw-reading range grew every
   day of the week, reintroducing the same cost that release fixed for last week specifically. No Edge-visible
   change - this only touches the Cloud reporting path.
-
-## [0.68.0] - 2026-09-15
-### Changed
-- (Cloud) Location Dashboard's "% of Yesterday's Full Day" energy tile and the "this week vs last week"
-  energy comparison dialogs (Location- and Area-level) no longer reconstruct yesterday/last-week totals
-  from raw Power readings on every Portal request - a Location-level load was measured as very slow against
-  the dev database. A new nightly sweep now persists each Area's settled-day energy totals once; only the
-  still-open current day/week is still computed live. Also removes a duplicate live fetch that existed
-  between the `/dashboard` and `/areas/dashboard-summaries` endpoints (the latter is now folded into the
-  former's response). No Edge-visible change - this only touches the Cloud reporting path.
