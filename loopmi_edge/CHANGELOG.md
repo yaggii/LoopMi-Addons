@@ -19,6 +19,18 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.72.0] - 2026-09-23
+### Added
+- (Cloud) Organization export archives are now versioned and self-checking (Azure Boards #74): every archive
+  carries a `manifest.json` with its format version and a SHA-256 checksum and row count for every file.
+  Restore checks the archive against its manifest when the restore is requested, and refuses one that was
+  edited, has files added or removed, or is in a format this platform cannot read. Archives exported before
+  this release have no manifest and are still accepted as format 1.0.
+- (Cloud) Organization export/restore now carries each Location's energy and compressor-efficiency history -
+  daily power rollups, efficiency results and flags, and Area energy rollups (Azure Boards #75). Raw power
+  readings are pruned after the raw-retention window, so this is the only history for older periods; it
+  used to be lost on restore. Archive format 1.2. No Edge-visible change.
+
 ## [0.71.0] - 2026-09-23
 ### Added
 - (Cloud) Organization export/restore now carries the Location Status Tablet data (Azure Boards #71): the
@@ -95,10 +107,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 - Backfills a missing changelog entry - `v0.67.0` was tagged without one (this file's own gate correctly
   failed that release's Edge add-on build as designed, same mistake as `0.61.0`/`0.62.0`/`0.65.2`). No code
   change to the add-on itself beyond this file.
-
-## [0.67.0] - 2026-09-14
-### Added
-- (Cloud) Compressor Efficiency Report activity tier and rule flags are now evaluated and persisted once a
-  night per Equipment, instead of being reconstructed from raw Power readings on every Portal request (a
-  single report load was measured at 6-7 seconds against the dev database). Only today's still-open day is
-  still evaluated live. No Edge-visible change - this only touches the Cloud reporting path.
