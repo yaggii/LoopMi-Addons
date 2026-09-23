@@ -19,6 +19,17 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.73.0] - 2026-09-23
+### Added
+- (Cloud) Locations now have their own time zone, always taken from browser information (Azure Boards #76):
+  the browser of whoever creates or edits the Location, and - as soon as one reports - its paired tablet's
+  browser, since the tablet is physically there. Every timestamp is still stored in UTC; the zone is only
+  used to interpret the Location's own wall-clock rules (its local day, door-rule windows, report days).
+### Changed
+- (Cloud) The Location dashboard, Temperature Report, Temperature Comparison Report and tablet status now use
+  the Location's time zone instead of a hard-coded Europe/Lisbon. Existing Locations keep Europe/Lisbon until a
+  browser reports their real zone. No Edge-visible change.
+
 ## [0.72.0] - 2026-09-23
 ### Added
 - (Cloud) Organization export archives are now versioned and self-checking (Azure Boards #74): every archive
@@ -101,9 +112,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   still-open current day/week is still computed live. Also removes a duplicate live fetch that existed
   between the `/dashboard` and `/areas/dashboard-summaries` endpoints (the latter is now folded into the
   former's response). No Edge-visible change - this only touches the Cloud reporting path.
-
-## [0.67.1] - 2026-09-14
-### Fixed
-- Backfills a missing changelog entry - `v0.67.0` was tagged without one (this file's own gate correctly
-  failed that release's Edge add-on build as designed, same mistake as `0.61.0`/`0.62.0`/`0.65.2`). No code
-  change to the add-on itself beyond this file.
