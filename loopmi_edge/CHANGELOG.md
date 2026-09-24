@@ -19,6 +19,19 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.77.0] - 2026-09-24
+### Added
+- (Cloud) Checklist templates with versioned items (Azure Boards #83, architecture §14.2). `ChecklistTemplate`
+  points at its current `ChecklistTemplateVersion`; versions never change, so editing creates the next version
+  recording who (and, in a support session, which access request) and when, and every run will reference the
+  version it used. Templates are archived, never deleted. Item types: yes/no (with the non-conforming answer and
+  optional "not applicable"), number (limits, unit), sensor reading of an Equipment (limits optional - empty means
+  the Equipment's own range at run time), choice (options can be non-conforming) and free text, each with optional
+  instructions and a key that stays stable across versions; corrective-action presets per template.
+  `ChecklistTemplateService` only accepts sensor-reading Equipment of the same Organization that is not Archived and
+  has a temperature Channel, and reports two editors saving from the same version as `TemplateChangedSinceOpened`.
+  No Edge-visible change.
+
 ## [0.76.1] - 2026-09-24
 ### Fixed
 - (Cloud) Seal key escrow no longer breaks when an old key version is disabled after a rotation or a compromise
@@ -101,10 +114,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 - Backfills the `0.70.0`/`0.70.1` entries below - both tagged without one, same mistake as
   `0.61.0`/`0.62.0`/`0.63.0` (see `0.62.1`/`0.63.1`'s own entries) and `0.65.2`/`0.65.1` (see `0.65.3`'s own
   entry) before them - this gate keeps catching it. No code change beyond this file.
-
-## [0.70.1] - 2026-09-17
-### Fixed
-- (Cloud) Wired the new `Reactivate` transition (see `0.70.0` below) into
-  `EquipmentManagementService.ApplyLifecycleTransitionAsync`'s dispatch switch - missed in that release, so
-  the Management API's lifecycle endpoint rejected it with `ArgumentOutOfRangeException` until this fix. No
-  Edge-visible change - this only touches the Cloud management path.
