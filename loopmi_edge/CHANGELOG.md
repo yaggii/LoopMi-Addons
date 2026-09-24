@@ -19,6 +19,18 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.75.0] - 2026-09-24
+### Added
+- (Cloud) Record sealing foundation (Azure Boards #80, architecture §14.4): tamper-evident records for the
+  upcoming operational checklists. `CanonicalRecordBuilder` gives each record one unambiguous byte form (never
+  including OrganizationId, so restored records still verify); `RecordChainHashing` chains records per Location
+  (SHA-256 links from a Location-bound genesis); `RecordChainEntry`/`RecordSeal`/`SealKeyVersion` are the
+  append-only chain, its signatures and the public key registry. `RecordChainService` appends a record in the
+  same save as the record and retries when another tablet took the same position; `RecordSealService` signs
+  through an `IRecordSigner` (Key Vault in the Cloud), never blocks a save when signing is unavailable, sweeps
+  unsigned entries and warns the platform administrator after an hour; `RecordChainVerification` detects a
+  changed field, reordered, removed or unchained records, and forged or unknown-key seals. No Edge-visible change.
+
 ## [0.74.1] - 2026-09-23
 ### Fixed
 - (Cloud) Organization export/restore now keeps each Location's time zone and where it came from (archive
@@ -100,11 +112,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   the Energy Comparison report for an equivalent range/reading volume. All 5 callers (the Energy/Temperature
   dashboard tiles, both comparison reports, and the plain Temperature report) updated to pass their own
   kind. No Edge-visible change - this only touches the Cloud reporting path.
-
-## [0.68.2] - 2026-09-15
-### Fixed
-- (Cloud) The Temperature Comparison report's per-Equipment day loop re-scanned that Equipment's entire
-  reading list once per day in the range (O(days x readings)) - found live as the reason it measured much
-  slower than the Energy Comparison report for an equivalent range/reading volume, which already bucketed
-  readings in one linear pass. Now buckets every reading against the range's day boundaries once, same
-  result, no behavior change. No Edge-visible change - this only touches the Cloud reporting path.
