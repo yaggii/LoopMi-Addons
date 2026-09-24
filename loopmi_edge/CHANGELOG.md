@@ -19,6 +19,13 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.78.1] - 2026-09-24
+### Fixed
+- (Cloud) A weekly checklist schedule paused or changed on the day it was created still expected the week already
+  under way under its first revision - that week would have been reported as missed. Days before a schedule's
+  first revision applies now follow the newest revision saved on its creation day (Azure Boards #85).
+  No Edge-visible change.
+
 ## [0.78.0] - 2026-09-24
 ### Added
 - (Cloud) Checklist schedules per Location (Azure Boards #85, architecture §14.2). `ChecklistSchedule` places a
@@ -112,13 +119,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   daily power rollups, efficiency results and flags, and Area energy rollups (Azure Boards #75). Raw power
   readings are pruned after the raw-retention window, so this is the only history for older periods; it
   used to be lost on restore. Archive format 1.2. No Edge-visible change.
-
-## [0.71.0] - 2026-09-23
-### Added
-- (Cloud) Organization export/restore now carries the Location Status Tablet data (Azure Boards #71): the
-  employee roster, tablets, contact-sensor expected-state rules and check-in history. Employee PIN hashes and
-  tablet credentials are never exported - restored employees are marked "PIN reset required" until an
-  Owner/Admin sets a new PIN, and restored tablets come back revoked and must be paired again. Archives
-  exported before this release still restore, with no tablet data. No Edge-visible change.
-- (Cloud) New `TabletCheckInFailureReason.PinResetRequired` - checked before the PIN lockout, so a restored
-  employee's attempts never count towards it.
