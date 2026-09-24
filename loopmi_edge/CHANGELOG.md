@@ -19,6 +19,13 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.76.1] - 2026-09-24
+### Fixed
+- (Cloud) Seal key escrow no longer breaks when an old key version is disabled after a rotation or a compromise
+  (Azure Boards #81): a version whose public key the vault will not return is skipped when it was already
+  escrowed (no false "registry disagrees" alarm), and reported when it never was. Found while writing the record
+  integrity administrator guide's rotation procedure. No Edge-visible change.
+
 ## [0.76.0] - 2026-09-24
 ### Added
 - (Cloud) Seal key escrow (Azure Boards #81, architecture §14.5). `SealKeyEscrowService` gives every seal key
@@ -101,12 +108,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   `EquipmentManagementService.ApplyLifecycleTransitionAsync`'s dispatch switch - missed in that release, so
   the Management API's lifecycle endpoint rejected it with `ArgumentOutOfRangeException` until this fix. No
   Edge-visible change - this only touches the Cloud management path.
-
-## [0.70.0] - 2026-09-17
-### Added
-- (Cloud) `Equipment.Reactivate()` ("un-retire") - lets Retired equipment return to Operational, undoing a
-  mistaken `Retire()`. Retired was never the terminal lifecycle state (Archived is), so this simply reopens
-  that path; raises `EquipmentReactivatedDomainEvent` on success, matching `CompleteMaintenance`'s shape.
-  Exposed as a new `Reactivate` value on the existing lifecycle transition endpoint, alongside
-  `Commission`/`MakeOperational`/etc. No Edge-visible change - Equipment lifecycle management is a
-  Cloud/Portal-only concern.
