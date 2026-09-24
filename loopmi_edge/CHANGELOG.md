@@ -19,6 +19,16 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.76.0] - 2026-09-24
+### Added
+- (Cloud) Seal key escrow (Azure Boards #81, architecture §14.5). `SealKeyEscrowService` gives every seal key
+  version a write-once bundle the first time it is seen - public key (DER and PEM), metadata and the vault's own
+  encrypted backup - records which archive formats each version vouched for, adds the per-Location range it
+  sealed when it retires, and cross-checks the key registry against the vault (emailing the platform
+  administrator on any disagreement). `ReadKeysFromEscrowAsync` rebuilds a key registry from escrow files alone,
+  so sealed records verify without the database or Key Vault. New `ISealKeyVault`/`ISealKeyEscrowStore` seams and
+  `IRecordSealRepository.SummarizeByKeyVersionAsync`. No Edge-visible change.
+
 ## [0.75.0] - 2026-09-24
 ### Added
 - (Cloud) Record sealing foundation (Azure Boards #80, architecture §14.4): tamper-evident records for the
@@ -100,15 +110,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   Exposed as a new `Reactivate` value on the existing lifecycle transition endpoint, alongside
   `Commission`/`MakeOperational`/etc. No Edge-visible change - Equipment lifecycle management is a
   Cloud/Portal-only concern.
-
-## [0.69.0] - 2026-09-15
-### Changed
-- (Cloud) `IMeasurementRepository.ListByEquipmentIdsAndTimeRangeAsync` now filters by the Channel's kind at
-  the source (a join to Channels), instead of every caller fetching every kind an Equipment has ever
-  recorded and filtering down to the relevant one afterward in memory. Found live: an Equipment carrying
-  channels of several kinds (e.g. a Fridge with both a Temperature sensor and a Power-metering smart plug)
-  meant a Temperature-only report also paid to fetch and transfer that Equipment's entire
-  Power/Humidity/Battery history - part of why the Temperature Comparison report measured much slower than
-  the Energy Comparison report for an equivalent range/reading volume. All 5 callers (the Energy/Temperature
-  dashboard tiles, both comparison reports, and the plain Temperature report) updated to pass their own
-  kind. No Edge-visible change - this only touches the Cloud reporting path.
