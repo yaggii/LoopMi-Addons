@@ -19,6 +19,20 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.79.0] - 2026-09-24
+### Added
+- (Cloud) Completing checklists on the Location tablet (Azure Boards #87-#90, architecture §14.2). `ChecklistRun`
+  is one completion: started by an employee with their PIN, every item copied in with its question, the limits that
+  applied (a sensor item's override, else the Equipment's own range), the Equipment's name and any skip reason
+  (maintenance, retired, archived, gone, moved). Answers are saved one by one with the server's time; a
+  non-conforming answer needs a corrective action; a sensor value records whether it came from the sensor (with the
+  reading's time) or was typed because the sensor had no recent reading. Signing needs the PIN again: the server
+  stamps the submission, marks it Late after its slot closed (allowed until the end of that local day), and seals
+  the run into the Location's chain. `TabletChecklistService` lists what is due, late and on demand, refuses new
+  checklists for a suspended Organization, reopens a draft after a reload, and lets only the first of two tablets
+  submit a slot. PIN checks are shared with check-in through `IEmployeePinVerifier` (same lockout).
+  No Edge-visible change.
+
 ## [0.78.1] - 2026-09-24
 ### Fixed
 - (Cloud) A weekly checklist schedule paused or changed on the day it was created still expected the week already
@@ -107,15 +121,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 - (Cloud) The Location dashboard, Temperature Report, Temperature Comparison Report and tablet status now use
   the Location's time zone instead of a hard-coded Europe/Lisbon. Existing Locations keep Europe/Lisbon until a
   browser reports their real zone. No Edge-visible change.
-
-## [0.72.0] - 2026-09-23
-### Added
-- (Cloud) Organization export archives are now versioned and self-checking (Azure Boards #74): every archive
-  carries a `manifest.json` with its format version and a SHA-256 checksum and row count for every file.
-  Restore checks the archive against its manifest when the restore is requested, and refuses one that was
-  edited, has files added or removed, or is in a format this platform cannot read. Archives exported before
-  this release have no manifest and are still accepted as format 1.0.
-- (Cloud) Organization export/restore now carries each Location's energy and compressor-efficiency history -
-  daily power rollups, efficiency results and flags, and Area energy rollups (Azure Boards #75). Raw power
-  readings are pruned after the raw-retention window, so this is the only history for older periods; it
-  used to be lost on restore. Archive format 1.2. No Edge-visible change.
