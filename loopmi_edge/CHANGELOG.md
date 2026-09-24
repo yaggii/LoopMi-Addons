@@ -19,6 +19,20 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.78.0] - 2026-09-24
+### Added
+- (Cloud) Checklist schedules per Location (Azure Boards #85, architecture §14.2). `ChecklistSchedule` places a
+  template at a Location, optionally narrowed to one of its Areas or Equipment: daily, chosen weekdays, weekly or
+  on demand, with an optional local time window (one ending before it starts runs past midnight). Every change,
+  pausing included, is an immutable `ChecklistScheduleRevision` with who, the support access request if any, and
+  the local date it applies from - the next day, so a slot already under way keeps its rules (the creation day is
+  the exception). `ChecklistSlots.Between` works out expected slots for any range from the revisions, in the
+  Location's time zone and daylight-saving safe (a skipped hour moves forward, a repeated hour counts once);
+  `ChecklistScheduleService` validates the Location, template, Area and Equipment and lists slots for up to 62 days.
+  `ChecklistItemSkipping` gives the reason an item about Equipment is skipped when a run starts (maintenance,
+  retired, archived, gone, moved to another Location). New `ChecklistFailureReason` values for schedules.
+  No Edge-visible change.
+
 ## [0.77.0] - 2026-09-24
 ### Added
 - (Cloud) Checklist templates with versioned items (Azure Boards #83, architecture §14.2). `ChecklistTemplate`
@@ -108,9 +122,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   exported before this release still restore, with no tablet data. No Edge-visible change.
 - (Cloud) New `TabletCheckInFailureReason.PinResetRequired` - checked before the PIN lockout, so a restored
   employee's attempts never count towards it.
-
-## [0.70.2] - 2026-09-17
-### Fixed
-- Backfills the `0.70.0`/`0.70.1` entries below - both tagged without one, same mistake as
-  `0.61.0`/`0.62.0`/`0.63.0` (see `0.62.1`/`0.63.1`'s own entries) and `0.65.2`/`0.65.1` (see `0.65.3`'s own
-  entry) before them - this gate keeps catching it. No code change beyond this file.
