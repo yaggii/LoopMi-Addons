@@ -19,6 +19,19 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.82.0] - 2026-09-25
+### Added
+- (Cloud) Emails about missed checklists (Azure Boards #101, #102).
+  - When the sweep records misses at a Location, the last of them raises one `ChecklistSlotsMissedDomainEvent`
+    listing them all. It goes through the existing Outbox, so it is emailed to Owners and Admins once per Location
+    per sweep (never one per slot) and appears in the alert feed. Each line gives the checklist, its window in the
+    Location's time zone, and any partial draft's progress.
+  - `ChecklistMissDigestService` sends a daily digest at 08:00 local time. It goes out once per Organization and
+    time zone, grouping that zone's Locations, and lists the previous day's misses, leaving out those completed
+    late since. There is no email when there is nothing to report. A `ChecklistMissDigest` note records each
+    digest sent, so it goes out once.
+  - Alert and digest emails format dates in English whatever the server's culture.
+
 ## [0.81.0] - 2026-09-25
 ### Added
 - (Cloud) Missed checklists are recorded (Azure Boards #100, architecture §14.2). `ChecklistMiss` is a sealed record
@@ -117,11 +130,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   through an `IRecordSigner` (Key Vault in the Cloud), never blocks a save when signing is unavailable, sweeps
   unsigned entries and warns the platform administrator after an hour; `RecordChainVerification` detects a
   changed field, reordered, removed or unchained records, and forged or unknown-key seals. No Edge-visible change.
-
-## [0.74.1] - 2026-09-23
-### Fixed
-- (Cloud) Organization export/restore now keeps each Location's time zone and where it came from (archive
-  format 1.3, Azure Boards #76). Found in the live export/delete/restore E2E: a restored Location fell back to
-  Europe/Lisbon, and since restored tablets come back revoked, nothing would report its real zone again until
-  a tablet was re-paired - so its days would be cut at the wrong midnight. Archives from before 1.3 still
-  restore, with the default zone; an identifier the host can't resolve is ignored. No Edge-visible change.
