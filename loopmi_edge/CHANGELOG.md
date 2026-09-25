@@ -19,6 +19,21 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.84.0] - 2026-09-25
+### Added
+- (Cloud) Restoring a refused archive anyway (Azure Boards #106). A platform administrator can override an
+  integrity refusal by giving a reason and typing the target Organization's name
+  (`RestoreIntegrityOverride`). The job records the reason, when it happened, and a report of everything the
+  check found (`OrganizationRestoreJob.RecordIntegrityOverride`).
+  - Every record is restored as it is in the archive. Only the sealed records that failed verification get a
+    permanent `RestoredRecordFlag` (Location, record, restore job, issue).
+  - New `OrganizationArchiveVerifier.Inspect`, which lists every checksum problem, and a lenient
+    `ChecklistArchiveIntegrity.ReadAndVerifyAsync(allowFailures)`.
+  - New `IDataPortabilityRepository.AddRestoredRecordFlags`.
+  - New `DataPortabilityFailureReason` values: `IntegrityOverrideReasonRequired` and
+    `IntegrityOverrideConfirmationMismatch`.
+  - No Edge-visible change.
+
 ## [0.83.0] - 2026-09-25
 ### Added
 - (Cloud) Checklists in backup and restore (Azure Boards #104, #105). Archive format 1.4:
@@ -124,13 +139,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   (Azure Boards #81): a version whose public key the vault will not return is skipped when it was already
   escrowed (no false "registry disagrees" alarm), and reported when it never was. Found while writing the record
   integrity administrator guide's rotation procedure. No Edge-visible change.
-
-## [0.76.0] - 2026-09-24
-### Added
-- (Cloud) Seal key escrow (Azure Boards #81, architecture §14.5). `SealKeyEscrowService` gives every seal key
-  version a write-once bundle the first time it is seen - public key (DER and PEM), metadata and the vault's own
-  encrypted backup - records which archive formats each version vouched for, adds the per-Location range it
-  sealed when it retires, and cross-checks the key registry against the vault (emailing the platform
-  administrator on any disagreement). `ReadKeysFromEscrowAsync` rebuilds a key registry from escrow files alone,
-  so sealed records verify without the database or Key Vault. New `ISealKeyVault`/`ISealKeyEscrowStore` seams and
-  `IRecordSealRepository.SummarizeByKeyVersionAsync`. No Edge-visible change.
