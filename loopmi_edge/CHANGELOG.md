@@ -19,6 +19,24 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.85.0] - 2026-09-25
+### Added
+- (Cloud) Scheduled seal key rotations and archive format retirements (Azure Boards #108, #109).
+  - New platform-wide `ArchiveCompatibilityChange`: a rotation (retires the key version signing today) or a
+    format retirement (that version and older), with a required reason.
+  - Notice rules: 15 days or more; 7 to 14 days only when forced; never less than 7 or more than 365.
+  - Only one pending change per kind. A change can be cancelled before its effective date, and every action goes
+    into the change's audit trail.
+  - `ArchiveCompatibilityService` schedules, cancels and lists changes. Its `RunAsync` puts due format retirements
+    in effect and emails the Owners of every Organization holding an affected export: when the change is
+    scheduled, 3 days before, on the effective date, and if a change they were told about is cancelled.
+  - New permanent export log `OrganizationExportRecord` (Organization, date, format version, signing key version,
+    who asked; facts only). `OrganizationExportService` writes it when an export completes.
+  - Restore refuses an archive whose format was retired by a change now in effect, with new
+    `DataPortabilityFailureReason.ArchiveFormatRetired`. A platform administrator can still override it (#106).
+  - New repositories `IArchiveCompatibilityChangeRepository` and `IOrganizationExportRecordRepository`.
+  - No Edge-visible change.
+
 ## [0.84.0] - 2026-09-25
 ### Added
 - (Cloud) Restoring a refused archive anyway (Azure Boards #106). A platform administrator can override an
@@ -119,23 +137,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   `ChecklistItemSkipping` gives the reason an item about Equipment is skipped when a run starts (maintenance,
   retired, archived, gone, moved to another Location). New `ChecklistFailureReason` values for schedules.
   No Edge-visible change.
-
-## [0.77.0] - 2026-09-24
-### Added
-- (Cloud) Checklist templates with versioned items (Azure Boards #83, architecture §14.2). `ChecklistTemplate`
-  points at its current `ChecklistTemplateVersion`; versions never change, so editing creates the next version
-  recording who (and, in a support session, which access request) and when, and every run will reference the
-  version it used. Templates are archived, never deleted. Item types: yes/no (with the non-conforming answer and
-  optional "not applicable"), number (limits, unit), sensor reading of an Equipment (limits optional - empty means
-  the Equipment's own range at run time), choice (options can be non-conforming) and free text, each with optional
-  instructions and a key that stays stable across versions; corrective-action presets per template.
-  `ChecklistTemplateService` only accepts sensor-reading Equipment of the same Organization that is not Archived and
-  has a temperature Channel, and reports two editors saving from the same version as `TemplateChangedSinceOpened`.
-  No Edge-visible change.
-
-## [0.76.1] - 2026-09-24
-### Fixed
-- (Cloud) Seal key escrow no longer breaks when an old key version is disabled after a rotation or a compromise
-  (Azure Boards #81): a version whose public key the vault will not return is skipped when it was already
-  escrowed (no false "registry disagrees" alarm), and reported when it never was. Found while writing the record
-  integrity administrator guide's rotation procedure. No Edge-visible change.
