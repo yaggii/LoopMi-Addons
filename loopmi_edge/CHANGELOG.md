@@ -19,6 +19,18 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.80.0] - 2026-09-25
+### Added
+- (Cloud) Corrections to submitted checklists (Azure Boards #94, architecture §14.3). `ChecklistCorrection` is its
+  own sealed record in the Location's chain: it links to the run and item, keeps the value it replaces and the new
+  one, and carries the mandatory reason, the corrector and the server time. The run itself never changes. A new
+  value is checked with the same rules as the employee's answer (type, options, the limits that applied), and a
+  non-conforming value needs a corrective action. A corrected sensor reading is marked as typed. Corrections of the
+  same item chain one after another, and each must be based on the latest, so a concurrent correction is refused.
+  `ChecklistCorrectionService` refuses corrections during a platform administrator's support session. New
+  `ChecklistFailureReason` values: `RunNotSubmitted`, `ItemNotFound`, `ItemNotAnswered`, `CorrectionReasonRequired`,
+  `CorrectionUnchanged`, `CorrectionDuringSupportSession`, `ItemCorrectedSinceOpened`.
+
 ## [0.79.0] - 2026-09-24
 ### Added
 - (Cloud) Completing checklists on the Location tablet (Azure Boards #87-#90, architecture §14.2). `ChecklistRun`
@@ -110,14 +122,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   tablet's Location, check-in history is listed by Location, and access to check-ins is scoped by it - so the
   check-ins of a revoked or missing tablet can no longer disappear from view. Existing check-ins are updated
   from their tablet's Location. No Edge-visible change.
-
-## [0.73.0] - 2026-09-23
-### Added
-- (Cloud) Locations now have their own time zone, always taken from browser information (Azure Boards #76):
-  the browser of whoever creates or edits the Location, and - as soon as one reports - its paired tablet's
-  browser, since the tablet is physically there. Every timestamp is still stored in UTC; the zone is only
-  used to interpret the Location's own wall-clock rules (its local day, door-rule windows, report days).
-### Changed
-- (Cloud) The Location dashboard, Temperature Report, Temperature Comparison Report and tablet status now use
-  the Location's time zone instead of a hard-coded Europe/Lisbon. Existing Locations keep Europe/Lisbon until a
-  browser reports their real zone. No Edge-visible change.
