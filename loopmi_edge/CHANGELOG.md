@@ -19,6 +19,16 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.81.0] - 2026-09-25
+### Added
+- (Cloud) Missed checklists are recorded (Azure Boards #100, architecture §14.2). `ChecklistMiss` is a sealed record
+  in the Location's chain, written once when a scheduled slot's window closes with no submission. It keeps what
+  any partial draft had reached: who started it, and how many items were answered. `ChecklistMissSweepService`
+  finds those slots in each Location's own time zone, over the last two days so a stopped sweep catches up. It
+  skips suspended Organizations and checklists archived before the slot opened, and on-demand checklists never
+  miss. A late completion that day still works and leaves the miss in place; both records name the same schedule
+  and local date.
+
 ## [0.80.0] - 2026-09-25
 ### Added
 - (Cloud) Corrections to submitted checklists (Azure Boards #94, architecture §14.3). `ChecklistCorrection` is its
@@ -115,10 +125,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   Europe/Lisbon, and since restored tablets come back revoked, nothing would report its real zone again until
   a tablet was re-paired - so its days would be cut at the wrong midnight. Archives from before 1.3 still
   restore, with the default zone; an identifier the host can't resolve is ignored. No Edge-visible change.
-
-## [0.74.0] - 2026-09-23
-### Changed
-- (Cloud) Tablet check-ins now belong to their Location directly (Azure Boards #77): `TabletCheckIn` records its
-  tablet's Location, check-in history is listed by Location, and access to check-ins is scoped by it - so the
-  check-ins of a revoked or missing tablet can no longer disappear from view. Existing check-ins are updated
-  from their tablet's Location. No Edge-visible change.
