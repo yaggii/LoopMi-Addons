@@ -19,6 +19,22 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.83.0] - 2026-09-25
+### Added
+- (Cloud) Checklists in backup and restore (Azure Boards #104, #105). Archive format 1.4:
+  - The export now carries checklist templates and schedules with their history. Per Location, as JSON Lines, it
+    carries the sealed runs, corrections and missed records with their record chain and seals. It also includes
+    the seal keys used, and a manifest signed with the seal key (`manifest.sig.json`), so an edit to any file is
+    detectable.
+  - Before anything is imported, a restore checks the manifest signature against the platform's key registry,
+    then every checksum, then every Location's chain and seals against the records rebuilt from the archive. Any
+    failure refuses the restore with a report naming the Location and records.
+  - An unknown or retired signing key is refused too. New `DataPortabilityFailureReason` values:
+    `ArchiveSignatureInvalid`, `ArchiveSealKeyUnknown`, `ArchiveSealKeyRetired` and
+    `ArchiveRecordsFailedVerification`.
+  - Restored records keep their identifiers and seals, and each chain continues from its restored head.
+  - Older archives (1.0-1.3) restore as before.
+
 ## [0.82.0] - 2026-09-25
 ### Added
 - (Cloud) Emails about missed checklists (Azure Boards #101, #102).
@@ -118,15 +134,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   administrator on any disagreement). `ReadKeysFromEscrowAsync` rebuilds a key registry from escrow files alone,
   so sealed records verify without the database or Key Vault. New `ISealKeyVault`/`ISealKeyEscrowStore` seams and
   `IRecordSealRepository.SummarizeByKeyVersionAsync`. No Edge-visible change.
-
-## [0.75.0] - 2026-09-24
-### Added
-- (Cloud) Record sealing foundation (Azure Boards #80, architecture §14.4): tamper-evident records for the
-  upcoming operational checklists. `CanonicalRecordBuilder` gives each record one unambiguous byte form (never
-  including OrganizationId, so restored records still verify); `RecordChainHashing` chains records per Location
-  (SHA-256 links from a Location-bound genesis); `RecordChainEntry`/`RecordSeal`/`SealKeyVersion` are the
-  append-only chain, its signatures and the public key registry. `RecordChainService` appends a record in the
-  same save as the record and retries when another tablet took the same position; `RecordSealService` signs
-  through an `IRecordSigner` (Key Vault in the Cloud), never blocks a save when signing is unavailable, sweeps
-  unsigned entries and warns the platform administrator after an hour; `RecordChainVerification` detects a
-  changed field, reordered, removed or unchained records, and forged or unknown-key seals. No Edge-visible change.
