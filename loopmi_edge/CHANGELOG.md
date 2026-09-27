@@ -19,6 +19,29 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.86.0] - 2026-09-27
+### Added
+- (Cloud) Seal key rotation on its effective date (Azure Boards #110) and archive format 1.5.
+  - New `SealKeyRotationService`. Shortly after a rotation is scheduled, it creates the next key version, or
+    adopts one an interrupted run already created. It registers that version as pending
+    (`SealKeyVersion.Prepare`, `IsPending`) and escrows it. The pending version signs nothing.
+  - On the effective date the service first checks the new version: it is in the vault with the registered public
+    key, it is escrowed, and it produces a signature that verifies. If any check fails, nothing changes; the
+    failure is recorded and platform administrators are emailed. Otherwise the new version is activated and the
+    old one retired.
+  - Every Location chain then gets a `RecordChainCheckpoint` sealed with the new version. The old version is
+    disabled in the vault (never deleted), the escrow records its range, and platform administrators get a
+    report. Steps after the switch are retried if they fail.
+  - The registry, not the vault's newest version, now decides which version signs. A version the registry has
+    never seen still signs at once (a hand rotation), except while a scheduled rotation is creating its next
+    version.
+  - New `ISealKeyRotator`, `IRecordChainCheckpointRepository` and
+    `ISealKeyVersionRepository.IsNextVersionBeingPreparedAsync`.
+  - Archive format 1.5 adds each Location's `Checkpoints.jsonl` and `RestoredFlags.jsonl`. A record flagged at an
+    earlier restore still fails verification, but the archive's signature vouches for its flag, so the problem
+    counts as known and the flag carries over to the restored Organization. Formats 1.0 to 1.4 restore as before.
+  - No Edge-visible change.
+
 ## [0.85.0] - 2026-09-25
 ### Added
 - (Cloud) Scheduled seal key rotations and archive format retirements (Azure Boards #108, #109).
