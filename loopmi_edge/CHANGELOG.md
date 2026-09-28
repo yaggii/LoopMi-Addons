@@ -19,6 +19,11 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.89.0] - 2026-09-28
+### Added
+- (Cloud) An Owner can redact a checklist photo (Azure Boards #142), for instance under an erasure request: the image is deleted, while the photo's hash stays in the record's seal. The removal is its own sealed record (which photo, why, who and when), so the record still verifies. Refused during a support session and without a reason; a photo is redacted once.
+- (Cloud) Organization archive format 1.7 carries photo redactions
+
 ## [0.88.0] - 2026-09-28
 ### Added
 - (Cloud) Checklist photos as proof (Azure Boards #113): each checklist item can ask for a photo (optional, required, or required when the answer is a non-conformity), and a checklist can require a photo of every corrective action. A tablet adds up to 3 photos of each kind per item; signing is refused while a required photo is missing. The seal covers each photo's SHA-256, type and size. Runs without photos are sealed exactly as before, so every existing record still verifies.
@@ -129,15 +134,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   skips suspended Organizations and checklists archived before the slot opened, and on-demand checklists never
   miss. A late completion that day still works and leaves the miss in place; both records name the same schedule
   and local date.
-
-## [0.80.0] - 2026-09-25
-### Added
-- (Cloud) Corrections to submitted checklists (Azure Boards #94, architecture §14.3). `ChecklistCorrection` is its
-  own sealed record in the Location's chain: it links to the run and item, keeps the value it replaces and the new
-  one, and carries the mandatory reason, the corrector and the server time. The run itself never changes. A new
-  value is checked with the same rules as the employee's answer (type, options, the limits that applied), and a
-  non-conforming value needs a corrective action. A corrected sensor reading is marked as typed. Corrections of the
-  same item chain one after another, and each must be based on the latest, so a concurrent correction is refused.
-  `ChecklistCorrectionService` refuses corrections during a platform administrator's support session. New
-  `ChecklistFailureReason` values: `RunNotSubmitted`, `ItemNotFound`, `ItemNotAnswered`, `CorrectionReasonRequired`,
-  `CorrectionUnchanged`, `CorrectionDuringSupportSession`, `ItemCorrectedSinceOpened`.
