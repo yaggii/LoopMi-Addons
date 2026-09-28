@@ -19,6 +19,11 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.87.0] - 2026-09-28
+### Fixed
+- (Cloud) A seal key rotation whose new key version keeps failing its checks on the effective date can now be cancelled by a platform administrator; before, cancelling stopped at the effective date, so a stuck rotation retried forever
+- (Cloud) A stuck rotation now emails platform administrators once, then once a day while it fails the same way, instead of every 15 minutes
+
 ## [0.86.1] - 2026-09-28
 ### Changed
 - (Cloud) A finished Organization export can now be downloaded for three full days instead of 48 hours
@@ -144,11 +149,4 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   the run into the Location's chain. `TabletChecklistService` lists what is due, late and on demand, refuses new
   checklists for a suspended Organization, reopens a draft after a reload, and lets only the first of two tablets
   submit a slot. PIN checks are shared with check-in through `IEmployeePinVerifier` (same lockout).
-  No Edge-visible change.
-
-## [0.78.1] - 2026-09-24
-### Fixed
-- (Cloud) A weekly checklist schedule paused or changed on the day it was created still expected the week already
-  under way under its first revision - that week would have been reported as missed. Days before a schedule's
-  first revision applies now follow the newest revision saved on its creation day (Azure Boards #85).
   No Edge-visible change.
