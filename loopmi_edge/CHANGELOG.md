@@ -19,6 +19,11 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.88.0] - 2026-09-28
+### Added
+- (Cloud) Checklist photos as proof (Azure Boards #113): each checklist item can ask for a photo (optional, required, or required when the answer is a non-conformity), and a checklist can require a photo of every corrective action. A tablet adds up to 3 photos of each kind per item; signing is refused while a required photo is missing. The seal covers each photo's SHA-256, type and size. Runs without photos are sealed exactly as before, so every existing record still verifies.
+- (Cloud) Organization archive format 1.6: photo settings and each photo's hash travel with the checklist records (the images themselves follow in a later release)
+
 ## [0.87.0] - 2026-09-28
 ### Fixed
 - (Cloud) A seal key rotation whose new key version keeps failing its checks on the effective date can now be cancelled by a platform administrator; before, cancelling stopped at the effective date, so a stuck rotation retried forever
@@ -136,17 +141,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   `ChecklistCorrectionService` refuses corrections during a platform administrator's support session. New
   `ChecklistFailureReason` values: `RunNotSubmitted`, `ItemNotFound`, `ItemNotAnswered`, `CorrectionReasonRequired`,
   `CorrectionUnchanged`, `CorrectionDuringSupportSession`, `ItemCorrectedSinceOpened`.
-
-## [0.79.0] - 2026-09-24
-### Added
-- (Cloud) Completing checklists on the Location tablet (Azure Boards #87-#90, architecture §14.2). `ChecklistRun`
-  is one completion: started by an employee with their PIN, every item copied in with its question, the limits that
-  applied (a sensor item's override, else the Equipment's own range), the Equipment's name and any skip reason
-  (maintenance, retired, archived, gone, moved). Answers are saved one by one with the server's time; a
-  non-conforming answer needs a corrective action; a sensor value records whether it came from the sensor (with the
-  reading's time) or was typed because the sensor had no recent reading. Signing needs the PIN again: the server
-  stamps the submission, marks it Late after its slot closed (allowed until the end of that local day), and seals
-  the run into the Location's chain. `TabletChecklistService` lists what is due, late and on demand, refuses new
-  checklists for a suspended Organization, reopens a draft after a reload, and lets only the first of two tablets
-  submit a slot. PIN checks are shared with check-in through `IEmployeePinVerifier` (same lockout).
-  No Edge-visible change.
