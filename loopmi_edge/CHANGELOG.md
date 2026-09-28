@@ -19,6 +19,12 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.86.1] - 2026-09-28
+### Changed
+- (Cloud) A finished Organization export can now be downloaded for three full days instead of 48 hours
+  (`OrganizationExportService.DownloadLinkLifetime`). That leaves time to fetch it even if the Organization is
+  deleted right after. The storage cleanup rule moves to 3 days to match (LoopMi-Infra). No Edge-visible change.
+
 ## [0.86.0] - 2026-09-27
 ### Added
 - (Cloud) Seal key rotation on its effective date (Azure Boards #110) and archive format 1.5.
@@ -145,18 +151,4 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 - (Cloud) A weekly checklist schedule paused or changed on the day it was created still expected the week already
   under way under its first revision - that week would have been reported as missed. Days before a schedule's
   first revision applies now follow the newest revision saved on its creation day (Azure Boards #85).
-  No Edge-visible change.
-
-## [0.78.0] - 2026-09-24
-### Added
-- (Cloud) Checklist schedules per Location (Azure Boards #85, architecture §14.2). `ChecklistSchedule` places a
-  template at a Location, optionally narrowed to one of its Areas or Equipment: daily, chosen weekdays, weekly or
-  on demand, with an optional local time window (one ending before it starts runs past midnight). Every change,
-  pausing included, is an immutable `ChecklistScheduleRevision` with who, the support access request if any, and
-  the local date it applies from - the next day, so a slot already under way keeps its rules (the creation day is
-  the exception). `ChecklistSlots.Between` works out expected slots for any range from the revisions, in the
-  Location's time zone and daylight-saving safe (a skipped hour moves forward, a repeated hour counts once);
-  `ChecklistScheduleService` validates the Location, template, Area and Equipment and lists slots for up to 62 days.
-  `ChecklistItemSkipping` gives the reason an item about Equipment is skipped when a run starts (maintenance,
-  retired, archived, gone, moved to another Location). New `ChecklistFailureReason` values for schedules.
   No Edge-visible change.
