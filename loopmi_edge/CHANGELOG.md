@@ -19,6 +19,13 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.94.0] - 2026-09-29
+### Fixed
+- (Edge) A sensor with a steady value no longer looks offline (Azure Boards #146). The add-on also listens to Home Assistant's `state_reported` event (Home Assistant 2024.4 or later), which fires when a device reports the same value again, and sends each monitored channel's last-seen time with its regular check-in - no extra readings are stored. A plug on a constant load (UPS, router) stopped flapping between fresh and stale. On an older Home Assistant the add-on logs a warning and works as before.
+- (Edge) A channel Home Assistant marks `unavailable` or `unknown` is no longer reported as seen, so the usual offline alert follows.
+- (Edge) Subscribing to Home Assistant events no longer fails when an event arrives before the subscription's reply; that used to force a reconnect.
+- (Cloud) Check-in accepts the channels seen and moves their last-seen time forward - never back, never into the future, only for the gateway's own channels.
+
 ## [0.93.0] - 2026-09-29
 ### Changed
 - (Cloud) Alert emails read in plain words, never a raw status name (Azure Boards #145). The temperature alert says the Equipment "is too warm" or "is too cold" and gives the reading, when it was taken (Location time) and the acceptable range, e.g. "9.5 °C at 06:31 on Tue 29 Sep 2026 (Europe/Lisbon time) - acceptable 1 to 6 °C". `EquipmentTemperatureRangeStatusChangedDomainEvent` now carries the reading and the limits (optional; older events still read plainly). Battery, offline, leak, gateway connection and storage alerts are reworded the same way.
@@ -69,26 +76,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 - (Cloud) A finished Organization export can now be downloaded for three full days instead of 48 hours
   (`OrganizationExportService.DownloadLinkLifetime`). That leaves time to fetch it even if the Organization is
   deleted right after. The storage cleanup rule moves to 3 days to match (LoopMi-Infra). No Edge-visible change.
-
-## [0.86.0] - 2026-09-27
-### Added
-- (Cloud) Seal key rotation on its effective date (Azure Boards #110) and archive format 1.5.
-  - New `SealKeyRotationService`. Shortly after a rotation is scheduled, it creates the next key version, or
-    adopts one an interrupted run already created. It registers that version as pending
-    (`SealKeyVersion.Prepare`, `IsPending`) and escrows it. The pending version signs nothing.
-  - On the effective date the service first checks the new version: it is in the vault with the registered public
-    key, it is escrowed, and it produces a signature that verifies. If any check fails, nothing changes; the
-    failure is recorded and platform administrators are emailed. Otherwise the new version is activated and the
-    old one retired.
-  - Every Location chain then gets a `RecordChainCheckpoint` sealed with the new version. The old version is
-    disabled in the vault (never deleted), the escrow records its range, and platform administrators get a
-    report. Steps after the switch are retried if they fail.
-  - The registry, not the vault's newest version, now decides which version signs. A version the registry has
-    never seen still signs at once (a hand rotation), except while a scheduled rotation is creating its next
-    version.
-  - New `ISealKeyRotator`, `IRecordChainCheckpointRepository` and
-    `ISealKeyVersionRepository.IsNextVersionBeingPreparedAsync`.
-  - Archive format 1.5 adds each Location's `Checkpoints.jsonl` and `RestoredFlags.jsonl`. A record flagged at an
-    earlier restore still fails verification, but the archive's signature vouches for its flag, so the problem
-    counts as known and the flag carries over to the restored Organization. Formats 1.0 to 1.4 restore as before.
-  - No Edge-visible change.
