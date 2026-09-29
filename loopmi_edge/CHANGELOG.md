@@ -19,6 +19,11 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.91.0] - 2026-09-29
+### Added
+- (Cloud) Reference images on checklist items (Azure Boards #114): an Owner or Admin attaches up to 3 JPEG, PNG or WebP images to an item to show how the job should look, and the tablet shows them with the question. The template version keeps each image's hash, type and size, so changing an image makes a new version and every record points at the images it showed. What an image is comes from its upload (`IChecklistReferenceImageService`), never from the editor; a template can only name images its own Organization uploaded.
+- (Cloud) Organization archive format 1.9 carries the reference images; a restore copies each one whose bytes match its item
+
 ## [0.90.0] - 2026-09-29
 ### Added
 - (Cloud) Checklist photos travel in the Organization backup (Azure Boards #143): archive format 1.8 carries each photo's image, listed with its SHA-256 in the signed manifest; a photo an Owner removed is not included. A restore checks every image against the hash its record's seal covers and refuses a missing or changed one as tampering (a platform administrator can override, and the record is then flagged), then copies the images to the target Organization.
@@ -118,16 +123,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
     `ArchiveRecordsFailedVerification`.
   - Restored records keep their identifiers and seals, and each chain continues from its restored head.
   - Older archives (1.0-1.3) restore as before.
-
-## [0.82.0] - 2026-09-25
-### Added
-- (Cloud) Emails about missed checklists (Azure Boards #101, #102).
-  - When the sweep records misses at a Location, the last of them raises one `ChecklistSlotsMissedDomainEvent`
-    listing them all. It goes through the existing Outbox, so it is emailed to Owners and Admins once per Location
-    per sweep (never one per slot) and appears in the alert feed. Each line gives the checklist, its window in the
-    Location's time zone, and any partial draft's progress.
-  - `ChecklistMissDigestService` sends a daily digest at 08:00 local time. It goes out once per Organization and
-    time zone, grouping that zone's Locations, and lists the previous day's misses, leaving out those completed
-    late since. There is no email when there is nothing to report. A `ChecklistMissDigest` note records each
-    digest sent, so it goes out once.
-  - Alert and digest emails format dates in English whatever the server's culture.
