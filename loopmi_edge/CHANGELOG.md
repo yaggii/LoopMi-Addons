@@ -19,6 +19,11 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.95.0] - 2026-09-29
+### Added
+- (Edge + Cloud) A device Home Assistant reports `unavailable` now counts as offline without waiting for its own "offline after" time (Azure Boards #146). The add-on sends the monitored channels Home Assistant reports unavailable, and since when, with every check-in. The Cloud marks the device offline once every monitored channel has been unavailable for 5 minutes - Home Assistant marks everything unavailable for a moment while it restarts. The alert reads "Home Assistant reports sensor ... unavailable". The per-device "offline after" rule works as before, and a device set to 0 (offline alerting off) still sends no offline alert. `unknown` (no value yet) is not offline.
+- (Cloud) New column `Channels.UnavailableSinceUtc` (migration `AddChannelUnavailableSince`).
+
 ## [0.94.1] - 2026-09-29
 ### Fixed
 - (Edge) Steady sensors now really stay fresh (Azure Boards #146). 0.94.0's subscription to Home Assistant's `state_reported` event is refused by every Home Assistant version, because that event needs a per-entity filter (found live on Home Assistant 2026.9). Instead, once a minute the add-on reads Home Assistant's states on its existing connection and records each monitored entity whose `last_reported` time moved, even with an unchanged value. No more "refused the state_reported subscription" warning.
@@ -70,8 +75,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ### Added
 - (Cloud) Checklist photos as proof (Azure Boards #113): each checklist item can ask for a photo (optional, required, or required when the answer is a non-conformity), and a checklist can require a photo of every corrective action. A tablet adds up to 3 photos of each kind per item; signing is refused while a required photo is missing. The seal covers each photo's SHA-256, type and size. Runs without photos are sealed exactly as before, so every existing record still verifies.
 - (Cloud) Organization archive format 1.6: photo settings and each photo's hash travel with the checklist records (the images themselves follow in a later release)
-
-## [0.87.0] - 2026-09-28
-### Fixed
-- (Cloud) A seal key rotation whose new key version keeps failing its checks on the effective date can now be cancelled by a platform administrator; before, cancelling stopped at the effective date, so a stuck rotation retried forever
-- (Cloud) A stuck rotation now emails platform administrators once, then once a day while it fails the same way, instead of every 15 minutes
