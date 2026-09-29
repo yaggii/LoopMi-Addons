@@ -19,6 +19,18 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.93.0] - 2026-09-29
+### Changed
+- (Cloud) Alert emails read in plain words, never a raw status name (Azure Boards #145). The temperature alert says the Equipment "is too warm" or "is too cold" and gives the reading, when it was taken (Location time) and the acceptable range, e.g. "9.5 °C at 06:31 on Tue 29 Sep 2026 (Europe/Lisbon time) - acceptable 1 to 6 °C". `EquipmentTemperatureRangeStatusChangedDomainEvent` now carries the reading and the limits (optional; older events still read plainly). Battery, offline, leak, gateway connection and storage alerts are reworded the same way.
+- (Cloud) A missed checklist a sensor anomaly started names the anomaly and its Equipment or Device, in the missed-checklist alert and in the daily digest, e.g. "Fridge checks - started by: temperature out of range · Under-counter Fridge" (Azure Boards #144). `MissedChecklistSlot` carries the `TriggerId`; `AlertEventDescriber` and `ChecklistMissDigestService` now take an `IChecklistTriggerRepository`.
+### Fixed
+- (Cloud) The daily digest now leaves out a triggered checklist that was completed late. It matched late completions by slot, which triggered checklists do not have.
+- No Edge-visible change.
+
+## [0.92.1] - 2026-09-29
+### Fixed
+- (Cloud) A door counts as "left open" (Azure Boards #122) only when it is open at a time its expected-state rule calls open a problem. A rule can also make "closed" the problem (a door expected to stay open during service); a closed door was then wrongly counted as left open. Found live on dev before any checklist was triggered by it.
+
 ## [0.92.0] - 2026-09-29
 ### Added
 - (Cloud) Checklists started by sensor anomalies (Azure Boards #122): a schedule can be "when a sensor detects a problem", with the anomalies it answers - temperature out of range, a door left open, a sensor offline, a low battery - and a deadline (default 60 minutes, 5 minutes to a day), narrowed to an Area or an Equipment like any schedule. Each anomaly event (from the health sweep, through the outbox) starts the checklist on that Location's tablets as due; only one is open per schedule, anomaly and Equipment at a time. Past its deadline it is recorded as missed (a sealed `ChecklistMiss` naming the trigger) and it can still be completed late until the end of that day.
@@ -79,37 +91,4 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   - Archive format 1.5 adds each Location's `Checkpoints.jsonl` and `RestoredFlags.jsonl`. A record flagged at an
     earlier restore still fails verification, but the archive's signature vouches for its flag, so the problem
     counts as known and the flag carries over to the restored Organization. Formats 1.0 to 1.4 restore as before.
-  - No Edge-visible change.
-
-## [0.85.0] - 2026-09-25
-### Added
-- (Cloud) Scheduled seal key rotations and archive format retirements (Azure Boards #108, #109).
-  - New platform-wide `ArchiveCompatibilityChange`: a rotation (retires the key version signing today) or a
-    format retirement (that version and older), with a required reason.
-  - Notice rules: 15 days or more; 7 to 14 days only when forced; never less than 7 or more than 365.
-  - Only one pending change per kind. A change can be cancelled before its effective date, and every action goes
-    into the change's audit trail.
-  - `ArchiveCompatibilityService` schedules, cancels and lists changes. Its `RunAsync` puts due format retirements
-    in effect and emails the Owners of every Organization holding an affected export: when the change is
-    scheduled, 3 days before, on the effective date, and if a change they were told about is cancelled.
-  - New permanent export log `OrganizationExportRecord` (Organization, date, format version, signing key version,
-    who asked; facts only). `OrganizationExportService` writes it when an export completes.
-  - Restore refuses an archive whose format was retired by a change now in effect, with new
-    `DataPortabilityFailureReason.ArchiveFormatRetired`. A platform administrator can still override it (#106).
-  - New repositories `IArchiveCompatibilityChangeRepository` and `IOrganizationExportRecordRepository`.
-  - No Edge-visible change.
-
-## [0.84.0] - 2026-09-25
-### Added
-- (Cloud) Restoring a refused archive anyway (Azure Boards #106). A platform administrator can override an
-  integrity refusal by giving a reason and typing the target Organization's name
-  (`RestoreIntegrityOverride`). The job records the reason, when it happened, and a report of everything the
-  check found (`OrganizationRestoreJob.RecordIntegrityOverride`).
-  - Every record is restored as it is in the archive. Only the sealed records that failed verification get a
-    permanent `RestoredRecordFlag` (Location, record, restore job, issue).
-  - New `OrganizationArchiveVerifier.Inspect`, which lists every checksum problem, and a lenient
-    `ChecklistArchiveIntegrity.ReadAndVerifyAsync(allowFailures)`.
-  - New `IDataPortabilityRepository.AddRestoredRecordFlags`.
-  - New `DataPortabilityFailureReason` values: `IntegrityOverrideReasonRequired` and
-    `IntegrityOverrideConfirmationMismatch`.
   - No Edge-visible change.
