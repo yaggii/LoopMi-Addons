@@ -19,6 +19,12 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.92.0] - 2026-09-29
+### Added
+- (Cloud) Checklists started by sensor anomalies (Azure Boards #122): a schedule can be "when a sensor detects a problem", with the anomalies it answers - temperature out of range, a door left open, a sensor offline, a low battery - and a deadline (default 60 minutes, 5 minutes to a day), narrowed to an Area or an Equipment like any schedule. Each anomaly event (from the health sweep, through the outbox) starts the checklist on that Location's tablets as due; only one is open per schedule, anomaly and Equipment at a time. Past its deadline it is recorded as missed (a sealed `ChecklistMiss` naming the trigger) and it can still be completed late until the end of that day.
+- (Cloud) Doors left open are detected: a contact sensor open for at least 5 minutes at a time its expected-state rule calls a problem raises `ChannelContactProblemChangedDomainEvent` (it starts checklists; it sends no email)
+- (Cloud) Organization archive format 1.10 carries the triggered schedules, the checklists anomalies started (`Triggers.jsonl`), and the trigger each run and miss answers - outside their sealed content, so every record seals as before
+
 ## [0.91.0] - 2026-09-29
 ### Added
 - (Cloud) Reference images on checklist items (Azure Boards #114): an Owner or Admin attaches up to 3 JPEG, PNG or WebP images to an item to show how the job should look, and the tablet shows them with the question. The template version keeps each image's hash, type and size, so changing an image makes a new version and every record points at the images it showed. What an image is comes from its upload (`IChecklistReferenceImageService`), never from the editor; a template can only name images its own Organization uploaded.
@@ -107,19 +113,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
   - New `DataPortabilityFailureReason` values: `IntegrityOverrideReasonRequired` and
     `IntegrityOverrideConfirmationMismatch`.
   - No Edge-visible change.
-
-## [0.83.0] - 2026-09-25
-### Added
-- (Cloud) Checklists in backup and restore (Azure Boards #104, #105). Archive format 1.4:
-  - The export now carries checklist templates and schedules with their history. Per Location, as JSON Lines, it
-    carries the sealed runs, corrections and missed records with their record chain and seals. It also includes
-    the seal keys used, and a manifest signed with the seal key (`manifest.sig.json`), so an edit to any file is
-    detectable.
-  - Before anything is imported, a restore checks the manifest signature against the platform's key registry,
-    then every checksum, then every Location's chain and seals against the records rebuilt from the archive. Any
-    failure refuses the restore with a report naming the Location and records.
-  - An unknown or retired signing key is refused too. New `DataPortabilityFailureReason` values:
-    `ArchiveSignatureInvalid`, `ArchiveSealKeyUnknown`, `ArchiveSealKeyRetired` and
-    `ArchiveRecordsFailedVerification`.
-  - Restored records keep their identifiers and seals, and each chain continues from its restored head.
-  - Older archives (1.0-1.3) restore as before.
