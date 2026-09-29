@@ -19,6 +19,11 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.94.1] - 2026-09-29
+### Fixed
+- (Edge) Steady sensors now really stay fresh (Azure Boards #146). 0.94.0's subscription to Home Assistant's `state_reported` event is refused by every Home Assistant version, because that event needs a per-entity filter (found live on Home Assistant 2026.9). Instead, once a minute the add-on reads Home Assistant's states on its existing connection and records each monitored entity whose `last_reported` time moved, even with an unchanged value. No more "refused the state_reported subscription" warning.
+- No Cloud change.
+
 ## [0.94.0] - 2026-09-29
 ### Fixed
 - (Edge) A sensor with a steady value no longer looks offline (Azure Boards #146). The add-on also listens to Home Assistant's `state_reported` event (Home Assistant 2024.4 or later), which fires when a device reports the same value again, and sends each monitored channel's last-seen time with its regular check-in - no extra readings are stored. A plug on a constant load (UPS, router) stopped flapping between fresh and stale. On an older Home Assistant the add-on logs a warning and works as before.
@@ -70,9 +75,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ### Fixed
 - (Cloud) A seal key rotation whose new key version keeps failing its checks on the effective date can now be cancelled by a platform administrator; before, cancelling stopped at the effective date, so a stuck rotation retried forever
 - (Cloud) A stuck rotation now emails platform administrators once, then once a day while it fails the same way, instead of every 15 minutes
-
-## [0.86.1] - 2026-09-28
-### Changed
-- (Cloud) A finished Organization export can now be downloaded for three full days instead of 48 hours
-  (`OrganizationExportService.DownloadLinkLifetime`). That leaves time to fetch it even if the Organization is
-  deleted right after. The storage cleanup rule moves to 3 days to match (LoopMi-Infra). No Edge-visible change.
