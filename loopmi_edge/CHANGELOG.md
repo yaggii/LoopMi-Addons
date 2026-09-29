@@ -19,6 +19,13 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.90.0] - 2026-09-29
+### Added
+- (Cloud) Checklist photos travel in the Organization backup (Azure Boards #143): archive format 1.8 carries each photo's image, listed with its SHA-256 in the signed manifest; a photo an Owner removed is not included. A restore checks every image against the hash its record's seal covers and refuses a missing or changed one as tampering (a platform administrator can override, and the record is then flagged), then copies the images to the target Organization.
+- (Cloud) The export records the archive's size, so the Owner sees it before downloading
+### Changed
+- (Cloud) Restore reads the uploaded archive from private blob storage as a stream instead of keeping it in the database and in memory, and each Location's readings are imported a batch at a time - memory no longer grows with the archive. The upload goes straight to storage through a short-lived link (`CreateUploadAsync`), and `RequestRestoreAsync` takes that upload's identifier instead of the archive's bytes. A finished or failed job's uploaded archive is deleted. `OrganizationRestoreJob.ArchiveContent` is replaced by `ArchiveBlobPath`.
+
 ## [0.89.0] - 2026-09-28
 ### Added
 - (Cloud) An Owner can redact a checklist photo (Azure Boards #142), for instance under an erasure request: the image is deleted, while the photo's hash stays in the record's seal. The removal is its own sealed record (which photo, why, who and when), so the record still verifies. Refused during a support session and without a reason; a photo is redacted once.
@@ -124,13 +131,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
     late since. There is no email when there is nothing to report. A `ChecklistMissDigest` note records each
     digest sent, so it goes out once.
   - Alert and digest emails format dates in English whatever the server's culture.
-
-## [0.81.0] - 2026-09-25
-### Added
-- (Cloud) Missed checklists are recorded (Azure Boards #100, architecture §14.2). `ChecklistMiss` is a sealed record
-  in the Location's chain, written once when a scheduled slot's window closes with no submission. It keeps what
-  any partial draft had reached: who started it, and how many items were answered. `ChecklistMissSweepService`
-  finds those slots in each Location's own time zone, over the last two days so a stopped sweep catches up. It
-  skips suspended Organizations and checklists archived before the slot opened, and on-demand checklists never
-  miss. A late completion that day still works and leaves the miss in place; both records name the same schedule
-  and local date.
