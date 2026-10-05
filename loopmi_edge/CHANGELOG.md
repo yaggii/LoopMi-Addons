@@ -19,6 +19,11 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.97.0] - 2026-10-05
+### Added
+- (Cloud) Inspector access, second part (Azure Boards Epic #147): an Organization's export now includes its inspector access grants and everything inspectors read under them (archive format 1.11). Restoring brings every grant back as revoked history - a restore never re-opens access - and the access log exactly as it was. Archives from before 1.11 still restore.
+- No Edge change.
+
 ## [0.96.0] - 2026-10-05
 ### Added
 - (Cloud) Inspector access, first part (Azure Boards Epic #147): the building blocks for an Owner or Admin to give a food-safety inspector time-limited, read-only, logged access to chosen Locations - the grant, its emailed link and one-time code sign-in, a separate inspection token that can never be used on the management API, and the access log. Nothing is visible in the Portal yet.
@@ -70,9 +75,4 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 - (Cloud) The export records the archive's size, so the Owner sees it before downloading
 ### Changed
 - (Cloud) Restore reads the uploaded archive from private blob storage as a stream instead of keeping it in the database and in memory, and each Location's readings are imported a batch at a time - memory no longer grows with the archive. The upload goes straight to storage through a short-lived link (`CreateUploadAsync`), and `RequestRestoreAsync` takes that upload's identifier instead of the archive's bytes. A finished or failed job's uploaded archive is deleted. `OrganizationRestoreJob.ArchiveContent` is replaced by `ArchiveBlobPath`.
-
-## [0.89.0] - 2026-09-28
-### Added
-- (Cloud) An Owner can redact a checklist photo (Azure Boards #142), for instance under an erasure request: the image is deleted, while the photo's hash stays in the record's seal. The removal is its own sealed record (which photo, why, who and when), so the record still verifies. Refused during a support session and without a reason; a photo is redacted once.
-- (Cloud) Organization archive format 1.7 carries photo redactions
 
