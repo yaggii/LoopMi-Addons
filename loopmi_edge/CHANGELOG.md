@@ -19,6 +19,11 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.96.0] - 2026-10-05
+### Added
+- (Cloud) Inspector access, first part (Azure Boards Epic #147): the building blocks for an Owner or Admin to give a food-safety inspector time-limited, read-only, logged access to chosen Locations - the grant, its emailed link and one-time code sign-in, a separate inspection token that can never be used on the management API, and the access log. Nothing is visible in the Portal yet.
+- No Edge change.
+
 ## [0.95.0] - 2026-09-29
 ### Added
 - (Edge + Cloud) A device Home Assistant reports `unavailable` now counts as offline without waiting for its own "offline after" time (Azure Boards #146). The add-on sends the monitored channels Home Assistant reports unavailable, and since when, with every check-in. The Cloud marks the device offline once every monitored channel has been unavailable for 5 minutes - Home Assistant marks everything unavailable for a moment while it restarts. The alert reads "Home Assistant reports sensor ... unavailable". The per-device "offline after" rule works as before, and a device set to 0 (offline alerting off) still sends no offline alert. `unknown` (no value yet) is not offline.
@@ -71,7 +76,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 - (Cloud) An Owner can redact a checklist photo (Azure Boards #142), for instance under an erasure request: the image is deleted, while the photo's hash stays in the record's seal. The removal is its own sealed record (which photo, why, who and when), so the record still verifies. Refused during a support session and without a reason; a photo is redacted once.
 - (Cloud) Organization archive format 1.7 carries photo redactions
 
-## [0.88.0] - 2026-09-28
-### Added
-- (Cloud) Checklist photos as proof (Azure Boards #113): each checklist item can ask for a photo (optional, required, or required when the answer is a non-conformity), and a checklist can require a photo of every corrective action. A tablet adds up to 3 photos of each kind per item; signing is refused while a required photo is missing. The seal covers each photo's SHA-256, type and size. Runs without photos are sealed exactly as before, so every existing record still verifies.
-- (Cloud) Organization archive format 1.6: photo settings and each photo's hash travel with the checklist records (the images themselves follow in a later release)
