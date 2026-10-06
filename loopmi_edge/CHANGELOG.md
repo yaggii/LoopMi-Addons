@@ -19,6 +19,26 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.100.0] - 2026-10-06
+### Added
+- (Cloud) Goods-receiving records (Azure Boards #173, part of the HACCP evidence gaps #170): each delivery - supplier, product, lot number, best-before, quantity, arrival temperature, accepted or rejected with the reason - is recorded by an employee with their PIN and sealed into the Location's tamper-evident chain, never edited; a mistake is voided with a reason. Searchable by lot and supplier for a recall. Included in an Organization's export and restore (archive format 1.13); archives from before 1.13 still restore.
+- No Edge change.
+
+## [0.99.2] - 2026-10-06
+### Fixed
+- (Cloud) Release housekeeping only: 0.99.0 and 0.99.1 were tagged without a changelog entry, so their add-on release failed the changelog check; their entries are added here. No behavior change since 0.99.1.
+- No Edge change.
+
+## [0.99.1] - 2026-10-06
+### Changed
+- (Cloud) The failure codes of staff training records are prefixed `Training` (`TrainingDetailsInvalid`, `TrainingVoidReasonRequired`, `TrainingAlreadyVoided`, `TrainingChangeDuringSupportSession`) so they cannot clash with other codes in the Portal's shared message file.
+- No Edge change.
+
+## [0.99.0] - 2026-10-06
+### Added
+- (Cloud) Staff training records (Azure Boards #172, part of the HACCP evidence gaps #170): who was trained on what, when, by whom and until when. Each record is sealed into its Location's tamper-evident chain and is never edited; a mistake is voided with a reason (the voiding is sealed too). Included in an Organization's export and restore (archive format 1.12); archives from before 1.12 still restore.
+- No Edge change.
+
 ## [0.98.0] - 2026-10-06
 ### Changed
 - (Cloud) Terms of Service / Privacy Policy version raised to 2 (Azure Boards #167): the policy, terms and cookie policy now cover inspector access - disclosure to competent authorities, the organization's responsibility for who it gives access to and for informing its staff, and the inspector's browser session storage. Every user is asked to accept the new version at their next sign-in.
@@ -51,27 +71,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 - (Edge) A channel Home Assistant marks `unavailable` or `unknown` is no longer reported as seen, so the usual offline alert follows.
 - (Edge) Subscribing to Home Assistant events no longer fails when an event arrives before the subscription's reply; that used to force a reconnect.
 - (Cloud) Check-in accepts the channels seen and moves their last-seen time forward - never back, never into the future, only for the gateway's own channels.
-
-## [0.93.0] - 2026-09-29
-### Changed
-- (Cloud) Alert emails read in plain words, never a raw status name (Azure Boards #145). The temperature alert says the Equipment "is too warm" or "is too cold" and gives the reading, when it was taken (Location time) and the acceptable range, e.g. "9.5 °C at 06:31 on Tue 29 Sep 2026 (Europe/Lisbon time) - acceptable 1 to 6 °C". `EquipmentTemperatureRangeStatusChangedDomainEvent` now carries the reading and the limits (optional; older events still read plainly). Battery, offline, leak, gateway connection and storage alerts are reworded the same way.
-- (Cloud) A missed checklist a sensor anomaly started names the anomaly and its Equipment or Device, in the missed-checklist alert and in the daily digest, e.g. "Fridge checks - started by: temperature out of range · Under-counter Fridge" (Azure Boards #144). `MissedChecklistSlot` carries the `TriggerId`; `AlertEventDescriber` and `ChecklistMissDigestService` now take an `IChecklistTriggerRepository`.
-### Fixed
-- (Cloud) The daily digest now leaves out a triggered checklist that was completed late. It matched late completions by slot, which triggered checklists do not have.
-- No Edge-visible change.
-
-## [0.92.1] - 2026-09-29
-### Fixed
-- (Cloud) A door counts as "left open" (Azure Boards #122) only when it is open at a time its expected-state rule calls open a problem. A rule can also make "closed" the problem (a door expected to stay open during service); a closed door was then wrongly counted as left open. Found live on dev before any checklist was triggered by it.
-
-## [0.92.0] - 2026-09-29
-### Added
-- (Cloud) Checklists started by sensor anomalies (Azure Boards #122): a schedule can be "when a sensor detects a problem", with the anomalies it answers - temperature out of range, a door left open, a sensor offline, a low battery - and a deadline (default 60 minutes, 5 minutes to a day), narrowed to an Area or an Equipment like any schedule. Each anomaly event (from the health sweep, through the outbox) starts the checklist on that Location's tablets as due; only one is open per schedule, anomaly and Equipment at a time. Past its deadline it is recorded as missed (a sealed `ChecklistMiss` naming the trigger) and it can still be completed late until the end of that day.
-- (Cloud) Doors left open are detected: a contact sensor open for at least 5 minutes at a time its expected-state rule calls a problem raises `ChannelContactProblemChangedDomainEvent` (it starts checklists; it sends no email)
-- (Cloud) Organization archive format 1.10 carries the triggered schedules, the checklists anomalies started (`Triggers.jsonl`), and the trigger each run and miss answers - outside their sealed content, so every record seals as before
-
-## [0.91.0] - 2026-09-29
-### Added
-- (Cloud) Reference images on checklist items (Azure Boards #114): an Owner or Admin attaches up to 3 JPEG, PNG or WebP images to an item to show how the job should look, and the tablet shows them with the question. The template version keeps each image's hash, type and size, so changing an image makes a new version and every record points at the images it showed. What an image is comes from its upload (`IChecklistReferenceImageService`), never from the editor; a template can only name images its own Organization uploaded.
-- (Cloud) Organization archive format 1.9 carries the reference images; a restore copies each one whose bytes match its item
-
