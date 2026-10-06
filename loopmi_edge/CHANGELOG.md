@@ -19,6 +19,16 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.101.0] - 2026-10-06
+### Added
+- (Cloud) A file on training and delivery records (Azure Boards #176): a training record can carry one certificate and a delivery record one delivery note (a PDF or an image, up to 5 MB), attached when the entry is made and sealed with it - its hash is part of the sealed record. Opening a file checks it still matches that hash. An Owner can remove a stored file later (for instance when it shows more personal data than may be kept); the removal is a sealed record of its own and the entry keeps verifying. Files are included in an Organization's export and restore (archive format 1.14); archives from before 1.14 still restore.
+- No Edge change.
+
+## [0.100.1] - 2026-10-06
+### Changed
+- (Cloud) Privacy Policy version 3 (Azure Boards #170): the policy now names staff records explicitly - training records, goods-receiving records and signed checklist records - with their legal basis, how long they are kept, and the rights of the employees named in them. Every user is asked to accept the new version at their next sign-in.
+- No Edge change.
+
 ## [0.100.0] - 2026-10-06
 ### Added
 - (Cloud) Goods-receiving records (Azure Boards #173, part of the HACCP evidence gaps #170): each delivery - supplier, product, lot number, best-before, quantity, arrival temperature, accepted or rejected with the reason - is recorded by an employee with their PIN and sealed into the Location's tamper-evident chain, never edited; a mistake is voided with a reason. Searchable by lot and supplier for a recall. Included in an Organization's export and restore (archive format 1.13); archives from before 1.13 still restore.
@@ -59,15 +69,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ### Added
 - (Edge + Cloud) A device Home Assistant reports `unavailable` now counts as offline without waiting for its own "offline after" time (Azure Boards #146). The add-on sends the monitored channels Home Assistant reports unavailable, and since when, with every check-in. The Cloud marks the device offline once every monitored channel has been unavailable for 5 minutes - Home Assistant marks everything unavailable for a moment while it restarts. The alert reads "Home Assistant reports sensor ... unavailable". The per-device "offline after" rule works as before, and a device set to 0 (offline alerting off) still sends no offline alert. `unknown` (no value yet) is not offline.
 - (Cloud) New column `Channels.UnavailableSinceUtc` (migration `AddChannelUnavailableSince`).
-
-## [0.94.1] - 2026-09-29
-### Fixed
-- (Edge) Steady sensors now really stay fresh (Azure Boards #146). 0.94.0's subscription to Home Assistant's `state_reported` event is refused by every Home Assistant version, because that event needs a per-entity filter (found live on Home Assistant 2026.9). Instead, once a minute the add-on reads Home Assistant's states on its existing connection and records each monitored entity whose `last_reported` time moved, even with an unchanged value. No more "refused the state_reported subscription" warning.
-- No Cloud change.
-
-## [0.94.0] - 2026-09-29
-### Fixed
-- (Edge) A sensor with a steady value no longer looks offline (Azure Boards #146). The add-on also listens to Home Assistant's `state_reported` event (Home Assistant 2024.4 or later), which fires when a device reports the same value again, and sends each monitored channel's last-seen time with its regular check-in - no extra readings are stored. A plug on a constant load (UPS, router) stopped flapping between fresh and stale. On an older Home Assistant the add-on logs a warning and works as before.
-- (Edge) A channel Home Assistant marks `unavailable` or `unknown` is no longer reported as seen, so the usual offline alert follows.
-- (Edge) Subscribing to Home Assistant events no longer fails when an event arrives before the subscription's reply; that used to force a reconnect.
-- (Cloud) Check-in accepts the channels seen and moves their last-seen time forward - never back, never into the future, only for the gateway's own channels.
