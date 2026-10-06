@@ -19,6 +19,12 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.98.0] - 2026-10-06
+### Changed
+- (Cloud) Terms of Service / Privacy Policy version raised to 2 (Azure Boards #167): the policy, terms and cookie policy now cover inspector access - disclosure to competent authorities, the organization's responsibility for who it gives access to and for informing its staff, and the inspector's browser session storage. Every user is asked to accept the new version at their next sign-in.
+- (Cloud) The email an inspector receives with their access link now carries the privacy notice and a link to the Privacy Policy.
+- No Edge change.
+
 ## [0.97.0] - 2026-10-05
 ### Added
 - (Cloud) Inspector access, second part (Azure Boards Epic #147): an Organization's export now includes its inspector access grants and everything inspectors read under them (archive format 1.11). Restoring brings every grant back as revoked history - a restore never re-opens access - and the access log exactly as it was. Archives from before 1.11 still restore.
@@ -68,11 +74,4 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ### Added
 - (Cloud) Reference images on checklist items (Azure Boards #114): an Owner or Admin attaches up to 3 JPEG, PNG or WebP images to an item to show how the job should look, and the tablet shows them with the question. The template version keeps each image's hash, type and size, so changing an image makes a new version and every record points at the images it showed. What an image is comes from its upload (`IChecklistReferenceImageService`), never from the editor; a template can only name images its own Organization uploaded.
 - (Cloud) Organization archive format 1.9 carries the reference images; a restore copies each one whose bytes match its item
-
-## [0.90.0] - 2026-09-29
-### Added
-- (Cloud) Checklist photos travel in the Organization backup (Azure Boards #143): archive format 1.8 carries each photo's image, listed with its SHA-256 in the signed manifest; a photo an Owner removed is not included. A restore checks every image against the hash its record's seal covers and refuses a missing or changed one as tampering (a platform administrator can override, and the record is then flagged), then copies the images to the target Organization.
-- (Cloud) The export records the archive's size, so the Owner sees it before downloading
-### Changed
-- (Cloud) Restore reads the uploaded archive from private blob storage as a stream instead of keeping it in the database and in memory, and each Location's readings are imported a batch at a time - memory no longer grows with the archive. The upload goes straight to storage through a short-lived link (`CreateUploadAsync`), and `RequestRestoreAsync` takes that upload's identifier instead of the archive's bytes. A finished or failed job's uploaded archive is deleted. `OrganizationRestoreJob.ArchiveContent` is replaced by `ArchiveBlobPath`.
 
