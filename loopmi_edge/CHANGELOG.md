@@ -19,6 +19,16 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.102.0] - 2026-10-06
+### Added
+- (Cloud) The HACCP plan of each Location (Azure Boards #178, part of the HACCP evidence gaps #170): a manager uploads the plan as a PDF of up to 20 MB, with a title, a version label and the date it comes into force. Every upload is a new version, sealed into the Location's tamper-evident chain together with the PDF's fingerprint and never changed - a corrected plan is a new version, so the history of what was in force when is never rewritten. The plan opens only if the stored file still matches its fingerprint. Included in an Organization's export and restore (archive format 1.15); archives from before 1.15 still restore.
+- No Edge change.
+
+## [0.101.1] - 2026-10-06
+### Changed
+- (Cloud) Privacy Policy version 4 (Azure Boards #176): the retention and rights wording now names the one exception to "sealed records cannot be deleted" - an Owner can remove the file (a certificate or a delivery note) attached to a training or delivery entry, for example to answer an erasure request; the entry stays with the file's fingerprint and a sealed note of who removed it, when and why. Every user is asked to accept the new version at their next sign-in.
+- No Edge change.
+
 ## [0.101.0] - 2026-10-06
 ### Added
 - (Cloud) A file on training and delivery records (Azure Boards #176): a training record can carry one certificate and a delivery record one delivery note (a PDF or an image, up to 5 MB), attached when the entry is made and sealed with it - its hash is part of the sealed record. Opening a file checks it still matches that hash. An Owner can remove a stored file later (for instance when it shows more personal data than may be kept); the removal is a sealed record of its own and the entry keeps verifying. Files are included in an Organization's export and restore (archive format 1.14); archives from before 1.14 still restore.
@@ -59,13 +69,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ### Added
 - (Cloud) Inspector access, second part (Azure Boards Epic #147): an Organization's export now includes its inspector access grants and everything inspectors read under them (archive format 1.11). Restoring brings every grant back as revoked history - a restore never re-opens access - and the access log exactly as it was. Archives from before 1.11 still restore.
 - No Edge change.
-
-## [0.96.0] - 2026-10-05
-### Added
-- (Cloud) Inspector access, first part (Azure Boards Epic #147): the building blocks for an Owner or Admin to give a food-safety inspector time-limited, read-only, logged access to chosen Locations - the grant, its emailed link and one-time code sign-in, a separate inspection token that can never be used on the management API, and the access log. Nothing is visible in the Portal yet.
-- No Edge change.
-
-## [0.95.0] - 2026-09-29
-### Added
-- (Edge + Cloud) A device Home Assistant reports `unavailable` now counts as offline without waiting for its own "offline after" time (Azure Boards #146). The add-on sends the monitored channels Home Assistant reports unavailable, and since when, with every check-in. The Cloud marks the device offline once every monitored channel has been unavailable for 5 minutes - Home Assistant marks everything unavailable for a moment while it restarts. The alert reads "Home Assistant reports sensor ... unavailable". The per-device "offline after" rule works as before, and a device set to 0 (offline alerting off) still sends no offline alert. `unknown` (no value yet) is not offline.
-- (Cloud) New column `Channels.UnavailableSinceUtc` (migration `AddChannelUnavailableSince`).
