@@ -19,6 +19,11 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.102.1] - 2026-10-07
+### Fixed
+- (Cloud) A Portal session no longer stays valid for days (Azure Boards #180): a sign-in now ends after one hour without activity, and every use of the Portal keeps it going, so only an inactive session needs a new login. Before, a session lasted 30 days. The authentication code on a trusted device is unchanged.
+- No Edge change.
+
 ## [0.102.0] - 2026-10-06
 ### Added
 - (Cloud) The HACCP plan of each Location (Azure Boards #178, part of the HACCP evidence gaps #170): a manager uploads the plan as a PDF of up to 20 MB, with a title, a version label and the date it comes into force. Every upload is a new version, sealed into the Location's tamper-evident chain together with the PDF's fingerprint and never changed - a corrected plan is a new version, so the history of what was in force when is never rewritten. The plan opens only if the stored file still matches its fingerprint. Included in an Organization's export and restore (archive format 1.15); archives from before 1.15 still restore.
@@ -63,9 +68,4 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ### Changed
 - (Cloud) Terms of Service / Privacy Policy version raised to 2 (Azure Boards #167): the policy, terms and cookie policy now cover inspector access - disclosure to competent authorities, the organization's responsibility for who it gives access to and for informing its staff, and the inspector's browser session storage. Every user is asked to accept the new version at their next sign-in.
 - (Cloud) The email an inspector receives with their access link now carries the privacy notice and a link to the Privacy Policy.
-- No Edge change.
-
-## [0.97.0] - 2026-10-05
-### Added
-- (Cloud) Inspector access, second part (Azure Boards Epic #147): an Organization's export now includes its inspector access grants and everything inspectors read under them (archive format 1.11). Restoring brings every grant back as revoked history - a restore never re-opens access - and the access log exactly as it was. Archives from before 1.11 still restore.
 - No Edge change.
