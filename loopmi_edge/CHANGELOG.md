@@ -19,6 +19,11 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.103.0] - 2026-10-08
+### Changed
+- (Cloud) The readings database no longer grows with time (Azure Boards #222): Humidity readings are kept for a week (only the latest value is ever shown), and Temperature and Energy readings older than two months and one month respectively are folded into 15-minute and one-hour summaries that keep everything the reports use - averages, minimums, maximums, standard deviation, conformance and consumption - so every temperature and energy report, the inspector view and the organization export give the same figures as before. An organization export now also carries those summaries (archive format 1.16).
+- No Edge change.
+
 ## [0.102.1] - 2026-10-07
 ### Fixed
 - (Cloud) A Portal session no longer stays valid for days (Azure Boards #180): a sign-in now ends after one hour without activity, and every use of the Portal keeps it going, so only an inactive session needs a new login. Before, a session lasted 30 days. The authentication code on a trusted device is unchanged.
@@ -64,8 +69,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 - (Cloud) Staff training records (Azure Boards #172, part of the HACCP evidence gaps #170): who was trained on what, when, by whom and until when. Each record is sealed into its Location's tamper-evident chain and is never edited; a mistake is voided with a reason (the voiding is sealed too). Included in an Organization's export and restore (archive format 1.12); archives from before 1.12 still restore.
 - No Edge change.
 
-## [0.98.0] - 2026-10-06
-### Changed
-- (Cloud) Terms of Service / Privacy Policy version raised to 2 (Azure Boards #167): the policy, terms and cookie policy now cover inspector access - disclosure to competent authorities, the organization's responsibility for who it gives access to and for informing its staff, and the inspector's browser session storage. Every user is asked to accept the new version at their next sign-in.
-- (Cloud) The email an inspector receives with their access link now carries the privacy notice and a link to the Privacy Policy.
-- No Edge change.
