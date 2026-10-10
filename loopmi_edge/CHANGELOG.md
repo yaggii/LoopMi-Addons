@@ -19,6 +19,10 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.104.0] - 2026-10-10
+### Fixed
+- A device is no longer reported as "stopped sending data" while it is still sending: the check counts any channel that measures something (energy, power, temperature, ...), not only the monitored one. A steady load changes no value, so its monitored power reading can stay quiet for a while although the device is fine. Battery and diagnostic channels still do not count, so a daily battery report cannot hide a stalled device. The add-on now tells the Cloud when Home Assistant last heard from every measuring channel of a device. Setting a device's "Offline after (minutes)" to 0 still means it is not watched, and that is the default.
+
 ## [0.103.0] - 2026-10-08
 ### Changed
 - (Cloud) The readings database no longer grows with time (Azure Boards #222): Humidity readings are kept for a week (only the latest value is ever shown), and Temperature and Energy readings older than two months and one month respectively are folded into 15-minute and one-hour summaries that keep everything the reports use - averages, minimums, maximums, standard deviation, conformance and consumption - so every temperature and energy report, the inspector view and the organization export give the same figures as before. An organization export now also carries those summaries (archive format 1.16).
@@ -63,9 +67,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ### Changed
 - (Cloud) The failure codes of staff training records are prefixed `Training` (`TrainingDetailsInvalid`, `TrainingVoidReasonRequired`, `TrainingAlreadyVoided`, `TrainingChangeDuringSupportSession`) so they cannot clash with other codes in the Portal's shared message file.
 - No Edge change.
-
-## [0.99.0] - 2026-10-06
-### Added
-- (Cloud) Staff training records (Azure Boards #172, part of the HACCP evidence gaps #170): who was trained on what, when, by whom and until when. Each record is sealed into its Location's tamper-evident chain and is never edited; a mistake is voided with a reason (the voiding is sealed too). Included in an Organization's export and restore (archive format 1.12); archives from before 1.12 still restore.
-- No Edge change.
-
