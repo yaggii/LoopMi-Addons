@@ -19,6 +19,10 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.105.0] - 2026-10-12
+### Changed
+- The add-on now tells the Cloud, once per device, when Home Assistant last heard from any of the device's measuring channels (energy, power, temperature, ...), instead of one entry per channel. Only one timestamp per device travels: no readings, and nothing about channels nobody configured. The Cloud uses it so a device is not reported as "stopped sending data" while any of its measuring channels still reports. Monitored channels are reported as before. Setting a device's "Offline after (minutes)" to 0 still means it is not watched, and that is the default.
+
 ## [0.104.0] - 2026-10-10
 ### Fixed
 - A device is no longer reported as "stopped sending data" while it is still sending: the check counts any channel that measures something (energy, power, temperature, ...), not only the monitored one. A steady load changes no value, so its monitored power reading can stay quiet for a while although the device is fine. Battery and diagnostic channels still do not count, so a daily battery report cannot hide a stalled device. The add-on now tells the Cloud when Home Assistant last heard from every measuring channel of a device. Setting a device's "Offline after (minutes)" to 0 still means it is not watched, and that is the default.
@@ -61,9 +65,4 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.99.2] - 2026-10-06
 ### Fixed
 - (Cloud) Release housekeeping only: 0.99.0 and 0.99.1 were tagged without a changelog entry, so their add-on release failed the changelog check; their entries are added here. No behavior change since 0.99.1.
-- No Edge change.
-
-## [0.99.1] - 2026-10-06
-### Changed
-- (Cloud) The failure codes of staff training records are prefixed `Training` (`TrainingDetailsInvalid`, `TrainingVoidReasonRequired`, `TrainingAlreadyVoided`, `TrainingChangeDuringSupportSession`) so they cannot clash with other codes in the Portal's shared message file.
 - No Edge change.
