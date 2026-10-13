@@ -19,6 +19,11 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.106.0] - 2026-10-14
+### Added
+- (Cloud) Emails are written in each person's own language (Azure Boards #225): alerts, the daily missed-checklist digest, invitations, notices to Owners and the inspector's emails come in the language the person uses the Portal in - English, Portuguese, Spanish, French, Italian or German - with dates and numbers written that language's way. Switching the Portal's language also switches the emails, and the choice follows the person to any device. Managers who read different languages each get the alert in theirs, and nobody gets it twice. Alerts shown in the Portal follow the reader's language too.
+- No Edge change.
+
 ## [0.105.0] - 2026-10-12
 ### Changed
 - The add-on now tells the Cloud, once per device, when Home Assistant last heard from any of the device's measuring channels (energy, power, temperature, ...), instead of one entry per channel. Only one timestamp per device travels: no readings, and nothing about channels nobody configured. The Cloud uses it so a device is not reported as "stopped sending data" while any of its measuring channels still reports. Monitored channels are reported as before. Setting a device's "Offline after (minutes)" to 0 still means it is not watched, and that is the default.
@@ -60,9 +65,4 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.100.0] - 2026-10-06
 ### Added
 - (Cloud) Goods-receiving records (Azure Boards #173, part of the HACCP evidence gaps #170): each delivery - supplier, product, lot number, best-before, quantity, arrival temperature, accepted or rejected with the reason - is recorded by an employee with their PIN and sealed into the Location's tamper-evident chain, never edited; a mistake is voided with a reason. Searchable by lot and supplier for a recall. Included in an Organization's export and restore (archive format 1.13); archives from before 1.13 still restore.
-- No Edge change.
-
-## [0.99.2] - 2026-10-06
-### Fixed
-- (Cloud) Release housekeeping only: 0.99.0 and 0.99.1 were tagged without a changelog entry, so their add-on release failed the changelog check; their entries are added here. No behavior change since 0.99.1.
 - No Edge change.
