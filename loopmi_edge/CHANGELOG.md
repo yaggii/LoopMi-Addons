@@ -19,6 +19,13 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.111.0] - 2026-10-14
+### Added
+- (Cloud) Stock control per Location, phase 1 (Azure Boards #230-#236). An Owner or Admin switches it on per Location (off by default) and sets how many days before a best-before date to warn (1-30, default 2). From then on every accepted delivery is a stock line on the Location's tablet, listed "use first"; an employee marks it Finished or Discarded with their PIN, and a discard (past its date, damaged, or another reason) is kept as a sealed record. The tablet shows a banner when products expire soon or are past their date, and Owners and Admins get one email a day at 08:00, in their language, only when there is something to report. Lines forgotten in stock close automatically 60 days after their date; nothing is deleted.
+- (Cloud) Product and supplier lists for the Organization (Azure Boards #231): the tablet's goods-receiving form suggests them while typing and adds a new name in one tap; the Portal's Products and Suppliers pages rename, deactivate and reactivate them. A delivery record keeps the name it was signed with. Existing deliveries are linked to lists built from their names.
+- (Cloud) Organization exports carry the lists, the stock settings, the stock state of each delivery and the discards (archive format 1.17); older exports restore with stock control off.
+- No Edge change.
+
 ## [0.110.0] - 2026-10-14
 ### Changed
 - (Cloud) Privacy Policy version 5 (Azure Boards #227): it now says how long the public export check at /verify keeps what it is given - the uploaded file is deleted as soon as it is checked, the result after a day. Every Portal user reviews and accepts the updated policy at their next sign-in.
@@ -60,9 +67,4 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.102.1] - 2026-10-07
 ### Fixed
 - (Cloud) A Portal session no longer stays valid for days (Azure Boards #180): a sign-in now ends after one hour without activity, and every use of the Portal keeps it going, so only an inactive session needs a new login. Before, a session lasted 30 days. The authentication code on a trusted device is unchanged.
-- No Edge change.
-
-## [0.102.0] - 2026-10-06
-### Added
-- (Cloud) The HACCP plan of each Location (Azure Boards #178, part of the HACCP evidence gaps #170): a manager uploads the plan as a PDF of up to 20 MB, with a title, a version label and the date it comes into force. Every upload is a new version, sealed into the Location's tamper-evident chain together with the PDF's fingerprint and never changed - a corrected plan is a new version, so the history of what was in force when is never rewritten. The plan opens only if the stored file still matches its fingerprint. Included in an Organization's export and restore (archive format 1.15); archives from before 1.15 still restore.
 - No Edge change.
