@@ -19,6 +19,11 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.110.0] - 2026-10-14
+### Changed
+- (Cloud) Privacy Policy version 5 (Azure Boards #227): it now says how long the public export check at /verify keeps what it is given - the uploaded file is deleted as soon as it is checked, the result after a day. Every Portal user reviews and accepts the updated policy at their next sign-in.
+- No Edge change.
+
 ## [0.109.0] - 2026-10-14
 ### Changed
 - (Cloud) Export check at /verify (Azure Boards #227): an export LoopMi signed whose files are all as exported is no longer called "changed after export" when one of its records already failed its check at export time (for example a photo missing from storage, found by the first check of a real export on dev). It now gets its own answer - unchanged since export, with those records listed - so whoever hands over a copy is never blamed for a gap in the original data.
@@ -60,9 +65,4 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.102.0] - 2026-10-06
 ### Added
 - (Cloud) The HACCP plan of each Location (Azure Boards #178, part of the HACCP evidence gaps #170): a manager uploads the plan as a PDF of up to 20 MB, with a title, a version label and the date it comes into force. Every upload is a new version, sealed into the Location's tamper-evident chain together with the PDF's fingerprint and never changed - a corrected plan is a new version, so the history of what was in force when is never rewritten. The plan opens only if the stored file still matches its fingerprint. Included in an Organization's export and restore (archive format 1.15); archives from before 1.15 still restore.
-- No Edge change.
-
-## [0.101.1] - 2026-10-06
-### Changed
-- (Cloud) Privacy Policy version 4 (Azure Boards #176): the retention and rights wording now names the one exception to "sealed records cannot be deleted" - an Owner can remove the file (a certificate or a delivery note) attached to a training or delivery entry, for example to answer an erasure request; the entry stays with the file's fingerprint and a sealed note of who removed it, when and why. Every user is asked to accept the new version at their next sign-in.
 - No Edge change.
