@@ -19,6 +19,11 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.108.0] - 2026-10-14
+### Added
+- (Cloud) Anyone can check an Organization export at /verify, without signing in (Azure Boards #227): upload the .zip from Data Export (up to 500 MB) and LoopMi tells, in plain words and in your language, whether it is exactly what LoopMi produced - signed by LoopMi, every file as exported, every Location's sealed records unchanged - or names what was changed. The file is deleted as soon as it is checked, the result after a day. Handy for inspectors and auditors who receive a copy of the records.
+- No Edge change.
+
 ## [0.107.0] - 2026-10-14
 ### Added
 - (Cloud) Warned before a fridge or freezer fails (Azure Boards #226): when the nightly Compressor Efficiency check sees a compressor start to behave worse than its own normal - running for hours without stopping, drawing more power or running longer per cycle, or starting and stopping too often - Owners and Admins get an alert, in their language, with what was seen and where to look. It is sent once when it starts, not every day; it waits until a unit has two weeks of history; days of low activity (which a closed day also shows) only appear in the report. On the dev data this means about one alert per unit every five months.
@@ -60,9 +65,4 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.101.0] - 2026-10-06
 ### Added
 - (Cloud) A file on training and delivery records (Azure Boards #176): a training record can carry one certificate and a delivery record one delivery note (a PDF or an image, up to 5 MB), attached when the entry is made and sealed with it - its hash is part of the sealed record. Opening a file checks it still matches that hash. An Owner can remove a stored file later (for instance when it shows more personal data than may be kept); the removal is a sealed record of its own and the entry keeps verifying. Files are included in an Organization's export and restore (archive format 1.14); archives from before 1.14 still restore.
-- No Edge change.
-
-## [0.100.1] - 2026-10-06
-### Changed
-- (Cloud) Privacy Policy version 3 (Azure Boards #170): the policy now names staff records explicitly - training records, goods-receiving records and signed checklist records - with their legal basis, how long they are kept, and the rights of the employees named in them. Every user is asked to accept the new version at their next sign-in.
 - No Edge change.
