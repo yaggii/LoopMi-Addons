@@ -19,6 +19,11 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.107.0] - 2026-10-14
+### Added
+- (Cloud) Warned before a fridge or freezer fails (Azure Boards #226): when the nightly Compressor Efficiency check sees a compressor start to behave worse than its own normal - running for hours without stopping, drawing more power or running longer per cycle, or starting and stopping too often - Owners and Admins get an alert, in their language, with what was seen and where to look. It is sent once when it starts, not every day; it waits until a unit has two weeks of history; days of low activity (which a closed day also shows) only appear in the report. On the dev data this means about one alert per unit every five months.
+- No Edge change.
+
 ## [0.106.0] - 2026-10-14
 ### Added
 - (Cloud) Emails are written in each person's own language (Azure Boards #225): alerts, the daily missed-checklist digest, invitations, notices to Owners and the inspector's emails come in the language the person uses the Portal in - English, Portuguese, Spanish, French, Italian or German - with dates and numbers written that language's way. Switching the Portal's language also switches the emails, and the choice follows the person to any device. Managers who read different languages each get the alert in theirs, and nobody gets it twice. Alerts shown in the Portal follow the reader's language too.
@@ -60,9 +65,4 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.100.1] - 2026-10-06
 ### Changed
 - (Cloud) Privacy Policy version 3 (Azure Boards #170): the policy now names staff records explicitly - training records, goods-receiving records and signed checklist records - with their legal basis, how long they are kept, and the rights of the employees named in them. Every user is asked to accept the new version at their next sign-in.
-- No Edge change.
-
-## [0.100.0] - 2026-10-06
-### Added
-- (Cloud) Goods-receiving records (Azure Boards #173, part of the HACCP evidence gaps #170): each delivery - supplier, product, lot number, best-before, quantity, arrival temperature, accepted or rejected with the reason - is recorded by an employee with their PIN and sealed into the Location's tamper-evident chain, never edited; a mistake is voided with a reason. Searchable by lot and supplier for a recall. Included in an Organization's export and restore (archive format 1.13); archives from before 1.13 still restore.
 - No Edge change.
