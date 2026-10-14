@@ -19,6 +19,11 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.112.0] - 2026-10-14
+### Changed
+- (Cloud) Privacy Policy version 6 (Azure Boards #237): the staff records it describes now include stock control - the employee who marked a delivered product as used up or thrown away, and why; a discard is kept as a sealed record. Every Portal user reviews and accepts the updated policy at their next sign-in.
+- No Edge change.
+
 ## [0.111.0] - 2026-10-14
 ### Added
 - (Cloud) Stock control per Location, phase 1 (Azure Boards #230-#236). An Owner or Admin switches it on per Location (off by default) and sets how many days before a best-before date to warn (1-30, default 2). From then on every accepted delivery is a stock line on the Location's tablet, listed "use first"; an employee marks it Finished or Discarded with their PIN, and a discard (past its date, damaged, or another reason) is kept as a sealed record. The tablet shows a banner when products expire soon or are past their date, and Owners and Admins get one email a day at 08:00, in their language, only when there is something to report. Lines forgotten in stock close automatically 60 days after their date; nothing is deleted.
@@ -62,9 +67,4 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.103.0] - 2026-10-08
 ### Changed
 - (Cloud) The readings database no longer grows with time (Azure Boards #222): Humidity readings are kept for a week (only the latest value is ever shown), and Temperature and Energy readings older than two months and one month respectively are folded into 15-minute and one-hour summaries that keep everything the reports use - averages, minimums, maximums, standard deviation, conformance and consumption - so every temperature and energy report, the inspector view and the organization export give the same figures as before. An organization export now also carries those summaries (archive format 1.16).
-- No Edge change.
-
-## [0.102.1] - 2026-10-07
-### Fixed
-- (Cloud) A Portal session no longer stays valid for days (Azure Boards #180): a sign-in now ends after one hour without activity, and every use of the Portal keeps it going, so only an inactive session needs a new login. Before, a session lasted 30 days. The authentication code on a trusted device is unchanged.
 - No Edge change.
