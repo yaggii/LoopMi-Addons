@@ -19,6 +19,11 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.109.0] - 2026-10-14
+### Changed
+- (Cloud) Export check at /verify (Azure Boards #227): an export LoopMi signed whose files are all as exported is no longer called "changed after export" when one of its records already failed its check at export time (for example a photo missing from storage, found by the first check of a real export on dev). It now gets its own answer - unchanged since export, with those records listed - so whoever hands over a copy is never blamed for a gap in the original data.
+- No Edge change.
+
 ## [0.108.0] - 2026-10-14
 ### Added
 - (Cloud) Anyone can check an Organization export at /verify, without signing in (Azure Boards #227): upload the .zip from Data Export (up to 500 MB) and LoopMi tells, in plain words and in your language, whether it is exactly what LoopMi produced - signed by LoopMi, every file as exported, every Location's sealed records unchanged - or names what was changed. The file is deleted as soon as it is checked, the result after a day. Handy for inspectors and auditors who receive a copy of the records.
@@ -60,9 +65,4 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.101.1] - 2026-10-06
 ### Changed
 - (Cloud) Privacy Policy version 4 (Azure Boards #176): the retention and rights wording now names the one exception to "sealed records cannot be deleted" - an Owner can remove the file (a certificate or a delivery note) attached to a training or delivery entry, for example to answer an erasure request; the entry stays with the file's fingerprint and a sealed note of who removed it, when and why. Every user is asked to accept the new version at their next sign-in.
-- No Edge change.
-
-## [0.101.0] - 2026-10-06
-### Added
-- (Cloud) A file on training and delivery records (Azure Boards #176): a training record can carry one certificate and a delivery record one delivery note (a PDF or an image, up to 5 MB), attached when the entry is made and sealed with it - its hash is part of the sealed record. Opening a file checks it still matches that hash. An Owner can remove a stored file later (for instance when it shows more personal data than may be kept); the removal is a sealed record of its own and the entry keeps verifying. Files are included in an Organization's export and restore (archive format 1.14); archives from before 1.14 still restore.
 - No Edge change.
