@@ -19,6 +19,10 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.113.2] - 2026-10-15
+### Changed
+- The cleanup of old readings now writes its progress to the log every 50 batches (about 50,000 readings): "Local storage cleanup of ... in progress: N reading(s) deleted so far". On an Edge with months of readings the first cleanup can take many minutes, and before this it was silent until it finished.
+
 ## [0.113.1] - 2026-10-15
 ### Fixed
 - The daily cleanup of old readings (0.113.0) could hold the local database locked for tens of seconds on an Edge with months of data, making the Home Assistant connection, the check-in and the reading upload fail once with "database is locked" before recovering by themselves. The cleanup now builds no index and deletes in smaller batches with pauses, so the other parts of the Edge keep working while it runs.
@@ -66,7 +70,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ### Added
 - (Cloud) Emails are written in each person's own language (Azure Boards #225): alerts, the daily missed-checklist digest, invitations, notices to Owners and the inspector's emails come in the language the person uses the Portal in - English, Portuguese, Spanish, French, Italian or German - with dates and numbers written that language's way. Switching the Portal's language also switches the emails, and the choice follows the person to any device. Managers who read different languages each get the alert in theirs, and nobody gets it twice. Alerts shown in the Portal follow the reader's language too.
 - No Edge change.
-
-## [0.105.0] - 2026-10-12
-### Changed
-- The add-on now tells the Cloud, once per device, when Home Assistant last heard from any of the device's measuring channels (energy, power, temperature, ...), instead of one entry per channel. Only one timestamp per device travels: no readings, and nothing about channels nobody configured. The Cloud uses it so a device is not reported as "stopped sending data" while any of its measuring channels still reports. Monitored channels are reported as before. Setting a device's "Offline after (minutes)" to 0 still means it is not watched, and that is the default.
