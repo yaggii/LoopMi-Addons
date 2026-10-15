@@ -97,6 +97,14 @@ System → Backups) - a full or add-on-scoped backup captures `/data`, so a Supe
 repair or a bad update can be recovered from that backup instead of losing your
 identity. Without a backup to restore from, there is no way back.
 
+## Local storage
+
+The Edge keeps readings on the device until the Cloud has them, and it protects the Home Assistant disk it shares:
+
+- Readings already sent to the Cloud are kept for **7 days** and then deleted (once a day). The same 7 days apply to the readings behind the Edge's own local dashboard.
+- If readings cannot be sent - for example your Organization is suspended, or the internet has been down for a long time - they wait on the device. When the free space of the disk falls **below 10%**, the Edge deletes the unsent readings of the **2 oldest days**, checks again, and repeats until the space is back to 10%. It checks every hour, and it **never deletes the last 7 days** of readings, whatever the free space. Deleted readings never reach the Cloud; each purge is written to the add-on log as a warning.
+- Free space counts the whole disk Home Assistant runs on, plus the free space inside the database file. The database file itself does not shrink when readings are deleted - the freed space is reused by new readings.
+
 ## Support
 
 - Cloud Portal and account questions: your LoopMi Cloud organization's Owner/Admin.

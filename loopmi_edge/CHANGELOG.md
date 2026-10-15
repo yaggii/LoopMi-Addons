@@ -19,6 +19,13 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.113.0] - 2026-10-15
+### Added
+- The Edge no longer fills the Home Assistant disk (Azure Boards #238-#240). Readings already sent to the Cloud, and the Edge's own local-dashboard readings, are now deleted after 7 days; before, they were kept forever and the database only grew. A daily job does it in small batches, and readings still waiting to be sent are never touched by it.
+- When readings cannot be sent for any reason (the Organization suspended, a long internet outage) and the free space of the disk falls below 10%, the Edge deletes the unsent readings of the 2 oldest days, measures again and repeats until the space is back to 10%. The last 7 days are never deleted, whatever the free space. Each purge is written to the log as a warning and kept on the device so the Cloud can show the gap in a later release.
+### Changed
+- The "remaining storage" the Edge reports on every check-in now measures the disk the database lives on (the whole Home Assistant disk, plus the free space inside the database file) instead of the container's root, so the Cloud's storage alert sees the real disk. The first daily run may delete months of old readings on an Edge that has been running for a long time; the database file keeps its size (the freed space is reused by new readings and counted as free).
+
 ## [0.112.0] - 2026-10-14
 ### Changed
 - (Cloud) Privacy Policy version 6 (Azure Boards #237): the staff records it describes now include stock control - the employee who marked a delivered product as used up or thrown away, and why; a discard is kept as a sealed record. Every Portal user reviews and accepts the updated policy at their next sign-in.
@@ -63,8 +70,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.104.0] - 2026-10-10
 ### Fixed
 - A device is no longer reported as "stopped sending data" while it is still sending: the check counts any channel that measures something (energy, power, temperature, ...), not only the monitored one. A steady load changes no value, so its monitored power reading can stay quiet for a while although the device is fine. Battery and diagnostic channels still do not count, so a daily battery report cannot hide a stalled device. The add-on now tells the Cloud when Home Assistant last heard from every measuring channel of a device. Setting a device's "Offline after (minutes)" to 0 still means it is not watched, and that is the default.
-
-## [0.103.0] - 2026-10-08
-### Changed
-- (Cloud) The readings database no longer grows with time (Azure Boards #222): Humidity readings are kept for a week (only the latest value is ever shown), and Temperature and Energy readings older than two months and one month respectively are folded into 15-minute and one-hour summaries that keep everything the reports use - averages, minimums, maximums, standard deviation, conformance and consumption - so every temperature and energy report, the inspector view and the organization export give the same figures as before. An organization export now also carries those summaries (archive format 1.16).
-- No Edge change.
