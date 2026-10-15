@@ -19,6 +19,11 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.114.0] - 2026-10-15
+### Added
+- When the Edge has to delete unsent readings because the Home Assistant disk is nearly full (0.113.0), it now tells the Cloud (Azure Boards #241). Each purge is sent with the next check-in until the Cloud confirms it, so a lost connection never makes the report disappear.
+- (Cloud) The Edge Gateways page of a Location shows a "Readings discarded by the Edge" table with the dates and the number of readings that never reached LoopMi. The Temperature report shows a notice above the table when a gap in its period overlaps one (the PDF carries the same note), so a gap caused by the disk protection is not mistaken for a sensor fault. Older Edges keep working unchanged.
+
 ## [0.113.2] - 2026-10-15
 ### Changed
 - The cleanup of old readings now writes its progress to the log every 50 batches (about 50,000 readings): "Local storage cleanup of ... in progress: N reading(s) deleted so far". On an Edge with months of readings the first cleanup can take many minutes, and before this it was silent until it finished.
@@ -64,9 +69,4 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.107.0] - 2026-10-14
 ### Added
 - (Cloud) Warned before a fridge or freezer fails (Azure Boards #226): when the nightly Compressor Efficiency check sees a compressor start to behave worse than its own normal - running for hours without stopping, drawing more power or running longer per cycle, or starting and stopping too often - Owners and Admins get an alert, in their language, with what was seen and where to look. It is sent once when it starts, not every day; it waits until a unit has two weeks of history; days of low activity (which a closed day also shows) only appear in the report. On the dev data this means about one alert per unit every five months.
-- No Edge change.
-
-## [0.106.0] - 2026-10-14
-### Added
-- (Cloud) Emails are written in each person's own language (Azure Boards #225): alerts, the daily missed-checklist digest, invitations, notices to Owners and the inspector's emails come in the language the person uses the Portal in - English, Portuguese, Spanish, French, Italian or German - with dates and numbers written that language's way. Switching the Portal's language also switches the emails, and the choice follows the person to any device. Managers who read different languages each get the alert in theirs, and nobody gets it twice. Alerts shown in the Portal follow the reader's language too.
 - No Edge change.
