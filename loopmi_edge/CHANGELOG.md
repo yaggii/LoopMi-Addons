@@ -19,6 +19,14 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.115.0] - 2026-10-16
+### Added
+- (Cloud) Modules (Azure Boards Epic #242, first phase): LoopMi is now switched on and off per Organization by module - Sensor monitoring, HACCP checklists, Goods receiving, Expiry control, Training and HACCP plan and Inspector access, with Platform always on - each with a price per Location per month. A platform administrator sets an Organization's modules from the Organizations page (puzzle icon) and chooses the bought modules when activating a Trial; every change is kept in a history that the database refuses to alter, with who made it, the price in force and the number of Locations. Existing Organizations keep every module.
+- (Cloud) A new Module prices page (Administration) keeps the price catalogue: a price in force, or in the past, is never edited - a new one is added from a later date.
+- (Cloud) With Expiry control off, receipts no longer become stock lines, the daily expiry email and the automatic close pause and the tablet hides the stock screens; with Inspector access off, no new grants can be given, the active ones are revoked and inspectors lose access; with Training and HACCP plan off, no new training records or plan versions can be added. History stays readable and nothing is deleted. The menus and pages follow the Organization's modules, and the inspector's view only shows the sections of modules the Organization has or had.
+### Changed
+- (Cloud) An inspection grant revoked by the system records why (the module was switched off).
+
 ## [0.114.0] - 2026-10-15
 ### Added
 - When the Edge has to delete unsent readings because the Home Assistant disk is nearly full (0.113.0), it now tells the Cloud (Azure Boards #241). Each purge is sent with the next check-in until the Cloud confirms it, so a lost connection never makes the report disappear.
@@ -64,9 +72,4 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.108.0] - 2026-10-14
 ### Added
 - (Cloud) Anyone can check an Organization export at /verify, without signing in (Azure Boards #227): upload the .zip from Data Export (up to 500 MB) and LoopMi tells, in plain words and in your language, whether it is exactly what LoopMi produced - signed by LoopMi, every file as exported, every Location's sealed records unchanged - or names what was changed. The file is deleted as soon as it is checked, the result after a day. Handy for inspectors and auditors who receive a copy of the records.
-- No Edge change.
-
-## [0.107.0] - 2026-10-14
-### Added
-- (Cloud) Warned before a fridge or freezer fails (Azure Boards #226): when the nightly Compressor Efficiency check sees a compressor start to behave worse than its own normal - running for hours without stopping, drawing more power or running longer per cycle, or starting and stopping too often - Owners and Admins get an alert, in their language, with what was seen and where to look. It is sent once when it starts, not every day; it waits until a unit has two weeks of history; days of low activity (which a closed day also shows) only appear in the report. On the dev data this means about one alert per unit every five months.
 - No Edge change.
