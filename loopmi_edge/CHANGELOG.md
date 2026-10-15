@@ -19,6 +19,10 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.113.1] - 2026-10-15
+### Fixed
+- The daily cleanup of old readings (0.113.0) could hold the local database locked for tens of seconds on an Edge with months of data, making the Home Assistant connection, the check-in and the reading upload fail once with "database is locked" before recovering by themselves. The cleanup now builds no index and deletes in smaller batches with pauses, so the other parts of the Edge keep working while it runs.
+
 ## [0.113.0] - 2026-10-15
 ### Added
 - The Edge no longer fills the Home Assistant disk (Azure Boards #238-#240). Readings already sent to the Cloud, and the Edge's own local-dashboard readings, are now deleted after 7 days; before, they were kept forever and the database only grew. A daily job does it in small batches, and readings still waiting to be sent are never touched by it.
@@ -66,7 +70,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.105.0] - 2026-10-12
 ### Changed
 - The add-on now tells the Cloud, once per device, when Home Assistant last heard from any of the device's measuring channels (energy, power, temperature, ...), instead of one entry per channel. Only one timestamp per device travels: no readings, and nothing about channels nobody configured. The Cloud uses it so a device is not reported as "stopped sending data" while any of its measuring channels still reports. Monitored channels are reported as before. Setting a device's "Offline after (minutes)" to 0 still means it is not watched, and that is the default.
-
-## [0.104.0] - 2026-10-10
-### Fixed
-- A device is no longer reported as "stopped sending data" while it is still sending: the check counts any channel that measures something (energy, power, temperature, ...), not only the monitored one. A steady load changes no value, so its monitored power reading can stay quiet for a while although the device is fine. Battery and diagnostic channels still do not count, so a daily battery report cannot hide a stalled device. The add-on now tells the Cloud when Home Assistant last heard from every measuring channel of a device. Setting a device's "Offline after (minutes)" to 0 still means it is not watched, and that is the default.
