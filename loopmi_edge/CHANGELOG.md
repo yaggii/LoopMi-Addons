@@ -19,6 +19,12 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.117.0] - 2026-10-16
+### Added
+- (Cloud) Modules (Azure Boards Epic #242, third phase): Sensor monitoring is now switched on and off per Organization. With it off, an Edge keeps running but everything it sends is accepted and discarded - readings are not stored, devices are not added to Discovered devices, and what the gateway saw of its sensors is ignored (its versions, storage and configuration are still kept) - so it never fills its disk or retries; new Edge registration tokens, device, channel and threshold changes and the sensor pages (dashboards, devices, gateways, temperature, energy and efficiency reports) are no longer offered, while the history stays readable.
+- (Cloud) Nothing is evaluated for an Organization without Sensor monitoring: no stale device, offline gateway, battery, leak, temperature, door or compressor-efficiency alert can follow from silence nobody is watching. When it is switched back on every device gets a full reporting interval before it can be called stale (no "stale" email for the weeks it was off), and the daily efficiency evaluation covers only days watched from midnight to midnight.
+- (Cloud) An Organization with only HACCP checklists, Goods receiving and the like works without an Edge: the tablet home shows just the buttons of the active modules (no equipment grid, no shift check), a checklist item that reads a sensor is skipped for a stated reason ("sensor monitoring is not switched on") and the rest of the checklist is asked as usual, and a template or schedule cannot be given sensor items or a sensor trigger.
+
 ## [0.116.0] - 2026-10-16
 ### Added
 - (Cloud) Modules (Azure Boards Epic #242, second phase): HACCP checklists and Goods receiving are now switched on and off per Organization. With HACCP checklists off, no template, schedule, correction or photo change can be made, the tablet offers no checklists and no sensor-triggered checklist starts; with Goods receiving off, no delivery can be recorded on the tablet and the product and supplier lists cannot be changed (and Expiry control, which needs it, goes off with it). Records, non-conformities, the compliance ranking, earlier deliveries and the recall search stay readable.
@@ -68,9 +74,4 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.110.0] - 2026-10-14
 ### Changed
 - (Cloud) Privacy Policy version 5 (Azure Boards #227): it now says how long the public export check at /verify keeps what it is given - the uploaded file is deleted as soon as it is checked, the result after a day. Every Portal user reviews and accepts the updated policy at their next sign-in.
-- No Edge change.
-
-## [0.109.0] - 2026-10-14
-### Changed
-- (Cloud) Export check at /verify (Azure Boards #227): an export LoopMi signed whose files are all as exported is no longer called "changed after export" when one of its records already failed its check at export time (for example a photo missing from storage, found by the first check of a real export on dev). It now gets its own answer - unchanged since export, with those records listed - so whoever hands over a copy is never blamed for a gap in the original data.
 - No Edge change.
