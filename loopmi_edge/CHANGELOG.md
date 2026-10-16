@@ -19,6 +19,10 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.122.0] - 2026-10-16
+### Added
+- (Cloud) An agreement with an Organization can now be a percentage off the catalogue price instead of a fixed price - for one module or for every module - and either kind can end on a date (the last day it applies; from the next day the catalogue price applies again). A percentage follows the catalogue when the catalogue price changes; the arrangement that started last is the one in force. Billing summaries show the discount, the end and on how many days an agreement applied; the Owner sees "agreed price - 10% off - until ..." on the Modules page and is emailed when an agreement is made.
+
 ## [0.121.0] - 2026-10-16
 ### Added
 - (Cloud) A platform administrator can agree a price with one Organization for one module - a different arrangement with a customer: a fixed price per Location per month (0 is free) from a date in the current month or later, with a reason. Billing summaries, the Owner's quote, estimate and module history all use it; the Owner sees it marked as an agreed price and, like the platform administrators, is emailed in their own language when one is agreed. A price already billed never changes, and a catalogue price change does not alter an agreed price.
@@ -68,7 +72,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.113.2] - 2026-10-15
 ### Changed
 - The cleanup of old readings now writes its progress to the log every 50 batches (about 50,000 readings): "Local storage cleanup of ... in progress: N reading(s) deleted so far". On an Edge with months of readings the first cleanup can take many minutes, and before this it was silent until it finished.
-
-## [0.113.1] - 2026-10-15
-### Fixed
-- The daily cleanup of old readings (0.113.0) could hold the local database locked for tens of seconds on an Edge with months of data, making the Home Assistant connection, the check-in and the reading upload fail once with "database is locked" before recovering by themselves. The cleanup now builds no index and deletes in smaller batches with pauses, so the other parts of the Edge keep working while it runs.
