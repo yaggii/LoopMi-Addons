@@ -19,6 +19,10 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.121.0] - 2026-10-16
+### Added
+- (Cloud) A platform administrator can agree a price with one Organization for one module - a different arrangement with a customer: a fixed price per Location per month (0 is free) from a date in the current month or later, with a reason. Billing summaries, the Owner's quote, estimate and module history all use it; the Owner sees it marked as an agreed price and, like the platform administrators, is emailed in their own language when one is agreed. A price already billed never changes, and a catalogue price change does not alter an agreed price.
+
 ## [0.120.0] - 2026-10-16
 ### Changed
 - (Cloud) Every module change is now emailed to LoopMi's platform administrators as well as to the Organization's Owners, each in their own language, instead of to a configured billing address.
@@ -68,10 +72,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.113.1] - 2026-10-15
 ### Fixed
 - The daily cleanup of old readings (0.113.0) could hold the local database locked for tens of seconds on an Edge with months of data, making the Home Assistant connection, the check-in and the reading upload fail once with "database is locked" before recovering by themselves. The cleanup now builds no index and deletes in smaller batches with pauses, so the other parts of the Edge keep working while it runs.
-
-## [0.113.0] - 2026-10-15
-### Added
-- The Edge no longer fills the Home Assistant disk (Azure Boards #238-#240). Readings already sent to the Cloud, and the Edge's own local-dashboard readings, are now deleted after 7 days; before, they were kept forever and the database only grew. A daily job does it in small batches, and readings still waiting to be sent are never touched by it.
-- When readings cannot be sent for any reason (the Organization suspended, a long internet outage) and the free space of the disk falls below 10%, the Edge deletes the unsent readings of the 2 oldest days, measures again and repeats until the space is back to 10%. The last 7 days are never deleted, whatever the free space. Each purge is written to the log as a warning and kept on the device so the Cloud can show the gap in a later release.
-### Changed
-- The "remaining storage" the Edge reports on every check-in now measures the disk the database lives on (the whole Home Assistant disk, plus the free space inside the database file) instead of the container's root, so the Cloud's storage alert sees the real disk. The first daily run may delete months of old readings on an Edge that has been running for a long time; the database file keeps its size (the freed space is reused by new readings and counted as free).
