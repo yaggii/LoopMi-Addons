@@ -19,6 +19,13 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.118.0] - 2026-10-16
+### Added
+- (Cloud) Modules (Azure Boards Epic #242, fourth phase): the Owner buys and cancels modules from the Portal. A purchase shows its cost first (the price per Location, the Locations billed and the amount for the rest of the month, worked out by the same rule as the monthly summary) and needs an explicit confirmation; the modules it needs come with it. A cancellation is scheduled for the end of the month (00:00 Lisbon time on the 1st, also shown in the Owner's own time zone) and can be cancelled until then; a sweep applies it at that moment and runs what must happen (inspector grants revoked, tablet buttons removed, evaluations stop). On a free Trial everything is free and immediate; a suspended Organization's Owner cannot change modules.
+- (Cloud) Every module change is emailed to the Organization's Owners, each in their own language, and to LoopMi's billing address, with the module, the date in Lisbon time, the price and the Locations.
+- (Cloud) A monthly billing summary is generated for every Organization at the start of each month: one line per module with the Locations billed, the days it counted, the price in force and the amount (a Location counts from the day it was created, Trial days are never billed). A platform administrator checks it, freezes it (validated: later price or module changes never alter it) and records the invoice number after invoicing it by hand.
+- (Cloud) Terms of Service and Privacy Policy version 7: module purchase, pro-rata billing, end-of-month cancellation, the data of a module that is off and price changes with notice. Everyone accepts it again at their next sign-in.
+
 ## [0.117.0] - 2026-10-16
 ### Added
 - (Cloud) Modules (Azure Boards Epic #242, third phase): Sensor monitoring is now switched on and off per Organization. With it off, an Edge keeps running but everything it sends is accepted and discarded - readings are not stored, devices are not added to Discovered devices, and what the gateway saw of its sensors is ignored (its versions, storage and configuration are still kept) - so it never fills its disk or retries; new Edge registration tokens, device, channel and threshold changes and the sensor pages (dashboards, devices, gateways, temperature, energy and efficiency reports) are no longer offered, while the history stays readable.
@@ -69,9 +76,4 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 - (Cloud) Stock control per Location, phase 1 (Azure Boards #230-#236). An Owner or Admin switches it on per Location (off by default) and sets how many days before a best-before date to warn (1-30, default 2). From then on every accepted delivery is a stock line on the Location's tablet, listed "use first"; an employee marks it Finished or Discarded with their PIN, and a discard (past its date, damaged, or another reason) is kept as a sealed record. The tablet shows a banner when products expire soon or are past their date, and Owners and Admins get one email a day at 08:00, in their language, only when there is something to report. Lines forgotten in stock close automatically 60 days after their date; nothing is deleted.
 - (Cloud) Product and supplier lists for the Organization (Azure Boards #231): the tablet's goods-receiving form suggests them while typing and adds a new name in one tap; the Portal's Products and Suppliers pages rename, deactivate and reactivate them. A delivery record keeps the name it was signed with. Existing deliveries are linked to lists built from their names.
 - (Cloud) Organization exports carry the lists, the stock settings, the stock state of each delivery and the discards (archive format 1.17); older exports restore with stock control off.
-- No Edge change.
-
-## [0.110.0] - 2026-10-14
-### Changed
-- (Cloud) Privacy Policy version 5 (Azure Boards #227): it now says how long the public export check at /verify keeps what it is given - the uploaded file is deleted as soon as it is checked, the result after a day. Every Portal user reviews and accepts the updated policy at their next sign-in.
 - No Edge change.
