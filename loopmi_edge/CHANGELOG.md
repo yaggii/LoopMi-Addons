@@ -19,6 +19,10 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.123.0] - 2026-10-16
+### Added
+- (Cloud) A platform administrator can change the values of a billing summary that is still waiting for validation: Locations, days, price and amount of each line, by hand. What the system computed stays on the line, the line is marked as changed by hand, the summary keeps who changed it and when, and the total follows. A recalculation discards the changes, and a validated summary can no longer be changed.
+
 ## [0.122.0] - 2026-10-16
 ### Added
 - (Cloud) An agreement with an Organization can now be a percentage off the catalogue price instead of a fixed price - for one module or for every module - and either kind can end on a date (the last day it applies; from the next day the catalogue price applies again). A percentage follows the catalogue when the catalogue price changes; the arrangement that started last is the one in force. Billing summaries show the discount, the end and on how many days an agreement applied; the Owner sees "agreed price - 10% off - until ..." on the Modules page and is emailed when an agreement is made.
@@ -68,7 +72,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ### Added
 - When the Edge has to delete unsent readings because the Home Assistant disk is nearly full (0.113.0), it now tells the Cloud (Azure Boards #241). Each purge is sent with the next check-in until the Cloud confirms it, so a lost connection never makes the report disappear.
 - (Cloud) The Edge Gateways page of a Location shows a "Readings discarded by the Edge" table with the dates and the number of readings that never reached LoopMi. The Temperature report shows a notice above the table when a gap in its period overlaps one (the PDF carries the same note), so a gap caused by the disk protection is not mistaken for a sensor fault. Older Edges keep working unchanged.
-
-## [0.113.2] - 2026-10-15
-### Changed
-- The cleanup of old readings now writes its progress to the log every 50 batches (about 50,000 readings): "Local storage cleanup of ... in progress: N reading(s) deleted so far". On an Edge with months of readings the first cleanup can take many minutes, and before this it was silent until it finished.
