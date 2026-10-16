@@ -19,6 +19,12 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.116.0] - 2026-10-16
+### Added
+- (Cloud) Modules (Azure Boards Epic #242, second phase): HACCP checklists and Goods receiving are now switched on and off per Organization. With HACCP checklists off, no template, schedule, correction or photo change can be made, the tablet offers no checklists and no sensor-triggered checklist starts; with Goods receiving off, no delivery can be recorded on the tablet and the product and supplier lists cannot be changed (and Expiry control, which needs it, goes off with it). Records, non-conformities, the compliance ranking, earlier deliveries and the recall search stay readable.
+- (Cloud) Nothing from a period in which HACCP checklists was off is evaluated: a missed checklist is recorded, counted or mailed only if the module was on for the whole window, from its start to its late deadline - so switching the module back on never records the off period as missed, and the compliance ranking leaves such windows out of both "due" and "missed".
+- (Cloud) The tablet and the employee roster follow the modules: the tablet (pairing, sign-in, shift check-in, PIN change) needs Sensor monitoring, HACCP checklists, Goods receiving or Expiry control, and shows only the buttons of the modules that are on, or "No active functions" - it stays paired and works again by itself; an Organization with only Training and HACCP plan can keep its employee roster, and employees are then added without a PIN (the Employees page asks for the PINs when a module that uses the tablet is switched on).
+
 ## [0.115.0] - 2026-10-16
 ### Added
 - (Cloud) Modules (Azure Boards Epic #242, first phase): LoopMi is now switched on and off per Organization by module - Sensor monitoring, HACCP checklists, Goods receiving, Expiry control, Training and HACCP plan and Inspector access, with Platform always on - each with a price per Location per month. A platform administrator sets an Organization's modules from the Organizations page (puzzle icon) and chooses the bought modules when activating a Trial; every change is kept in a history that the database refuses to alter, with who made it, the price in force and the number of Locations. Existing Organizations keep every module.
@@ -67,9 +73,4 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.109.0] - 2026-10-14
 ### Changed
 - (Cloud) Export check at /verify (Azure Boards #227): an export LoopMi signed whose files are all as exported is no longer called "changed after export" when one of its records already failed its check at export time (for example a photo missing from storage, found by the first check of a real export on dev). It now gets its own answer - unchanged since export, with those records listed - so whoever hands over a copy is never blamed for a gap in the original data.
-- No Edge change.
-
-## [0.108.0] - 2026-10-14
-### Added
-- (Cloud) Anyone can check an Organization export at /verify, without signing in (Azure Boards #227): upload the .zip from Data Export (up to 500 MB) and LoopMi tells, in plain words and in your language, whether it is exactly what LoopMi produced - signed by LoopMi, every file as exported, every Location's sealed records unchanged - or names what was changed. The file is deleted as soon as it is checked, the result after a day. Handy for inspectors and auditors who receive a copy of the records.
 - No Edge change.
