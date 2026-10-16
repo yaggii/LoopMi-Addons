@@ -19,6 +19,10 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.119.0] - 2026-10-16
+### Fixed
+- (Cloud) The monthly billing summary of an Organization read none of its Locations when it was generated or recalculated from the platform administrator's session (Row-Level Security hides them from someone with no Organization), so every line showed 0 Locations billed and 0.00. It now reads the Locations of the Organization it is computing.
+
 ## [0.118.0] - 2026-10-16
 ### Added
 - (Cloud) Modules (Azure Boards Epic #242, fourth phase): the Owner buys and cancels modules from the Portal. A purchase shows its cost first (the price per Location, the Locations billed and the amount for the rest of the month, worked out by the same rule as the monthly summary) and needs an explicit confirmation; the modules it needs come with it. A cancellation is scheduled for the end of the month (00:00 Lisbon time on the 1st, also shown in the Owner's own time zone) and can be cancelled until then; a sweep applies it at that moment and runs what must happen (inspector grants revoked, tablet buttons removed, evaluations stop). On a free Trial everything is free and immediate; a suspended Organization's Owner cannot change modules.
@@ -69,11 +73,4 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.112.0] - 2026-10-14
 ### Changed
 - (Cloud) Privacy Policy version 6 (Azure Boards #237): the staff records it describes now include stock control - the employee who marked a delivered product as used up or thrown away, and why; a discard is kept as a sealed record. Every Portal user reviews and accepts the updated policy at their next sign-in.
-- No Edge change.
-
-## [0.111.0] - 2026-10-14
-### Added
-- (Cloud) Stock control per Location, phase 1 (Azure Boards #230-#236). An Owner or Admin switches it on per Location (off by default) and sets how many days before a best-before date to warn (1-30, default 2). From then on every accepted delivery is a stock line on the Location's tablet, listed "use first"; an employee marks it Finished or Discarded with their PIN, and a discard (past its date, damaged, or another reason) is kept as a sealed record. The tablet shows a banner when products expire soon or are past their date, and Owners and Admins get one email a day at 08:00, in their language, only when there is something to report. Lines forgotten in stock close automatically 60 days after their date; nothing is deleted.
-- (Cloud) Product and supplier lists for the Organization (Azure Boards #231): the tablet's goods-receiving form suggests them while typing and adds a new name in one tap; the Portal's Products and Suppliers pages rename, deactivate and reactivate them. A delivery record keeps the name it was signed with. Existing deliveries are linked to lists built from their names.
-- (Cloud) Organization exports carry the lists, the stock settings, the stock state of each delivery and the discards (archive format 1.17); older exports restore with stock control off.
 - No Edge change.
