@@ -19,6 +19,12 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.120.0] - 2026-10-16
+### Changed
+- (Cloud) Every module change is now emailed to LoopMi's platform administrators as well as to the Organization's Owners, each in their own language, instead of to a configured billing address.
+### Fixed
+- (Cloud) An Organization that was already active when module billing began is billed from the moment billing went live, not from the start of time: its first summary no longer bills days before billing existed.
+
 ## [0.119.0] - 2026-10-16
 ### Fixed
 - (Cloud) The monthly billing summary of an Organization read none of its Locations when it was generated or recalculated from the platform administrator's session (Row-Level Security hides them from someone with no Organization), so every line showed 0 Locations billed and 0.00. It now reads the Locations of the Organization it is computing.
@@ -69,8 +75,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 - When readings cannot be sent for any reason (the Organization suspended, a long internet outage) and the free space of the disk falls below 10%, the Edge deletes the unsent readings of the 2 oldest days, measures again and repeats until the space is back to 10%. The last 7 days are never deleted, whatever the free space. Each purge is written to the log as a warning and kept on the device so the Cloud can show the gap in a later release.
 ### Changed
 - The "remaining storage" the Edge reports on every check-in now measures the disk the database lives on (the whole Home Assistant disk, plus the free space inside the database file) instead of the container's root, so the Cloud's storage alert sees the real disk. The first daily run may delete months of old readings on an Edge that has been running for a long time; the database file keeps its size (the freed space is reused by new readings and counted as free).
-
-## [0.112.0] - 2026-10-14
-### Changed
-- (Cloud) Privacy Policy version 6 (Azure Boards #237): the staff records it describes now include stock control - the employee who marked a delivered product as used up or thrown away, and why; a discard is kept as a sealed record. Every Portal user reviews and accepts the updated policy at their next sign-in.
-- No Edge change.
