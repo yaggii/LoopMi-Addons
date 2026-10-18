@@ -19,6 +19,12 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.123.1] - 2026-10-18
+### Fixed
+- (Cloud) The monthly billing summaries are generated again. The timer that creates them failed on every run since 2026-10-16 ("PlatformInternalTenantAccessor can never be scoped to a single Organization"), because the billing service tried to scope a platform-internal session to one Organization. It now leaves such a session as it is; the summaries that were due (September) are made up by the next run, without duplicates.
+### Changed
+- (Edge) The libraries the add-on is built with are updated to the .NET 10 servicing release 10.0.13 (Microsoft.Extensions.*, SQLite storage); no change in behaviour.
+
 ## [0.123.0] - 2026-10-16
 ### Added
 - (Cloud) A platform administrator can change the values of a billing summary that is still waiting for validation: Locations, days, price and amount of each line, by hand. What the system computed stays on the line, the line is marked as changed by hand, the summary keeps who changed it and when, and the total follows. A recalculation discards the changes, and a validated summary can no longer be changed.
@@ -67,8 +73,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 - (Cloud) With Expiry control off, receipts no longer become stock lines, the daily expiry email and the automatic close pause and the tablet hides the stock screens; with Inspector access off, no new grants can be given, the active ones are revoked and inspectors lose access; with Training and HACCP plan off, no new training records or plan versions can be added. History stays readable and nothing is deleted. The menus and pages follow the Organization's modules, and the inspector's view only shows the sections of modules the Organization has or had.
 ### Changed
 - (Cloud) An inspection grant revoked by the system records why (the module was switched off).
-
-## [0.114.0] - 2026-10-15
-### Added
-- When the Edge has to delete unsent readings because the Home Assistant disk is nearly full (0.113.0), it now tells the Cloud (Azure Boards #241). Each purge is sent with the next check-in until the Cloud confirms it, so a lost connection never makes the report disappear.
-- (Cloud) The Edge Gateways page of a Location shows a "Readings discarded by the Edge" table with the dates and the number of readings that never reached LoopMi. The Temperature report shows a notice above the table when a gap in its period overlaps one (the PDF carries the same note), so a gap caused by the disk protection is not mistaken for a sensor fault. Older Edges keep working unchanged.
