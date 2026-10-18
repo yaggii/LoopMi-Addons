@@ -19,6 +19,12 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.124.0] - 2026-10-18
+### Added
+- (Cloud) Alerts are now kept in a permanent alert history, for at least 3 years from the time of the alert (the queue that sends the alert emails still keeps its own records for 20 days only). For each alert the history records what was raised, for which Location, which manager accounts it was sent to and in which language (accounts only, never email addresses), and who dismissed it or whether the system resolved it. A daily upkeep job (05:30 UTC) writes the history rows of alerts still in the queue and later removes history older than the retention; both steps start in a counting-only mode and write or delete only when switched on.
+### Changed
+- (Cloud) Terms of Service and Privacy Policy version 8: the Privacy Policy now states that alert history is kept for 3 years and what it contains, and the Terms name the one exception to "nothing is deleted when a module is switched off". Everyone accepts the new version at their next sign-in.
+
 ## [0.123.1] - 2026-10-18
 ### Fixed
 - (Cloud) The monthly billing summaries are generated again. The timer that creates them failed on every run since 2026-10-16 ("PlatformInternalTenantAccessor can never be scoped to a single Organization"), because the billing service tried to scope a platform-internal session to one Organization. It now leaves such a session as it is; the summaries that were due (September) are made up by the next run, without duplicates.
@@ -65,11 +71,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 - (Cloud) Modules (Azure Boards Epic #242, second phase): HACCP checklists and Goods receiving are now switched on and off per Organization. With HACCP checklists off, no template, schedule, correction or photo change can be made, the tablet offers no checklists and no sensor-triggered checklist starts; with Goods receiving off, no delivery can be recorded on the tablet and the product and supplier lists cannot be changed (and Expiry control, which needs it, goes off with it). Records, non-conformities, the compliance ranking, earlier deliveries and the recall search stay readable.
 - (Cloud) Nothing from a period in which HACCP checklists was off is evaluated: a missed checklist is recorded, counted or mailed only if the module was on for the whole window, from its start to its late deadline - so switching the module back on never records the off period as missed, and the compliance ranking leaves such windows out of both "due" and "missed".
 - (Cloud) The tablet and the employee roster follow the modules: the tablet (pairing, sign-in, shift check-in, PIN change) needs Sensor monitoring, HACCP checklists, Goods receiving or Expiry control, and shows only the buttons of the modules that are on, or "No active functions" - it stays paired and works again by itself; an Organization with only Training and HACCP plan can keep its employee roster, and employees are then added without a PIN (the Employees page asks for the PINs when a module that uses the tablet is switched on).
-
-## [0.115.0] - 2026-10-16
-### Added
-- (Cloud) Modules (Azure Boards Epic #242, first phase): LoopMi is now switched on and off per Organization by module - Sensor monitoring, HACCP checklists, Goods receiving, Expiry control, Training and HACCP plan and Inspector access, with Platform always on - each with a price per Location per month. A platform administrator sets an Organization's modules from the Organizations page (puzzle icon) and chooses the bought modules when activating a Trial; every change is kept in a history that the database refuses to alter, with who made it, the price in force and the number of Locations. Existing Organizations keep every module.
-- (Cloud) A new Module prices page (Administration) keeps the price catalogue: a price in force, or in the past, is never edited - a new one is added from a later date.
-- (Cloud) With Expiry control off, receipts no longer become stock lines, the daily expiry email and the automatic close pause and the tablet hides the stock screens; with Inspector access off, no new grants can be given, the active ones are revoked and inspectors lose access; with Training and HACCP plan off, no new training records or plan versions can be added. History stays readable and nothing is deleted. The menus and pages follow the Organization's modules, and the inspector's view only shows the sections of modules the Organization has or had.
-### Changed
-- (Cloud) An inspection grant revoked by the system records why (the module was switched off).
