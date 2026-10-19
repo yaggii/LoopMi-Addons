@@ -19,6 +19,33 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.129.0] - 2026-10-19
+### Added
+- (Cloud) Foundations of the new "Operational follow-up" module: events become actions that are assigned to a user or an employee, worked, recorded and resolved, with a complete, unchangeable log of every step. Nothing is visible in the Portal yet and the module cannot be switched on until its price is set; it will appear on the Modules page when it is launched.
+### Changed
+- (Cloud) A module that has no price yet can no longer be switched on, so it is never billed at 0.00 without anybody saying so. New trial Organizations do not start with Operational follow-up.
+- (Edge) The Edge add-on image is rebuilt with this release because the list of modules, shared by the Cloud and the Edge, gained an entry. Its behaviour is unchanged.
+
+## [0.128.0] - 2026-10-19
+### Fixed
+- (Cloud) An extended audit history module (5 or 10 years) that is switched off now keeps its period for the full 30 days even when it had been on for less than 30 days. Before, a module switched on and off again within a month had no grace: the Alert history page showed the shorter period at once while the banner promised the removal in 30 days. The page, the daily clean-up, the restore and the removal preview now agree.
+### Changed
+- (Edge) No change for the Edge add-on: this release changes only the Cloud.
+
+## [0.127.0] - 2026-10-19
+### Added
+- (Cloud) New "Alert history" page under Reporting for Owners and Admins: every alert raised for the Organization, where, who it was sent to and what became of it. It shows how many years the history is kept, when it starts, and - during the 30 days after an extended history module is switched off - the date the older history will be removed. Filters by period, Location, Equipment, alert type and state; downloads as CSV or PDF without naming any account. Alerts recovered from the send queue say that who received them was not recorded.
+- (Cloud) The Organization export (archive format 1.18) now includes the alert history, and a restore brings it back. Alerts older than the retention of the Organization restored into are left out - the export's modules are not part of the archive - and how many were left out is recorded.
+- (Cloud) When an Owner removes a member, they can also erase that person's identifier from the Organization's alert history: it is replaced by "removed user" and the facts of each alert are kept.
+### Changed
+- (Edge) No change for the Edge add-on: this release changes only the Cloud.
+
+## [0.126.0] - 2026-10-19
+### Added
+- (Cloud) Switching off an extended audit history module (5 or 10 years) now asks for a second, explicit confirmation that shows how many alert-history records would be deleted and from which date. The history older than the period that remains is kept for 30 more days after the switch-off takes effect and deleted only after that; switching the module back on before then cancels the deletion. The organization's Owners and LoopMi's administrators are emailed when the switch-off is scheduled, the day it takes effect, 7 days and 1 day before the deletion, and after it with the number of records removed.
+### Changed
+- (Edge) No change for the Edge add-on: this release changes only the Cloud.
+
 ## [0.125.0] - 2026-10-19
 ### Added
 - (Cloud) Two new optional modules, "Audit history, 5 years" and "Audit history, 10 years", extend how long the alert history is kept beyond the standard 3 years. They are priced per Location per month (4 EUR and 6 EUR, added together for both); switching on the 10-year module also switches on the 5-year one it needs, and switching the 5-year one off also switches the 10-year one off. A platform administrator can grant both to the existing organizations at no charge with a counting-only trial run first; no emails are sent for the grant.
@@ -48,26 +75,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.121.0] - 2026-10-16
 ### Added
 - (Cloud) A platform administrator can agree a price with one Organization for one module - a different arrangement with a customer: a fixed price per Location per month (0 is free) from a date in the current month or later, with a reason. Billing summaries, the Owner's quote, estimate and module history all use it; the Owner sees it marked as an agreed price and, like the platform administrators, is emailed in their own language when one is agreed. A price already billed never changes, and a catalogue price change does not alter an agreed price.
-
-## [0.120.0] - 2026-10-16
-### Changed
-- (Cloud) Every module change is now emailed to LoopMi's platform administrators as well as to the Organization's Owners, each in their own language, instead of to a configured billing address.
-### Fixed
-- (Cloud) An Organization that was already active when module billing began is billed from the moment billing went live, not from the start of time: its first summary no longer bills days before billing existed.
-
-## [0.119.0] - 2026-10-16
-### Fixed
-- (Cloud) The monthly billing summary of an Organization read none of its Locations when it was generated or recalculated from the platform administrator's session (Row-Level Security hides them from someone with no Organization), so every line showed 0 Locations billed and 0.00. It now reads the Locations of the Organization it is computing.
-
-## [0.118.0] - 2026-10-16
-### Added
-- (Cloud) Modules (Azure Boards Epic #242, fourth phase): the Owner buys and cancels modules from the Portal. A purchase shows its cost first (the price per Location, the Locations billed and the amount for the rest of the month, worked out by the same rule as the monthly summary) and needs an explicit confirmation; the modules it needs come with it. A cancellation is scheduled for the end of the month (00:00 Lisbon time on the 1st, also shown in the Owner's own time zone) and can be cancelled until then; a sweep applies it at that moment and runs what must happen (inspector grants revoked, tablet buttons removed, evaluations stop). On a free Trial everything is free and immediate; a suspended Organization's Owner cannot change modules.
-- (Cloud) Every module change is emailed to the Organization's Owners, each in their own language, and to LoopMi's billing address, with the module, the date in Lisbon time, the price and the Locations.
-- (Cloud) A monthly billing summary is generated for every Organization at the start of each month: one line per module with the Locations billed, the days it counted, the price in force and the amount (a Location counts from the day it was created, Trial days are never billed). A platform administrator checks it, freezes it (validated: later price or module changes never alter it) and records the invoice number after invoicing it by hand.
-- (Cloud) Terms of Service and Privacy Policy version 7: module purchase, pro-rata billing, end-of-month cancellation, the data of a module that is off and price changes with notice. Everyone accepts it again at their next sign-in.
-
-## [0.117.0] - 2026-10-16
-### Added
-- (Cloud) Modules (Azure Boards Epic #242, third phase): Sensor monitoring is now switched on and off per Organization. With it off, an Edge keeps running but everything it sends is accepted and discarded - readings are not stored, devices are not added to Discovered devices, and what the gateway saw of its sensors is ignored (its versions, storage and configuration are still kept) - so it never fills its disk or retries; new Edge registration tokens, device, channel and threshold changes and the sensor pages (dashboards, devices, gateways, temperature, energy and efficiency reports) are no longer offered, while the history stays readable.
-- (Cloud) Nothing is evaluated for an Organization without Sensor monitoring: no stale device, offline gateway, battery, leak, temperature, door or compressor-efficiency alert can follow from silence nobody is watching. When it is switched back on every device gets a full reporting interval before it can be called stale (no "stale" email for the weeks it was off), and the daily efficiency evaluation covers only days watched from midnight to midnight.
-- (Cloud) An Organization with only HACCP checklists, Goods receiving and the like works without an Edge: the tablet home shows just the buttons of the active modules (no equipment grid, no shift check), a checklist item that reads a sensor is skipped for a stated reason ("sensor monitoring is not switched on") and the rest of the checklist is asked as usual, and a template or schedule cannot be given sensor items or a sensor trigger.
