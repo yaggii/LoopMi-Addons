@@ -19,59 +19,63 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
-## [0.129.0] - 2026-10-19
+## [0.146.0] - 2026-10-24
 ### Added
-- (Cloud) Foundations of the new "Operational follow-up" module: events become actions that are assigned to a user or an employee, worked, recorded and resolved, with a complete, unchangeable log of every step. Nothing is visible in the Portal yet and the module cannot be switched on until its price is set; it will appear on the Modules page when it is launched.
-### Changed
-- (Cloud) A module that has no price yet can no longer be switched on, so it is never billed at 0.00 without anybody saying so. New trial Organizations do not start with Operational follow-up.
-- (Edge) The Edge add-on image is rebuilt with this release because the list of modules, shared by the Cloud and the Edge, gained an entry. Its behaviour is unchanged.
+- (Cloud) A channel that never reported anything (typically left over when a sensor was renamed in Zigbee2MQTT) can be removed by an Owner or Admin from the device's Channels dialog; a channel that has reported keeps its history and cannot be removed (Azure Boards #326). The discovery report can also list channels the Edge no longer has, for the Cloud to remove under the same rule.
+- (Cloud) When a door's problem ends, the log of the open action made from its alert says "The door is back to normal" (a note only: the action is still closed by a person) (Azure Boards #327).
 
-## [0.128.0] - 2026-10-19
+### Changed
+- (Cloud) The battery of a device is the percentage with the newest reading, not that of the first Battery channel found, so a device with an empty leftover channel shows its battery again (Azure Boards #326).
+- (Cloud) The Channels dialog is wider, so the contact rule of a door sensor is visible at once (Azure Boards #324).
+
 ### Fixed
-- (Cloud) An extended audit history module (5 or 10 years) that is switched off now keeps its period for the full 30 days even when it had been on for less than 30 days. Before, a module switched on and off again within a month had no grace: the Alert history page showed the shorter period at once while the banner promised the removal in 30 days. The page, the daily clean-up, the restore and the removal preview now agree.
-### Changed
-- (Edge) No change for the Edge add-on: this release changes only the Cloud.
+- (Cloud) Back from an action no longer loses the tab it was opened from after following a recurrence (Azure Boards #328).
 
-## [0.127.0] - 2026-10-19
-### Added
-- (Cloud) New "Alert history" page under Reporting for Owners and Admins: every alert raised for the Organization, where, who it was sent to and what became of it. It shows how many years the history is kept, when it starts, and - during the 30 days after an extended history module is switched off - the date the older history will be removed. Filters by period, Location, Equipment, alert type and state; downloads as CSV or PDF without naming any account. Alerts recovered from the send queue say that who received them was not recorded.
-- (Cloud) The Organization export (archive format 1.18) now includes the alert history, and a restore brings it back. Alerts older than the retention of the Organization restored into are left out - the export's modules are not part of the archive - and how many were left out is recorded.
-- (Cloud) When an Owner removes a member, they can also erase that person's identifier from the Organization's alert history: it is replaced by "removed user" and the facts of each alert are kept.
-### Changed
-- (Edge) No change for the Edge add-on: this release changes only the Cloud.
-
-## [0.126.0] - 2026-10-19
-### Added
-- (Cloud) Switching off an extended audit history module (5 or 10 years) now asks for a second, explicit confirmation that shows how many alert-history records would be deleted and from which date. The history older than the period that remains is kept for 30 more days after the switch-off takes effect and deleted only after that; switching the module back on before then cancels the deletion. The organization's Owners and LoopMi's administrators are emailed when the switch-off is scheduled, the day it takes effect, 7 days and 1 day before the deletion, and after it with the number of records removed.
-### Changed
-- (Edge) No change for the Edge add-on: this release changes only the Cloud.
-
-## [0.125.0] - 2026-10-19
-### Added
-- (Cloud) Two new optional modules, "Audit history, 5 years" and "Audit history, 10 years", extend how long the alert history is kept beyond the standard 3 years. They are priced per Location per month (4 EUR and 6 EUR, added together for both); switching on the 10-year module also switches on the 5-year one it needs, and switching the 5-year one off also switches the 10-year one off. A platform administrator can grant both to the existing organizations at no charge with a counting-only trial run first; no emails are sent for the grant.
-### Changed
-- (Edge) No change for the Edge add-on: the module list is shared code that only the Cloud uses, so this release rebuilds the add-on image without changing what it does.
-
-## [0.124.0] - 2026-10-18
-### Added
-- (Cloud) Alerts are now kept in a permanent alert history, for at least 3 years from the time of the alert (the queue that sends the alert emails still keeps its own records for 20 days only). For each alert the history records what was raised, for which Location, which manager accounts it was sent to and in which language (accounts only, never email addresses), and who dismissed it or whether the system resolved it. A daily upkeep job (05:30 UTC) writes the history rows of alerts still in the queue and later removes history older than the retention; both steps start in a counting-only mode and write or delete only when switched on.
-### Changed
-- (Cloud) Terms of Service and Privacy Policy version 8: the Privacy Policy now states that alert history is kept for 3 years and what it contains, and the Terms name the one exception to "nothing is deleted when a module is switched off". Everyone accepts the new version at their next sign-in.
-
-## [0.123.1] - 2026-10-18
+## [0.145.1] - 2026-10-23
 ### Fixed
-- (Cloud) The monthly billing summaries are generated again. The timer that creates them failed on every run since 2026-10-16 ("PlatformInternalTenantAccessor can never be scoped to a single Organization"), because the billing service tried to scope a platform-internal session to one Organization. It now leaves such a session as it is; the summaries that were due (September) are made up by the next run, without duplicates.
+- (Cloud) A door alert can be turned into an action: it is now an operational event of its own kind, "Door problem" (high when the door was left open, low when it is closed but should be open), instead of being refused as not valid.
+
+## [0.145.0] - 2026-10-23
+### Added
+- (Cloud) Operations: an action's page lists the actions for the same problem (the same Location, Equipment and kind), earliest first, each linking to its page, so the recurrences can be reached from an action (Azure Boards #321).
+
+## [0.144.0] - 2026-10-23
+### Added
+- (Cloud) Operations: every action and every event to follow up says where it stands among the actions for the same problem (the same Location, Equipment and kind) - "Occurrence 2 of 3" - counted the way the metrics count recurrences, so a recurrence seen in the metrics can be found in the lists.
+- (Cloud) Operations: an action's page says that its response and resolution times count from its first event, and the list of actions says when only open actions are shown.
+
 ### Changed
-- (Edge) The libraries the add-on is built with are updated to the .NET 10 servicing release 10.0.13 (Microsoft.Extensions.*, SQLite storage); no change in behaviour.
+- (Cloud) Operations: "Back" from an action returns to the tab it was opened from (Events to follow up or Actions).
+- (Cloud) The error bar of the Portal has the Portal's own look.
 
-## [0.123.0] - 2026-10-16
-### Added
-- (Cloud) A platform administrator can change the values of a billing summary that is still waiting for validation: Locations, days, price and amount of each line, by hand. What the system computed stays on the line, the line is marked as changed by hand, the summary keeps who changed it and when, and the total follows. A recalculation discards the changes, and a validated summary can no longer be changed.
+## [0.143.1] - 2026-10-23
+### Fixed
+- (Cloud) The "Doors" tile now also shows a door sensor that has an expected-state rule but is not marked monitored, as the alert and the tablet already did (Azure Boards #313).
 
-## [0.122.0] - 2026-10-16
+## [0.143.0] - 2026-10-23
 ### Added
-- (Cloud) An agreement with an Organization can now be a percentage off the catalogue price instead of a fixed price - for one module or for every module - and either kind can end on a date (the last day it applies; from the next day the catalogue price applies again). A percentage follows the catalogue when the catalogue price changes; the arrangement that started last is the one in force. Billing summaries show the discount, the end and on how many days an agreement applied; the Owner sees "agreed price - 10% off - until ..." on the Modules page and is emailed when an agreement is made.
+- (Cloud) Doors: a door sensor whose state is a problem under its own rule (open or closed, by time of day) for longer than its alert-after time raises an alert in the feed of the Location and the Area and by email; the alert leaves the feed when the door is back to normal. The time is set per sensor in the sensor's rule (1 to 1440 minutes, 5 by default) and is carried by the organisation export and restore (Azure Boards #122).
+- (Cloud) The Location and Area dashboards show a live "Doors" tile for each monitored door sensor - Open or Closed, red as soon as the state is a problem under the sensor's rule.
 
-## [0.121.0] - 2026-10-16
+### Fixed
+- (Cloud) A door opened and closed within one sync interval could show as open: when several readings arrive together, the latest is now the one the sensor itself reported last.
+
+## [0.142.0] - 2026-10-22
 ### Added
-- (Cloud) A platform administrator can agree a price with one Organization for one module - a different arrangement with a customer: a fixed price per Location per month (0 is free) from a date in the current month or later, with a reason. Billing summaries, the Owner's quote, estimate and module history all use it; the Owner sees it marked as an agreed price and, like the platform administrators, is emailed in their own language when one is agreed. A price already billed never changes, and a catalogue price change does not alter an agreed price.
+- (Cloud) Tablet "My problems": the work an employee records on a problem can carry up to three photos (JPEG, PNG or WebP, 5 MB each), stored and shown like the photos of work recorded in the Portal and covered by the same removal, retention, export and restore rules (Azure Boards #306).
+
+## [0.141.0] - 2026-10-22
+### Added
+- (Cloud) Compare Locations (Azure Boards #128): the Organization's Locations side by side - alerts, incidents, mean time to acknowledge and to resolve, what is open now, recurrences, Equipment in service and days observed - with the incidents per piece of Equipment per 30 days so a large and a small Location compare fairly. The figures count only from when Operational follow-up was switched on. A Location is marked Needs attention (with the reason: a critical action open, many incidents for its size, slow acknowledgement, problems that keep returning), Reference, Typical or Not enough data, by fixed rules stated on the page. CSV export; about Locations and problems, never about people.
+- (Cloud) Tablet "My problems" (Azure Boards #128): an employee confirms their name with their PIN and sees only the open problems assigned to them at the tablet's Location, then takes note, starts work, records what they did or resolves. The server checks the PIN on every call; the log names the employee. Removing an employee from the roster also clears their identifier from the actions they worked.
+
+## [0.140.0] - 2026-10-22
+### Added
+- (Cloud) Inspectors can read corrective actions: when work is recorded on an action of the operational follow-up (a corrective action, maintenance or a calibration) the organization can leave it marked as visible to inspectors - on by default, never for a note, and fixed once saved. An inspector sees the problem, the times and state, how it was resolved and that work with the display name of who did it, in a new Corrective actions section; never notes, review notes, integration details, e-mail addresses, user identifiers or photos. Each time one opens the section it is written to the inspector access log. Work recorded before this change stays hidden (Azure Boards #298).
+### Changed
+- (Cloud) Terms of Service and Privacy Policy version 10: the disclosure to inspectors names this work and what stays hidden, and the Terms add the duty to check the flag before recording work; everyone accepts again at the next sign-in (Azure Boards #298).
+- (Cloud) Organization export archive format 1.21: each intervention carries whether inspectors may see it; older archives still restore, with their interventions hidden from inspectors (Azure Boards #298).
+
+## [0.139.0] - 2026-10-21
+### Changed
+- (Tests) The kernel's three test projects moved from xunit v2 (deprecated) to xunit v3; same 1,723 tests, same trx and coverage output. Nothing that ships changed (Azure Boards #267).
