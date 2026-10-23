@@ -19,6 +19,13 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.147.0] - 2026-10-24
+### Fixed
+- (Edge) A Home Assistant binary_sensor with device_class battery (the "battery low" flag, off or on) is no longer taken for a battery percentage: it is no longer a Battery channel, so a 0 meaning "battery fine" can never look like an empty battery (Azure Boards #325, #326). A channel already created that way is reclassified at the next reading.
+
+### Added
+- (Edge) After each full discovery sweep the Edge tells the Cloud which of its channels Home Assistant no longer has (their entity is in neither the current states nor the entity registry, as after a rename in Zigbee2MQTT); the Cloud removes those that never reported and keeps the others (Azure Boards #326).
+
 ## [0.146.0] - 2026-10-24
 ### Added
 - (Cloud) A channel that never reported anything (typically left over when a sensor was renamed in Zigbee2MQTT) can be removed by an Owner or Admin from the device's Channels dialog; a channel that has reported keeps its history and cannot be removed (Azure Boards #326). The discovery report can also list channels the Edge no longer has, for the Cloud to remove under the same rule.
@@ -75,7 +82,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ### Changed
 - (Cloud) Terms of Service and Privacy Policy version 10: the disclosure to inspectors names this work and what stays hidden, and the Terms add the duty to check the flag before recording work; everyone accepts again at the next sign-in (Azure Boards #298).
 - (Cloud) Organization export archive format 1.21: each intervention carries whether inspectors may see it; older archives still restore, with their interventions hidden from inspectors (Azure Boards #298).
-
-## [0.139.0] - 2026-10-21
-### Changed
-- (Tests) The kernel's three test projects moved from xunit v2 (deprecated) to xunit v3; same 1,723 tests, same trx and coverage output. Nothing that ships changed (Azure Boards #267).
