@@ -19,66 +19,42 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
-## [0.147.0] - 2026-10-24
-### Fixed
-- (Edge) A Home Assistant binary_sensor with device_class battery (the "battery low" flag, off or on) is no longer taken for a battery percentage: it is no longer a Battery channel, so a 0 meaning "battery fine" can never look like an empty battery (Azure Boards #325, #326). A channel already created that way is reclassified at the next reading.
-
+## [0.162.0] - 2026-10-27
 ### Added
-- (Edge) After each full discovery sweep the Edge tells the Cloud which of its channels Home Assistant no longer has (their entity is in neither the current states nor the entity registry, as after a rename in Zigbee2MQTT); the Cloud removes those that never reported and keeps the others (Azure Boards #326).
+- (Cloud, Edge) An Owner can stop a Location from the end of the month (Azure Boards #383). From that instant the Location registers nothing: its readings are accepted and discarded (so the gateway does not retry), its tablets refuse new records with a clear message, no alert, health sweep, missed-checklist record or nightly digest is produced for it, and its days are not billed (the quote and the monthly summary use the same rule: a Location counts on a day unless it was stopped for the whole day). The Owner can cancel a scheduled stop, and resume at once; the time it was stopped stays excluded for good - a reading is judged by the time it was taken, so a backlog sent after the resume loses exactly the stopped stretch - and the temperature report shows that time as *Stopped by the Owner*, not as a fault or data lost. Everything recorded before stays readable and sealed records are untouched. The stop and resume history is append-only and is carried in the organisation export and restore (archive format 1.24). The Edge add-on now learns the stopped periods from the check-in answer: it stops keeping readings taken inside one, deletes the unsent ones it already holds (saving its storage and traffic) and reports them with their own reason, *Location stopped*, so they are never shown as a full-disk purge. An older Edge keeps working and the Cloud still discards, so either side can be deployed first. Database migration: new table of stop changes.
 
-## [0.146.0] - 2026-10-24
-### Added
-- (Cloud) A channel that never reported anything (typically left over when a sensor was renamed in Zigbee2MQTT) can be removed by an Owner or Admin from the device's Channels dialog; a channel that has reported keeps its history and cannot be removed (Azure Boards #326). The discovery report can also list channels the Edge no longer has, for the Cloud to remove under the same rule.
-- (Cloud) When a door's problem ends, the log of the open action made from its alert says "The door is back to normal" (a note only: the action is still closed by a person) (Azure Boards #327).
-
+## [0.161.0] - 2026-10-27
 ### Changed
-- (Cloud) The battery of a device is the percentage with the newest reading, not that of the first Battery channel found, so a device with an empty leftover channel shows its battery again (Azure Boards #326).
-- (Cloud) The Channels dialog is wider, so the contact rule of a door sensor is visible at once (Azure Boards #324).
+- (Cloud) Trainings follow the employee for an inspector (Azure Boards #379, #380). An inspector now sees, for the Locations their access covers, the training records of those Locations and also those of every employee who works at one of them (assigned there, or at every Location), wherever the training was recorded - so an employee who moved to another Location does not lose their earlier trainings from the inspector's view there; the Location they left still shows them as its own. Each row says where it was recorded, and a training certificate opens by the same rule. Nothing sealed is changed, and a manager's own list is as before. Also fixed: the certificate of a training recorded for the whole organization could not be opened or removed; it can now, and a removal is sealed in the Organization's own record chain. No change to the Edge add-on.
 
-### Fixed
-- (Cloud) Back from an action no longer loses the tab it was opened from after following a recurrence (Azure Boards #328).
-
-## [0.145.1] - 2026-10-23
-### Fixed
-- (Cloud) A door alert can be turned into an action: it is now an operational event of its own kind, "Door problem" (high when the door was left open, low when it is closed but should be open), instead of being refused as not valid.
-
-## [0.145.0] - 2026-10-23
+## [0.160.0] - 2026-10-27
 ### Added
-- (Cloud) Operations: an action's page lists the actions for the same problem (the same Location, Equipment and kind), earliest first, each linking to its page, so the recurrences can be reached from an action (Azure Boards #321).
+- (Cloud) Organization-level training (Azure Boards #362, #371-#377). A training record can now belong to the whole Organization instead of one Location: leave the Location empty when recording it. It is sealed into a record chain of its own, the Organization's, kept next to the Locations' chains and checked, signed and backed up exactly like them (organization exports and restores carry it, archive format 1.23; the chain keeps its identity when restored into another Organization). A training recorded at a Location can only be for an employee who works there or at every Location. The Training page shows, filters and verifies the organization-wide records. An inspector reaches them when their access covers every Location, or when the access was given with the new option *also show organization-wide training*; access given earlier is unchanged and sees no more than before. HACCP plans and every existing record, chain and seal are untouched. No change to the Edge add-on.
 
-## [0.144.0] - 2026-10-23
+## [0.159.0] - 2026-10-27
 ### Added
-- (Cloud) Operations: every action and every event to follow up says where it stands among the actions for the same problem (the same Location, Equipment and kind) - "Occurrence 2 of 3" - counted the way the metrics count recurrences, so a recurrence seen in the metrics can be found in the lists.
-- (Cloud) Operations: an action's page says that its response and resolution times count from its first event, and the list of actions says when only open actions are shown.
+- (Cloud) Tablet employees can be assigned to one or more Locations (Azure Boards #362, #365-#370). An employee with no Location is organization-wide and works everywhere, exactly as before, so nothing changes until someone is assigned. A tablet lists, and accepts the PIN of, only the employees who are organization-wide or assigned to its Location; an employee assigned only to other Locations is refused as not found, and the refusal does not count as a wrong PIN. The PIN and its lockout stay one per employee, shared by every Location. Owners and Admins set the Locations on the Employees page, and a new Management endpoint sets them. Organization exports and restores carry the assignment (archive format 1.22); an older archive restores with every employee organization-wide. No change to the Edge add-on.
 
+## [0.158.0] - 2026-10-26
 ### Changed
-- (Cloud) Operations: "Back" from an action returns to the tab it was opened from (Events to follow up or Actions).
-- (Cloud) The error bar of the Portal has the Portal's own look.
+- (Cloud) Door and compressor in the efficiency report (Azure Boards #360): the nightly evaluation now also stores, once, the door profile of every past day that was evaluated before the door was marked as a door of the equipment (while its raw door and power readings are still kept, up to 33 days), with the same compressor figures as before. The report then reads the stored profile instead of working it out from a month of power readings each time it is opened, which makes it faster with the door on. No change to the figures, flags or alerts, and no change to the Edge add-on.
 
-## [0.143.1] - 2026-10-23
+## [0.157.0] - 2026-10-26
 ### Fixed
-- (Cloud) The "Doors" tile now also shows a door sensor that has an expected-state rule but is not marked monitored, as the alert and the tablet already did (Azure Boards #313).
+- (Cloud) Compressor efficiency report: it was slow to open (about 27 seconds on the dev database, which hit its limit while the report loaded). An equipment with no door contact marked as its door now costs the report no door query at all, and for one with a door the door readings are looked at first, so the heavy read of a month of power readings only happens when there is door data to work out. No change to the figures, flags or alerts, and no change to the Edge add-on.
 
-## [0.143.0] - 2026-10-23
-### Added
-- (Cloud) Doors: a door sensor whose state is a problem under its own rule (open or closed, by time of day) for longer than its alert-after time raises an alert in the feed of the Location and the Area and by email; the alert leaves the feed when the door is back to normal. The time is set per sensor in the sensor's rule (1 to 1440 minutes, 5 by default) and is carried by the organisation export and restore (Azure Boards #122).
-- (Cloud) The Location and Area dashboards show a live "Doors" tile for each monitored door sensor - Open or Closed, red as soon as the state is a problem under the sensor's rule.
-
+## [0.156.0] - 2026-10-26
 ### Fixed
-- (Cloud) A door opened and closed within one sync interval could show as open: when several readings arrive together, the latest is now the one the sensor itself reported last.
+- (Cloud) Door and compressor in the efficiency report (Azure Boards #360): days from before the door was marked as a door of the equipment, whose raw door and power readings are still kept, now get their door facts worked out when the report is opened, so the flagged days that predate the marking show their door analysis too (before, they said there was no door data). No change to the report's own figures, flags or alerts, and no change to the Edge add-on.
 
-## [0.142.0] - 2026-10-22
-### Added
-- (Cloud) Tablet "My problems": the work an employee records on a problem can carry up to three photos (JPEG, PNG or WebP, 5 MB each), stored and shown like the photos of work recorded in the Portal and covered by the same removal, retention, export and restore rules (Azure Boards #306).
-
-## [0.141.0] - 2026-10-22
-### Added
-- (Cloud) Compare Locations (Azure Boards #128): the Organization's Locations side by side - alerts, incidents, mean time to acknowledge and to resolve, what is open now, recurrences, Equipment in service and days observed - with the incidents per piece of Equipment per 30 days so a large and a small Location compare fairly. The figures count only from when Operational follow-up was switched on. A Location is marked Needs attention (with the reason: a critical action open, many incidents for its size, slow acknowledgement, problems that keep returning), Reference, Typical or Not enough data, by fixed rules stated on the page. CSV export; about Locations and problems, never about people.
-- (Cloud) Tablet "My problems" (Azure Boards #128): an employee confirms their name with their PIN and sees only the open problems assigned to them at the tablet's Location, then takes note, starts work, records what they did or resolves. The server checks the PIN on every call; the log names the employee. Removing an employee from the roster also clears their identifier from the actions they worked.
-
-## [0.140.0] - 2026-10-22
-### Added
-- (Cloud) Inspectors can read corrective actions: when work is recorded on an action of the operational follow-up (a corrective action, maintenance or a calibration) the organization can leave it marked as visible to inspectors - on by default, never for a note, and fixed once saved. An inspector sees the problem, the times and state, how it was resolved and that work with the display name of who did it, in a new Corrective actions section; never notes, review notes, integration details, e-mail addresses, user identifiers or photos. Each time one opens the section it is written to the inspector access log. Work recorded before this change stays hidden (Azure Boards #298).
+## [0.155.0] - 2026-10-26
 ### Changed
-- (Cloud) Terms of Service and Privacy Policy version 10: the disclosure to inspectors names this work and what stays hidden, and the Terms add the duty to check the flag before recording work; everyone accepts again at the next sign-in (Azure Boards #298).
-- (Cloud) Organization export archive format 1.21: each intervention carries whether inspectors may see it; older archives still restore, with their interventions hidden from inspectors (Azure Boards #298).
+- (Cloud) Door and compressor in the efficiency report (Azure Boards #360): door times are now given in seconds (shown as minutes and seconds), and each day carries how busy its door was against that equipment's own other days (quiet, usual or busy), so the report can set a flagged day beside what the door did that day. No change to the report's own figures, flags or alerts, and no change to the Edge add-on.
+
+## [0.154.0] - 2026-10-26
+### Added
+- (Cloud) Door facts beside the compressor efficiency report (Azure Boards #360, Feature #356): for an Equipment with a power plug and a door contact, each day of the report now also shows how often and for how long the door was open and how many compressor cycles started soon after an opening (up to 5, 15 and 30 minutes) or with the door open. It is informational: the report's own figures, flags and alerts are exactly as before, and an Equipment with no door contact shows nothing new. The nightly evaluation stores the door profile of each day beside the compressor result, from the same cycles. Included in the organisation export and restore. Database migration: new columns on the efficiency results. No change to the Edge add-on.
+
+## [0.153.0] - 2026-10-26
+### Added
+- (Cloud) The compressor analysis keeps the fridge door (Azure Boards #358, Feature #356): for an Equipment with a power plug and a contact marked as its door, the nightly summary of each settled day now also stores how often and for how long the door was open, an hourly profile (openings, open seconds, compressor-on seconds, cycles) and, for every compressor cycle, how the door stood just before it. The raw door readings of a summarized day are deleted (the most recent reading of each door is always kept); the Location's raw retention window now applies to both power and door. Nothing in today's compressor report or alerts changes. Included in the organisation export and restore. Database migration: new columns on the power rollups. No change to the Edge add-on.
