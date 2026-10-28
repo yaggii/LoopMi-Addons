@@ -19,6 +19,32 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.500.0] - 2026-10-29
+### Milestone
+- (Cloud, Edge) LoopMi goes live with its first commercial trial: an Organization in trial mode that stays at least 90 days, installed at a real site and sending real measurements. The version number jumps from 0.165.1 to 0.500.0 on purpose, to mark the milestone; 0.166 to 0.499 will never exist. The Cloud and the Edge add-on are released together under this one number.
+- (Edge) The add-on is rebuilt and published as 0.500.0. The Edge code is the one of 0.162.0 (stopped Locations: the Edge deletes and reports the readings of a stopped period); nothing in the Edge changed since.
+- (Cloud) Everything since 0.162.0: an operational action can only be assigned to the people who work at its Location (0.164.0); the nightly record verification reads the new records plus a rotating slice instead of the whole history, and every sealed record is still checked at least every 30 days (0.165.0); the build pipelines run on pinned images (0.165.1).
+
+## [0.165.1] - 2026-10-29
+### Changed
+- (Cloud) No functional change. The build and release pipelines run on pinned Ubuntu 24.04 images instead of the moving `ubuntu-latest` label (which is being moved to Ubuntu 26), so release builds stay what they were. No change to the Edge add-on.
+
+## [0.165.0] - 2026-10-29
+### Changed
+- (Cloud) The nightly verification of the sealed records no longer re-reads every record of every chain each night (Azure Boards #387). Each chain keeps a checkpoint (the last entry verified and its link, outside the export and deleted with the Organization); a night verifies the entries added since, plus one slice of the older ones, so the cost follows the new records and one slice instead of the whole history. A pass over the older entries takes half the period (15 nights for the default 30 days, `RecordIntegrity:VerifyCoverageDays` of the Alerting app), so every sealed record is still read again at least once every 30 days and each chain shows its last full coverage date. A changed recent record is found the same night, a changed old one within the period; a night that finds something open does not move the checkpoint, so it is found again the next night. The first night of a chain, a restore and the platform administrator's on-demand request run a full verification (which is also what finds a record that was never chained). No change to the Edge add-on.
+
+## [0.164.0] - 2026-10-28
+### Changed
+- (Cloud) The assign dialog of an operational action lists only the people who can act at the Location of the action (Azure Boards #386): the employees assigned to that Location, the employees who work organization-wide, and the Organization's users (a user has no Location list, so a user stays assignable everywhere). The server enforces it: assigning an action to an employee who does not work at its Location is refused with the new code `OperationalPersonNotAtLocation`. An action already assigned to someone who no longer works at its Location keeps its owner and shows it; only a new assignment is checked. The list of performers for an intervention is unchanged. No change to the Edge add-on.
+
+## [0.163.1] - 2026-10-28
+### Fixed
+- (Cloud) A discovery report no longer answers 500 when Home Assistant lists an entity under another device than before (Azure Boards #385). The Edge keeps the entity's channel id but derives a new device id, so the Cloud tried to add a channel that already existed under the first device and failed on every report (and every retry). The channel now stays on the device that has it, only its label and kind are refreshed, and the report is accepted.
+
+## [0.163.0] - 2026-10-28
+### Changed
+- (Cloud) Stopping a Location follows the product owner's decisions (Azure Boards #383). The platform administrator can stop, cancel and resume a Location from the Organizations page, with the same history and audit trail as the Owner; an Admin or a Member is refused. An Organization's last active Location (not stopped and with no stop scheduled) is never stopped by a stop: the Owner is told to ask the platform administrator, and the platform administrator is asked whether to suspend the Organization instead - on Yes it is suspended with the existing Suspend organization (same audit trail, effects and e-mails), on No nothing changes; the server refuses the stop whatever the client does, so the question cannot be skipped. A stopped Location now refuses every new write: also training records and their voiding, the voiding of a delivery record, checklist corrections and events recorded by a person or by an integration (the system's own events are skipped); reading stays open. The compressor efficiency report, the temperature comparison and the inspector's temperature report show the stopped time as *Stopped by the Owner*. The Terms of Service are version 11: everyone accepts again at their next sign-in, with new wording about stopped Locations in the modules and billing section. No change to the Edge add-on.
+
 ## [0.162.0] - 2026-10-27
 ### Added
 - (Cloud, Edge) An Owner can stop a Location from the end of the month (Azure Boards #383). From that instant the Location registers nothing: its readings are accepted and discarded (so the gateway does not retry), its tablets refuse new records with a clear message, no alert, health sweep, missed-checklist record or nightly digest is produced for it, and its days are not billed (the quote and the monthly summary use the same rule: a Location counts on a day unless it was stopped for the whole day). The Owner can cancel a scheduled stop, and resume at once; the time it was stopped stays excluded for good - a reading is judged by the time it was taken, so a backlog sent after the resume loses exactly the stopped stretch - and the temperature report shows that time as *Stopped by the Owner*, not as a fault or data lost. Everything recorded before stays readable and sealed records are untouched. The stop and resume history is append-only and is carried in the organisation export and restore (archive format 1.24). The Edge add-on now learns the stopped periods from the check-in answer: it stops keeping readings taken inside one, deletes the unsent ones it already holds (saving its storage and traffic) and reports them with their own reason, *Location stopped*, so they are never shown as a full-disk purge. An older Edge keeps working and the Cloud still discards, so either side can be deployed first. Database migration: new table of stop changes.
@@ -34,27 +60,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.159.0] - 2026-10-27
 ### Added
 - (Cloud) Tablet employees can be assigned to one or more Locations (Azure Boards #362, #365-#370). An employee with no Location is organization-wide and works everywhere, exactly as before, so nothing changes until someone is assigned. A tablet lists, and accepts the PIN of, only the employees who are organization-wide or assigned to its Location; an employee assigned only to other Locations is refused as not found, and the refusal does not count as a wrong PIN. The PIN and its lockout stay one per employee, shared by every Location. Owners and Admins set the Locations on the Employees page, and a new Management endpoint sets them. Organization exports and restores carry the assignment (archive format 1.22); an older archive restores with every employee organization-wide. No change to the Edge add-on.
-
-## [0.158.0] - 2026-10-26
-### Changed
-- (Cloud) Door and compressor in the efficiency report (Azure Boards #360): the nightly evaluation now also stores, once, the door profile of every past day that was evaluated before the door was marked as a door of the equipment (while its raw door and power readings are still kept, up to 33 days), with the same compressor figures as before. The report then reads the stored profile instead of working it out from a month of power readings each time it is opened, which makes it faster with the door on. No change to the figures, flags or alerts, and no change to the Edge add-on.
-
-## [0.157.0] - 2026-10-26
-### Fixed
-- (Cloud) Compressor efficiency report: it was slow to open (about 27 seconds on the dev database, which hit its limit while the report loaded). An equipment with no door contact marked as its door now costs the report no door query at all, and for one with a door the door readings are looked at first, so the heavy read of a month of power readings only happens when there is door data to work out. No change to the figures, flags or alerts, and no change to the Edge add-on.
-
-## [0.156.0] - 2026-10-26
-### Fixed
-- (Cloud) Door and compressor in the efficiency report (Azure Boards #360): days from before the door was marked as a door of the equipment, whose raw door and power readings are still kept, now get their door facts worked out when the report is opened, so the flagged days that predate the marking show their door analysis too (before, they said there was no door data). No change to the report's own figures, flags or alerts, and no change to the Edge add-on.
-
-## [0.155.0] - 2026-10-26
-### Changed
-- (Cloud) Door and compressor in the efficiency report (Azure Boards #360): door times are now given in seconds (shown as minutes and seconds), and each day carries how busy its door was against that equipment's own other days (quiet, usual or busy), so the report can set a flagged day beside what the door did that day. No change to the report's own figures, flags or alerts, and no change to the Edge add-on.
-
-## [0.154.0] - 2026-10-26
-### Added
-- (Cloud) Door facts beside the compressor efficiency report (Azure Boards #360, Feature #356): for an Equipment with a power plug and a door contact, each day of the report now also shows how often and for how long the door was open and how many compressor cycles started soon after an opening (up to 5, 15 and 30 minutes) or with the door open. It is informational: the report's own figures, flags and alerts are exactly as before, and an Equipment with no door contact shows nothing new. The nightly evaluation stores the door profile of each day beside the compressor result, from the same cycles. Included in the organisation export and restore. Database migration: new columns on the efficiency results. No change to the Edge add-on.
-
-## [0.153.0] - 2026-10-26
-### Added
-- (Cloud) The compressor analysis keeps the fridge door (Azure Boards #358, Feature #356): for an Equipment with a power plug and a contact marked as its door, the nightly summary of each settled day now also stores how often and for how long the door was open, an hourly profile (openings, open seconds, compressor-on seconds, cycles) and, for every compressor cycle, how the door stood just before it. The raw door readings of a summarized day are deleted (the most recent reading of each door is always kept); the Location's raw retention window now applies to both power and door. Nothing in today's compressor report or alerts changes. Included in the organisation export and restore. Database migration: new columns on the power rollups. No change to the Edge add-on.
