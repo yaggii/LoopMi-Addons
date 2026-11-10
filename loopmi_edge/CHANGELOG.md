@@ -19,6 +19,14 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.506.1] - 2026-11-10
+### Security
+- (Edge) The Native AOT compiler used to build the add-on is updated from 10.0.12 to 10.0.14, which fixes a known high-severity .NET Brotli decoder vulnerability (GHSA-p3jp-9v83-76w9) in the build toolchain. No change in behaviour; the add-on image is rebuilt.
+
+## [0.506.0] - 2026-11-06
+### Changed
+- (Cloud) Energy readings are now stored at most once a minute per channel (a counter that goes down, or the first reading, is always kept). A smart plug that reports its kWh counter every few seconds used to fill the database with rows the reports never use; consumption figures are unchanged because they come from the difference between counter values.
+
 ## [0.505.2] - 2026-11-06
 ### Fixed
 - (Edge) A suspended Organization no longer floods the add-on log: the cloud's "organization is suspended" rejection is now logged as one short line at most once an hour (check-in, measurement sync, discovery reports) instead of a full stack trace on every retry and for every discovered entity. Retrying and recovery when the Organization is reactivated are unchanged.
@@ -50,11 +58,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.503.4] - 2026-11-03
 ### Fixed
 - (Cloud) The Energy review (Azure Boards #403): only the days an energy meter actually covers count as days with readings. A month in which the meter started reporting on its last days no longer shows "31 of 31 days with readings", an average over the whole month or "almost no power use on 28 days"; it says there is not enough data. When a meter reported irregularly, the kWh it credits to the day of its next reading are spread over the silent days before it, so those days are neither days of "no power use" nor one very high day.
-
-## [0.503.3] - 2026-11-03
-### Fixed
-- (Cloud) The Energy review (Azure Boards #401): there is no "x% more than last month" for a unit, and no change in the Location's total, when the earlier month was next to nothing (under 0.3 kWh a day), so a first month of real readings after a month of almost none no longer shows results like "+6142%".
-
-## [0.503.2] - 2026-11-03
-### Fixed
-- (Cloud) The Energy review (Azure Boards #401, #402): an earlier month only counts for "compared with last month" and the rise-over-months finding when it has at least 7 days with readings, so a month that monitoring covered for a day or two no longer gives results like "+6142%"; a fridge, freezer or cold room that has no energy meter is no longer listed (a meter that reads nothing still is, as the finding it is).
