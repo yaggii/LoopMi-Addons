@@ -19,6 +19,18 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.509.0] - 2026-11-12
+### Changed
+- (Edge) Build only: the Native AOT compiler pin moves from 10.0.14 to 10.0.15 so the Edge image builds again on the CI agent (its SDK now carries the 10.0.15 runtime). No change to what the add-on does.
+
+## [0.508.0] - 2026-11-10
+### Added
+- (Cloud) The platform-level alert (the Data Protection secret about to expire or expired) also reaches the platform administrator's paired phones as a short fixed notice, in the administrator's language; the email with the details is unchanged. An alert can now also be found by its id after its Outbox row was purged, from the permanent alert history, so a notification opened late still opens.
+
+## [0.507.0] - 2026-11-10
+### Added
+- (Cloud) Groundwork for push notifications to the Android app: alert types can be classified Operational or Safety (every change audited), the Outbox dispatcher delivers Safety alerts first and pushes before it emails (a failed push never stops the email), and push notice texts exist in the six languages. The app side is in too: a phone is paired from the Portal with a one-time code and then holds its own revocable read-only credential (valid while it is used, 30 days by default and adjustable by the platform administrator; a password change, password reset or TOTP re-enrolment ends it), and each user can choose email, push or both for Operational alerts. Nothing is delivered by push yet: the sender, the device registration and the pages come with the next Cloud release, and with none configured alerts behave exactly as before.
+
 ## [0.506.1] - 2026-11-10
 ### Security
 - (Edge) The Native AOT compiler used to build the add-on is updated from 10.0.12 to 10.0.14, which fixes a known high-severity .NET Brotli decoder vulnerability (GHSA-p3jp-9v83-76w9) in the build toolchain. No change in behaviour; the add-on image is rebuilt.
@@ -46,15 +58,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.504.0] - 2026-11-03
 ### Added
 - (Cloud) The Energy review for a quarter and for a half-year (Azure Boards #405, #406): the same rules, kWh and approximate cost as the monthly review for a calendar quarter (Q1-Q4) or half-year (H1, H2), compared with the quarter or half-year before; the counts of days in the rules (peaks, very high days, flagged compressor days, long door openings, days without power use) grow with the length of the period, so a quarter is not judged on a month's allowance. A month behaves exactly as before.
-
-## [0.503.6] - 2026-11-03
-### Changed
-- (Cloud) The Energy review, calibrated with the owner on a real kitchen (Azure Boards #396): equipment that is not a fridge, freezer or cold room - a washer, a dishwasher, a stove, an oven - is never reported as "Needs attention" for using more than last month (at most "worth watching": more laundry is not a fault), is not told "if maintenance or a repair was done, it worked" when it was simply used less, and its "rising month after month" remark needs a rise of at least 20 percent a month and is at most "worth watching". Fridges, freezers and cold rooms keep the stricter rules.
-
-## [0.503.5] - 2026-11-03
-### Fixed
-- (Cloud) The Energy review (Azure Boards #404): one unit with no readings in the month no longer blanks the Location's approximate cost and its change against last month - those are over the units that have days with readings, and the unit keeps its own "not enough data" line. A month in which no day could be priced still says where the price would come from (the national average or the Location's own), instead of "No price known".
-
-## [0.503.4] - 2026-11-03
-### Fixed
-- (Cloud) The Energy review (Azure Boards #403): only the days an energy meter actually covers count as days with readings. A month in which the meter started reporting on its last days no longer shows "31 of 31 days with readings", an average over the whole month or "almost no power use on 28 days"; it says there is not enough data. When a meter reported irregularly, the kWh it credits to the day of its next reading are spread over the silent days before it, so those days are neither days of "no power use" nor one very high day.
