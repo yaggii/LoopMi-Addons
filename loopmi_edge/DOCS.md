@@ -59,7 +59,7 @@ Edge worse off than before.
 
 | Port | Purpose |
 |---|---|
-| `5034/tcp` | LoopMi Edge REST API, also used as this add-on's watchdog health check (`/health`). |
+| `5034/tcp` | LoopMi Edge local REST API. **Not published by default** since 0.513.0: it serves the readings without a login, so it is only reachable from other machines if you set a host port for it under the add-on's **Network** settings (do that only for the local dashboard, on a network you trust). Home Assistant's own watchdog health check (`/health`) uses the add-on's internal address and works either way. |
 
 ## Data persistence
 

@@ -19,6 +19,22 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.513.0] - 2026-11-13
+### Security
+- (Edge) The local REST API on port 5034 is no longer published on the Home Assistant host by default. It serves the readings without a login, so until now anyone on the site's network could read them. Nothing changes for the Cloud connection or for Home Assistant's health check of the add-on. If you use the local dashboard, set a host port for 5034 under the add-on's Network settings and name the dashboard's address in `LocalApi:AllowedOrigins`: web pages from any other address can no longer read the API. (Azure Boards #467)
+
+## [0.512.0] - 2026-11-12
+### Security
+- (Cloud) The first platform administrator of an environment is now invited by email like every later one: a random temporary password valid for 7 days, a forced password change and the administrator's own authenticator enrolment at first sign-in. The earlier bootstrap used a fixed password and wrote it, the authenticator secret and the recovery codes to the application log; the method that returned those secrets is removed. An invitation that was never used can be sent again. No change for existing accounts. (Azure Boards #466)
+
+## [0.511.0] - 2026-11-13
+### Changed
+- (Cloud) Terms of Service and Privacy Policy version 12 for the Android app and push notifications: the Terms gain a section saying LoopMi is not a life-safety or certified alarm system, that notifications are best effort and that no time between an event and a notification is promised; the Privacy Policy gains the paired phones, their legal basis, Google Firebase Cloud Messaging as a sub-processor and their retention. Everyone is asked to accept the new version at their next sign-in.
+
+## [0.510.0] - 2026-11-12
+### Added
+- (Cloud) A reusable pairing code for one demo Organization named "LoopMi Play review", so Google's Play reviewers can pair the Android app whenever they test: it never expires and is never used up, only the platform administrator can create or switch it off, only for an Owner or Admin of that exact Organization, and only one exists in the whole platform. Pairing again with it revokes the oldest phone instead of failing on the five-phone cap. Every other pairing code is unchanged (single use, five minutes).
+
 ## [0.509.0] - 2026-11-12
 ### Changed
 - (Edge) Build only: the Native AOT compiler pin moves from 10.0.14 to 10.0.15 so the Edge image builds again on the CI agent (its SDK now carries the 10.0.15 runtime). No change to what the add-on does.
@@ -42,19 +58,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.505.2] - 2026-11-06
 ### Fixed
 - (Edge) A suspended Organization no longer floods the add-on log: the cloud's "organization is suspended" rejection is now logged as one short line at most once an hour (check-in, measurement sync, discovery reports) instead of a full stack trace on every retry and for every discovered entity. Retrying and recovery when the Organization is reactivated are unchanged.
-
-## [0.505.1] - 2026-11-04
-### Fixed
-- (Cloud) The Energy report e-mail (Azure Boards #409): the grey line at the bottom of the e-mail ("Automated message from LoopMi Cloud...") now comes in the recipients' language instead of always English. The e-mail sender takes the footer line as a parameter.
-
-## [0.505.0] - 2026-11-04
-### Added
-- (Cloud) The Energy report by e-mail (Azure Boards #409): after each month, quarter and half-year ends, the Owners and Admins of an Organization with the Energy module get one e-mail (one per language, hiding the other recipients) with a line per Location - energy, approximate cost, change, how many need attention - a link to the Portal page, and the PDF of each Location's report attached. It is sent once per Organization and period, from the 2nd to the 8th day of the month; stopped Locations and Locations with nothing to report are left out. Each person can switch it off (new setting on the user, on by default). The e-mail sender can attach files.
-
-## [0.504.1] - 2026-11-03
-### Fixed
-- (Cloud) The Energy review for a quarter or a half-year (Azure Boards #406): the counts of days in the rules (compressor flagged days, peaks, very high days, long door openings, days without power use) now grow with the days actually counted - a month's allowance for up to about 45 days, three times for a complete quarter, six times for a half-year - instead of with the length of the period, so a quarter that is only a month old (like the quarter in progress) is judged like a month and still shows a compressor flagged on 4 days.
-
-## [0.504.0] - 2026-11-03
-### Added
-- (Cloud) The Energy review for a quarter and for a half-year (Azure Boards #405, #406): the same rules, kWh and approximate cost as the monthly review for a calendar quarter (Q1-Q4) or half-year (H1, H2), compared with the quarter or half-year before; the counts of days in the rules (peaks, very high days, flagged compressor days, long door openings, days without power use) grow with the length of the period, so a quarter is not judged on a month's allowance. A month behaves exactly as before.
