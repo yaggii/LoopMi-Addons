@@ -19,6 +19,12 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.516.0] - 2026-11-14
+### Security
+- (Cloud) An authenticator code can now be used only once. Until now the same code worked again for up to about 90 seconds, so someone who saw it (over a shoulder, on a shared screen, through a fake sign-in page) and also knew the password could sign in with it. A second use is refused with "This authentication code was already used. Wait for the next code in your authenticator app." and does not count toward the 15-minute lockout. This applies to signing in, resetting a password and linking a Microsoft or Google account. (Azure Boards #477)
+### Documentation
+- (Edge) New section "Keeping this Edge's identity safe" in the add-on's Documentation tab: the identity file has no password, so protect Home Assistant backups with a password, give administrator rights only to people you trust, wipe the storage of a replaced device, and revoke and re-register the gateway if you think the file was copied. Nothing changes in how the add-on runs. (security evaluation 2026-11-11, finding 13)
+
 ## [0.515.0] - 2026-11-13
 ### Security
 - (Edge) Every request the add-on sends to the Cloud now also signs the time it is sent. The Cloud refuses a request whose signed time is more than 5 minutes from its own, so a request that was captured cannot be sent again later. If the clock of the Home Assistant machine is wrong (for example after a power cut, before the network time arrives), the add-on takes the right time from the Cloud's answer and sends again by itself; nothing to configure. Readings stored during an outage are not affected: the signed time is the time of sending, not of the reading. (Azure Boards #475)
@@ -56,7 +62,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.507.0] - 2026-11-10
 ### Added
 - (Cloud) Groundwork for push notifications to the Android app: alert types can be classified Operational or Safety (every change audited), the Outbox dispatcher delivers Safety alerts first and pushes before it emails (a failed push never stops the email), and push notice texts exist in the six languages. The app side is in too: a phone is paired from the Portal with a one-time code and then holds its own revocable read-only credential (valid while it is used, 30 days by default and adjustable by the platform administrator; a password change, password reset or TOTP re-enrolment ends it), and each user can choose email, push or both for Operational alerts. Nothing is delivered by push yet: the sender, the device registration and the pages come with the next Cloud release, and with none configured alerts behave exactly as before.
-
-## [0.506.1] - 2026-11-10
-### Security
-- (Edge) The Native AOT compiler used to build the add-on is updated from 10.0.12 to 10.0.14, which fixes a known high-severity .NET Brotli decoder vulnerability (GHSA-p3jp-9v83-76w9) in the build toolchain. No change in behaviour; the add-on image is rebuilt.

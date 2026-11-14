@@ -97,6 +97,28 @@ System → Backups) - a full or add-on-scoped backup captures `/data`, so a Supe
 repair or a bad update can be recovered from that backup instead of losing your
 identity. Without a backup to restore from, there is no way back.
 
+## Keeping this Edge's identity safe
+
+`/data/edge-identity.pfx` is this Edge's identity towards LoopMi Cloud: the certificate and its private
+key, in one file, **without a password**. Whoever holds a copy of that file can send readings to the
+Cloud as this Edge. The file never leaves this machine by itself, but it travels with anything that
+copies the add-on's data:
+
+- **Home Assistant backups include it.** Always protect backups with a password or encryption key
+  (Home Assistant: **Settings > System > Backups**), also the ones copied to a NAS or a cloud drive.
+  An unprotected backup file is a working copy of this Edge's identity.
+- **Home Assistant administrators and other add-ons with access to add-on data can read it.** Give
+  administrator accounts only to people you trust, and install add-ons only from sources you trust.
+- **When the device is replaced, sold or thrown away,** wipe its storage (the SD card or disk); deleting
+  the add-on is not enough if backups remain on it.
+
+**If you think the file was copied** (a lost backup, a stolen device, an administrator who left):
+in the Cloud Portal open **Edge Gateways**, press **Revoke** on this gateway, then register this Edge
+again with a new registration token (see *Recovering a lost connection* above). Revoking blocks the old
+identity at once and cannot be undone; the re-registered Edge gets a new certificate and key. Read
+*Data persistence* above first: a re-registration that produces a new identity discovers the devices
+again as new.
+
 ## Local storage
 
 The Edge keeps readings on the device until the Cloud has them, and it protects the Home Assistant disk it shares:
