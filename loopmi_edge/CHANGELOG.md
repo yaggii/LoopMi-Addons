@@ -19,6 +19,16 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.515.0] - 2026-11-13
+### Security
+- (Edge) Every request the add-on sends to the Cloud now also signs the time it is sent. The Cloud refuses a request whose signed time is more than 5 minutes from its own, so a request that was captured cannot be sent again later. If the clock of the Home Assistant machine is wrong (for example after a power cut, before the network time arrives), the add-on takes the right time from the Cloud's answer and sends again by itself; nothing to configure. Readings stored during an outage are not affected: the signed time is the time of sending, not of the reading. (Azure Boards #475)
+- (Cloud) The sign-in page no longer tells which e-mail addresses have an account: an unknown e-mail, a wrong password and a locked account get the same answer after the same amount of work. The message now says for everyone that an account is locked for 15 minutes after several failed attempts. The login history still shows the real reason. (Azure Boards #473)
+- (Cloud) Signing out now ends the session on the server too, not only in the browser. (Azure Boards #474)
+
+## [0.514.0] - 2026-11-13
+### Security
+- (Cloud) An account that already has an authenticator can no longer start a new authenticator set-up. Until now, opening the set-up page while signed in replaced the stored secret: the person's authenticator stopped working, and anyone holding that person's session could take over the second factor. An authenticator is now only replaced when the account is re-invited. (Azure Boards #472)
+
 ## [0.513.0] - 2026-11-13
 ### Security
 - (Edge) The local REST API on port 5034 is no longer published on the Home Assistant host by default. It serves the readings without a login, so until now anyone on the site's network could read them. Nothing changes for the Cloud connection or for Home Assistant's health check of the add-on. If you use the local dashboard, set a host port for 5034 under the add-on's Network settings and name the dashboard's address in `LocalApi:AllowedOrigins`: web pages from any other address can no longer read the API. (Azure Boards #467)
@@ -50,11 +60,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.506.1] - 2026-11-10
 ### Security
 - (Edge) The Native AOT compiler used to build the add-on is updated from 10.0.12 to 10.0.14, which fixes a known high-severity .NET Brotli decoder vulnerability (GHSA-p3jp-9v83-76w9) in the build toolchain. No change in behaviour; the add-on image is rebuilt.
-
-## [0.506.0] - 2026-11-06
-### Changed
-- (Cloud) Energy readings are now stored at most once a minute per channel (a counter that goes down, or the first reading, is always kept). A smart plug that reports its kWh counter every few seconds used to fill the database with rows the reports never use; consumption figures are unchanged because they come from the difference between counter values.
-
-## [0.505.2] - 2026-11-06
-### Fixed
-- (Edge) A suspended Organization no longer floods the add-on log: the cloud's "organization is suspended" rejection is now logged as one short line at most once an hour (check-in, measurement sync, discovery reports) instead of a full stack trace on every retry and for every discovered entity. Retrying and recovery when the Organization is reactivated are unchanged.
