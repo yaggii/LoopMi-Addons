@@ -19,6 +19,15 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
+## [0.518.0] - 2026-11-18
+### Changed
+- (Edge) Device settings in Home Assistant are no longer picked up as channels: entities of the types number (thresholds, poll intervals, calibrations), select (power-on behavior and similar), button and text. They only made long lists of unused "Other" channels. A setting channel that is monitored or set to always report keeps working exactly as before. The Edge reports the unused ones to the Cloud so they can be cleaned up, and its log shows how many of each type. (Azure Boards #478)
+- (Cloud) A channel whose Home Assistant entity is gone, or is an unused setting, is removed only when it never sent a reading and is neither monitored nor set to always report. Removal stays off (count and log only) until the setting Discovery:GoneChannelCleanup:Mode is Apply. (Azure Boards #478)
+
+## [0.517.0] - 2026-11-16
+### Changed
+- (Cloud) Terms version 13: the Privacy Policy and the Cookie Policy are published, no longer drafts. They now name the operator of LoopMi (an independent professional in Lisbon, with tax number and address), the e-mail provider, the 90 days account data is kept after an Organization closes and the contact address. The Privacy Policy explains Sign in with Google: what Google gives LoopMi (account identifier, e-mail, name, Workspace domain), that it is used only to sign in, never sold or shared, and that LoopMi follows Google's Limited Use rules. The Terms of Service name Portuguese law and state that there is no uptime commitment. Everyone accepts the new version at their next sign-in. (Azure Boards #349)
+
 ## [0.516.0] - 2026-11-14
 ### Security
 - (Cloud) An authenticator code can now be used only once. Until now the same code worked again for up to about 90 seconds, so someone who saw it (over a shoulder, on a shared screen, through a fake sign-in page) and also knew the password could sign in with it. A second use is refused with "This authentication code was already used. Wait for the next code in your authenticator app." and does not count toward the 15-minute lockout. This applies to signing in, resetting a password and linking a Microsoft or Google account. (Azure Boards #477)
@@ -54,11 +63,3 @@ the build if this file ever exceeds 10 entries, so trim before tagging, not afte
 ## [0.509.0] - 2026-11-12
 ### Changed
 - (Edge) Build only: the Native AOT compiler pin moves from 10.0.14 to 10.0.15 so the Edge image builds again on the CI agent (its SDK now carries the 10.0.15 runtime). No change to what the add-on does.
-
-## [0.508.0] - 2026-11-10
-### Added
-- (Cloud) The platform-level alert (the Data Protection secret about to expire or expired) also reaches the platform administrator's paired phones as a short fixed notice, in the administrator's language; the email with the details is unchanged. An alert can now also be found by its id after its Outbox row was purged, from the permanent alert history, so a notification opened late still opens.
-
-## [0.507.0] - 2026-11-10
-### Added
-- (Cloud) Groundwork for push notifications to the Android app: alert types can be classified Operational or Safety (every change audited), the Outbox dispatcher delivers Safety alerts first and pushes before it emails (a failed push never stops the email), and push notice texts exist in the six languages. The app side is in too: a phone is paired from the Portal with a one-time code and then holds its own revocable read-only credential (valid while it is used, 30 days by default and adjustable by the platform administrator; a password change, password reset or TOTP re-enrolment ends it), and each user can choose email, push or both for Operational alerts. Nothing is delivered by push yet: the sender, the device registration and the pages come with the next Cloud release, and with none configured alerts behave exactly as before.
