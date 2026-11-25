@@ -19,47 +19,42 @@ file never holds more than 10 - the full history remains in git (`git log -p --
 addons/loopmi_edge/CHANGELOG.md`) for anyone who needs it. The release pipeline fails
 the build if this file ever exceeds 10 entries, so trim before tagging, not after.
 
-## [0.518.0] - 2026-11-18
-### Changed
-- (Edge) Device settings in Home Assistant are no longer picked up as channels: entities of the types number (thresholds, poll intervals, calibrations), select (power-on behavior and similar), button and text. They only made long lists of unused "Other" channels. A setting channel that is monitored or set to always report keeps working exactly as before. The Edge reports the unused ones to the Cloud so they can be cleaned up, and its log shows how many of each type. (Azure Boards #478)
-- (Cloud) A channel whose Home Assistant entity is gone, or is an unused setting, is removed only when it never sent a reading and is neither monitored nor set to always report. Removal stays off (count and log only) until the setting Discovery:GoneChannelCleanup:Mode is Apply. (Azure Boards #478)
-
-## [0.517.0] - 2026-11-16
-### Changed
-- (Cloud) Terms version 13: the Privacy Policy and the Cookie Policy are published, no longer drafts. They now name the operator of LoopMi (an independent professional in Lisbon, with tax number and address), the e-mail provider, the 90 days account data is kept after an Organization closes and the contact address. The Privacy Policy explains Sign in with Google: what Google gives LoopMi (account identifier, e-mail, name, Workspace domain), that it is used only to sign in, never sold or shared, and that LoopMi follows Google's Limited Use rules. The Terms of Service name Portuguese law and state that there is no uptime commitment. Everyone accepts the new version at their next sign-in. (Azure Boards #349)
-
-## [0.516.0] - 2026-11-14
-### Security
-- (Cloud) An authenticator code can now be used only once. Until now the same code worked again for up to about 90 seconds, so someone who saw it (over a shoulder, on a shared screen, through a fake sign-in page) and also knew the password could sign in with it. A second use is refused with "This authentication code was already used. Wait for the next code in your authenticator app." and does not count toward the 15-minute lockout. This applies to signing in, resetting a password and linking a Microsoft or Google account. (Azure Boards #477)
-### Documentation
-- (Edge) New section "Keeping this Edge's identity safe" in the add-on's Documentation tab: the identity file has no password, so protect Home Assistant backups with a password, give administrator rights only to people you trust, wipe the storage of a replaced device, and revoke and re-register the gateway if you think the file was copied. Nothing changes in how the add-on runs. (security evaluation 2026-11-11, finding 13)
-
-## [0.515.0] - 2026-11-13
-### Security
-- (Edge) Every request the add-on sends to the Cloud now also signs the time it is sent. The Cloud refuses a request whose signed time is more than 5 minutes from its own, so a request that was captured cannot be sent again later. If the clock of the Home Assistant machine is wrong (for example after a power cut, before the network time arrives), the add-on takes the right time from the Cloud's answer and sends again by itself; nothing to configure. Readings stored during an outage are not affected: the signed time is the time of sending, not of the reading. (Azure Boards #475)
-- (Cloud) The sign-in page no longer tells which e-mail addresses have an account: an unknown e-mail, a wrong password and a locked account get the same answer after the same amount of work. The message now says for everyone that an account is locked for 15 minutes after several failed attempts. The login history still shows the real reason. (Azure Boards #473)
-- (Cloud) Signing out now ends the session on the server too, not only in the browser. (Azure Boards #474)
-
-## [0.514.0] - 2026-11-13
-### Security
-- (Cloud) An account that already has an authenticator can no longer start a new authenticator set-up. Until now, opening the set-up page while signed in replaced the stored secret: the person's authenticator stopped working, and anyone holding that person's session could take over the second factor. An authenticator is now only replaced when the account is re-invited. (Azure Boards #472)
-
-## [0.513.0] - 2026-11-13
-### Security
-- (Edge) The local REST API on port 5034 is no longer published on the Home Assistant host by default. It serves the readings without a login, so until now anyone on the site's network could read them. Nothing changes for the Cloud connection or for Home Assistant's health check of the add-on. If you use the local dashboard, set a host port for 5034 under the add-on's Network settings and name the dashboard's address in `LocalApi:AllowedOrigins`: web pages from any other address can no longer read the API. (Azure Boards #467)
-
-## [0.512.0] - 2026-11-12
-### Security
-- (Cloud) The first platform administrator of an environment is now invited by email like every later one: a random temporary password valid for 7 days, a forced password change and the administrator's own authenticator enrolment at first sign-in. The earlier bootstrap used a fixed password and wrote it, the authenticator secret and the recovery codes to the application log; the method that returned those secrets is removed. An invitation that was never used can be sent again. No change for existing accounts. (Azure Boards #466)
-
-## [0.511.0] - 2026-11-13
-### Changed
-- (Cloud) Terms of Service and Privacy Policy version 12 for the Android app and push notifications: the Terms gain a section saying LoopMi is not a life-safety or certified alarm system, that notifications are best effort and that no time between an event and a notification is promised; the Privacy Policy gains the paired phones, their legal basis, Google Firebase Cloud Messaging as a sub-processor and their retention. Everyone is asked to accept the new version at their next sign-in.
-
-## [0.510.0] - 2026-11-12
+## [0.529.0] - 2026-11-25
 ### Added
-- (Cloud) A reusable pairing code for one demo Organization named "LoopMi Play review", so Google's Play reviewers can pair the Android app whenever they test: it never expires and is never used up, only the platform administrator can create or switch it off, only for an Owner or Admin of that exact Organization, and only one exists in the whole platform. Pairing again with it revokes the oldest phone instead of failing on the five-phone cap. Every other pairing code is unchanged (single use, five minutes).
+- (Edge) A device made by LoopMi with several probes (the LM-DT2) now appears in LoopMi as one device per probe, "<device name> · Probe 1" and "· Probe 2", so each probe can be assigned to its own Equipment. Only devices whose manufacturer is LoopMi and whose entities end in `_probe_<n>` are split; signal strength and firmware stay with Probe 1. An LM-DT2 discovered before this version moves to the two new devices on its next reading; the old device stops reporting. Devices from any other manufacturer are unchanged. (Azure Boards #522)
 
-## [0.509.0] - 2026-11-12
+## [0.528.0] - 2026-11-23
+### Added
+- (Cloud) One-time settings code for a Location tablet (decision D9, architecture 15.11): an Owner or Admin issues six digits for one tablet; the tablet opens its settings with it once, within 10 minutes. Stored hashed, recorded with who issued it and when it was used; five wrong tries burn it; revoking the tablet clears it. New `ITabletManagementService.IssueSettingsCodeAsync` and `TryOpenSettingsAsync`. (Azure Boards #512)
+
+## [0.527.0] - 2026-11-23
 ### Changed
-- (Edge) Build only: the Native AOT compiler pin moves from 10.0.14 to 10.0.15 so the Edge image builds again on the CI agent (its SDK now carries the 10.0.15 runtime). No change to what the add-on does.
+- (Cloud) Members may pair a phone with the LoopMi app and use it (decision D2, architecture 15.2): their phone reads and acts like the Portal for their role but receives no push - alerts still go to Owners and Admins only (15.5). New `ReceivesPushAsync` says whose phones are notified. (Azure Boards #506)
+
+## [0.526.0] - 2026-11-23
+### Changed
+- (Cloud) A Location tablet's pairing code is now 8 characters (ABCD-EFGH, no 0, 1, I or O), like the phone's, instead of a 43-character string; spaces, dashes and case do not matter when it is typed. It works once, for 5 minutes (was 15), also like the phone code. (Azure Boards #504)
+
+## [0.525.0] - 2026-11-22
+### Added
+- (Cloud) Each Location tablet remembers when it was last seen (its status poll, written at most every five minutes), so the Portal and the app show it online or offline. (Azure Boards #504)
+
+## [0.524.0] - 2026-11-22
+### Fixed
+- (Cloud) "Create action" on an alert whose problem already has an open action now joins that action and opens it, in the Portal and in the app, instead of answering "another action is already open". (Azure Boards #503)
+
+## [0.523.0] - 2026-11-22
+### Added
+- (Cloud) A problem a Portal or app user reports by hand can carry up to three photos, like an employee's report from the tablet: each photo's type comes from its own bytes, the images are kept under the event and removed again when the report is refused. (Azure Boards #502)
+
+## [0.522.0] - 2026-11-20
+### Added
+- (Cloud) The Android app can show a Location's checklists for today, read only: the same due, late and on-demand list the Location tablet shows, read for the Location without a tablet. Filling in and signing stay on the tablet with the employee PIN. (Azure Boards #496)
+
+## [0.521.0] - 2026-11-20
+### Added
+- (Cloud) An alert now carries the numbers behind it - the reading, its unit and time, and the acceptable range - so the Android app can draw the alert detail: the value against its range, the curve of the hours around it with the acceptable band, and the timeline of the same equipment's alerts. The alert wording is unchanged. (Azure Boards #492)
+
+## [0.520.0] - 2026-11-20
+### Added
+- (Cloud) The Android app can now do more than read alerts, safely: after the unlock it exchanges its device credential for a 10-minute app token that works only on a fixed list of app routes, each marked read, act or sensitive. Every request checks the phone again, so a revoked phone stops at once. A platform setting can later demand a full sign-in for sensitive or acting routes; it is off. The first app routes are the person's own Operational alerts choice. (Azure Boards #488)

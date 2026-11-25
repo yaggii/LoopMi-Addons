@@ -50,6 +50,9 @@ Edge worse off than before.
 
 - Discovers your Home Assistant entities and reports them to LoopMi Cloud, where you
   group them under Equipment and Areas.
+- Shows a LoopMi device with several probes (such as the LM-DT2) as one device per probe,
+  "Probe 1" and "Probe 2", so each probe can go on its own Equipment. Devices from other
+  manufacturers always stay one device.
 - Watches entity state changes and periodically sweeps full state, forwarding
   measurements upward.
 - Reports its own health (connectivity, storage) so Cloud-side alerting knows if this
